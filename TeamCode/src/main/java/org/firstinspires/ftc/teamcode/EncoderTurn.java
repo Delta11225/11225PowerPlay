@@ -27,18 +27,25 @@ public class EncoderTurn extends LinearOpMode {
 
         waitForStart();
 
-        encoderTurn(.25, 90, true);
+        encoderTurn(0.25, -90, true );
+        sleep(10000);
     }
 
     public void encoderTurn(double speed, double degrees, boolean isPointTurn){
+        if (degrees < 0) {
+            speed = -speed;
+        }
         double turningCircumference = Math.PI * WHEEL_SEPERATION;
         if(!isPointTurn){
             turningCircumference *= 2;
         }
+        telemetry.addData("Turning Circumference", turningCircumference);
         double encoderTarget = ENCODER_COUNTS_PER_CM * turningCircumference * (degrees/360);
+        telemetry.addData("Encoder Target", encoderTarget);
+
 
         leftMotor.setTargetPosition((int) encoderTarget);
-        rightMotor.setTargetPosition((int) encoderTarget);
+        rightMotor.setTargetPosition((int) -encoderTarget);
 
         leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -48,13 +55,16 @@ public class EncoderTurn extends LinearOpMode {
             rightMotor.setPower(-speed);
         }
 
-        while (opModeIsActive() && leftMotor.isBusy()) {}
+        while (opModeIsActive() && leftMotor.isBusy()) {
+            telemetry.update();
+        }
 
         leftMotor.setPower(0);
         rightMotor.setPower(0);
 
         leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
 }
