@@ -243,11 +243,12 @@ public class TeleopTestFinalSide22 extends LinearOpMode {
 ///////WOBBLE CLAW OPEN AND CLOSE///////////
     
 ///////WOBBLE ARM ROTATION//////////////
+        // TODO can potentially add an acceleration method
         if (gamepad1.x){
-            robot.towerMotor.setPower(0.75);
+            robot.towerMotor.setPower(0.60);
         }
         else if (gamepad1.y) {
-            robot.towerMotor.setPower(1);
+            robot.towerMotor.setPower(.70);
         }
         else {
             robot.towerMotor.setPower(0);
