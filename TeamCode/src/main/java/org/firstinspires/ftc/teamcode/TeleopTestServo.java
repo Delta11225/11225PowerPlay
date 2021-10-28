@@ -34,6 +34,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Func;
@@ -61,17 +62,21 @@ import java.util.Locale;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp test final side", group="Pushbot")
+@TeleOp(name="TeleOp test servo", group="Pushbot")
 //@Disabled
-public class TeleopTestFinalSide22 extends LinearOpMode {
+public class TeleopTestServo extends LinearOpMode {
 
-    Hardware22 robot = new Hardware22();
+    //Hardware22 robot = new Hardware22();
 
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
 
     private ElapsedTime runtime = new ElapsedTime();
+
+
+    Servo dumpServo = null;
+
 
     double frontLeft;
     double rearLeft;
@@ -110,156 +115,27 @@ public class TeleopTestFinalSide22 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        dumpServo=hardwareMap.servo.get("servo_dump");
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-
-        composeTelemetry();
-
-        robot.init(hardwareMap);
-
-        robot.frontLeft.setPower(0);
-        robot.frontRight.setPower(0);
-        robot.rearLeft.setPower(0);
-        robot.rearRight.setPower(0);
-        robot.dumpServo.setPosition(0);
-
-
-
-        robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
-        robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
-        robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        dumpServo.setPosition(0.7);
 
         waitForStart();
-
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-        currentAngle = 0;
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-
-
-            telemetry.update();
-
-            while (angles.firstAngle < 0 && opModeIsActive()) {
-                currentAngle = angles.firstAngle + 360;
-                telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
-                telemetry.update();
-                move();
-                peripheralMove();
+            if (gamepad2.y) {
+                dumpServo.setPosition(0.7);
+            } if (gamepad2.a) {
+                dumpServo.setPosition(0);
             }
 
-            while (angles.firstAngle >= 0 && opModeIsActive()) {
-                currentAngle = angles.firstAngle;
-                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
-                telemetry.update();
-                move();
-                peripheralMove();
-            }
-
-            telemetry.addLine("null angle");
-
         }
-    }
-
-
-    public void move(){
-
-        double theta = Math.toRadians(currentAngle);
-
-        telemetry.addData("CurrentAngle", currentAngle);
-        telemetry.addData("Theta", theta);
-
-        forward =  gamepad1.left_stick_x;
-        right = gamepad1.left_stick_y;
-        clockwise = gamepad1.right_stick_x;
-
-        temp = (forward * Math.cos(theta) - right * Math.sin(theta));
-        side = (forward * Math.sin(theta) + right * Math.cos(theta));
-
-        forward = temp;
-        right = side;
-
-        telemetry.addData("right: ", right);
-        telemetry.addData("forward: ", forward);
-        telemetry.addData("temp: ", temp);
-        telemetry.addData("side: ", side);
-        telemetry.addData("clockwise: ", clockwise);
-
-        frontLeft = forward + right + clockwise;
-        rearLeft = forward - right + clockwise;
-        rearRight = forward + right - clockwise;
-        frontRight = forward - right - clockwise;
-
-        telemetry.addData("front left: ", frontLeft);
-        telemetry.addData("rear left: ", rearLeft);
-        telemetry.addData("rear right: ", rearRight);
-        telemetry.addData("front right: ", frontRight);
-
-       /* if (gamepad1.x){
-            powerMultiplier = 1;
-        }
-        if (gamepad1.y){
-            powerMultiplier = 0.3;
-        }
-*/
-
-        if (gamepad1.right_bumper==false){
-            powerMultiplier = 1;
-            telemetry.addLine("fast");
-            telemetry.update();
-        }
-        else if (gamepad1.right_bumper==true){
-            powerMultiplier = 0.3;
-            telemetry.addLine("slow");
-            telemetry.update();
-        }
-
-
-        robot.frontLeft.setPower(frontLeft * powerMultiplier);
-        robot.frontRight.setPower(-frontRight * powerMultiplier);
-        robot.rearLeft.setPower(rearLeft * powerMultiplier);
-        robot.rearRight.setPower(-rearRight * powerMultiplier);
-
-
-    }
-
-    public void peripheralMove(){
 //////////////////servos///////////////////////////////
 //////////////dumper///////////////
-    if (gamepad2.x) {
-        robot.dumpServo.setPosition(180);
-    } else if (gamepad2.a){
-        robot.dumpServo.setPosition(90);
-    }
 //////////////Launcher///////////////
-     
-///////WOBBLE CLAW OPEN AND CLOSE///////////
-    
-///////WOBBLE ARM ROTATION//////////////
-        // TODO can potentially add an acceleration method
-        if (gamepad1.x){
-            robot.towerMotor.setPower(0.60);
-        }
-        else if (gamepad1.y) {
-            robot.towerMotor.setPower(.70);
-        }
-        else {
-            robot.towerMotor.setPower(0);
-        }
-    }
 
+///////WOBBLE CLAW OPEN AND CLOSE///////////
+    }
 
 
     //----------------------------------------------------------------------------------------------
