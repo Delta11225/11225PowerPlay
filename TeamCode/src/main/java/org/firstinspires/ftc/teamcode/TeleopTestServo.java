@@ -125,7 +125,8 @@ public class TeleopTestServo extends LinearOpMode {
 
             if (gamepad2.y) {
                 dumpServo.setPosition(0.7);
-            } if (gamepad2.a) {
+            }
+            if (gamepad2.a) {
                 dumpServo.setPosition(0);
             }
 

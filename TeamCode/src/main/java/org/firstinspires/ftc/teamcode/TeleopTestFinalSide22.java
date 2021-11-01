@@ -139,6 +139,8 @@ public class TeleopTestFinalSide22 extends LinearOpMode {
         robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
+        robot.dumpServo.setPosition(0.7);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         waitForStart();
@@ -168,7 +170,20 @@ public class TeleopTestFinalSide22 extends LinearOpMode {
                 peripheralMove();
             }
 
+
             telemetry.addLine("null angle");
+
+            // Set collection bucket servo position
+
+            double dumpPosition = 0.7;
+            double collectPosition = 0.0;
+
+            if (gamepad2.y) {
+                robot.dumpServo.setPosition(dumpPosition);
+            }
+            if (gamepad2.a) {
+                robot.dumpServo.setPosition(collectPosition);
+            }
 
         }
     }
