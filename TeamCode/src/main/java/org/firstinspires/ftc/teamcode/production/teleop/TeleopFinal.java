@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.production.teleop;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -42,8 +42,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.old.Hardware21;
 
 import java.util.Locale;
 
@@ -61,11 +60,11 @@ import java.util.Locale;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp test final side", group="Pushbot")
+@TeleOp(name="Teleop Final")
 //@Disabled
-public class TeleopTestFinalSide22 extends LinearOpMode {
+public class TeleopFinal extends LinearOpMode {
 
-    Hardware22 robot = new Hardware22();
+    Hardware21 robot = new Hardware21();
 
     BNO055IMU imu;
     Orientation angles;
@@ -77,34 +76,6 @@ public class TeleopTestFinalSide22 extends LinearOpMode {
     double rearLeft;
     double frontRight;
     double rearRight;
-
-    double forward;
-    double right;
-    double clockwise;
-
-    double powerMultiplier = 1;
-    double deadZone = Math.abs(0.2);
-
-    double temp;
-    double side;
-
-    double currentAngle;
-
-    Boolean buttonPress=false;
-    Boolean servoSwitch=false;
-
-    Boolean buttonPress2=false;
-    Boolean servoSwitch2=false;
-
-    Boolean buttonPress3 = false;
-    Boolean servoSwitch3 = false;
-
-    Boolean aButtonPress = false;
-    Boolean launcherOn = false;
-
-    Boolean xButtonPress = false;
-    Boolean servoPosition = false;
-
 
 
 
@@ -127,151 +98,29 @@ public class TeleopTestFinalSide22 extends LinearOpMode {
         robot.init(hardwareMap);
 
         robot.frontLeft.setPower(0);
-        robot.frontRight.setPower(0);
-        robot.rearLeft.setPower(0);
-        robot.rearRight.setPower(0);
-        robot.dumpServo.setPosition(0);
 
 
 
         robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
-        robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
-        robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
-
-        robot.dumpServo.setPosition(0.7);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+       /////////////////////////////
 
         waitForStart();
 
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-        currentAngle = 0;
+
+
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+if(gamepad1.a){
+    robot.frontLeft.setPower(.7);
 
-
-
-            telemetry.update();
-
-            while (angles.firstAngle < 0 && opModeIsActive()) {
-                currentAngle = angles.firstAngle + 360;
-                telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
-                telemetry.update();
-                move();
-                peripheralMove();
-            }
-
-            while (angles.firstAngle >= 0 && opModeIsActive()) {
-                currentAngle = angles.firstAngle;
-                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
-                telemetry.update();
-                move();
-                peripheralMove();
-            }
-
-
-            telemetry.addLine("null angle");
-
-            // Set collection bucket servo position
-
-            double dumpPosition = 0.7;
-            double collectPosition = 0.0;
-
-            if (gamepad2.y) {
-                robot.dumpServo.setPosition(dumpPosition);
-            }
-            if (gamepad2.a) {
-                robot.dumpServo.setPosition(collectPosition);
-            }
-
-        }
-    }
-
-
-    public void move(){
-
-        double theta = Math.toRadians(currentAngle);
-
-        telemetry.addData("CurrentAngle", currentAngle);
-        telemetry.addData("Theta", theta);
-
-        forward =  gamepad1.left_stick_x;
-        right = gamepad1.left_stick_y;
-        clockwise = gamepad1.right_stick_x;
-
-        temp = (forward * Math.cos(theta) - right * Math.sin(theta));
-        side = (forward * Math.sin(theta) + right * Math.cos(theta));
-
-        forward = temp;
-        right = side;
-
-        telemetry.addData("right: ", right);
-        telemetry.addData("forward: ", forward);
-        telemetry.addData("temp: ", temp);
-        telemetry.addData("side: ", side);
-        telemetry.addData("clockwise: ", clockwise);
-
-        frontLeft = forward + right + clockwise;
-        rearLeft = forward - right + clockwise;
-        rearRight = forward + right - clockwise;
-        frontRight = forward - right - clockwise;
-
-        telemetry.addData("front left: ", frontLeft);
-        telemetry.addData("rear left: ", rearLeft);
-        telemetry.addData("rear right: ", rearRight);
-        telemetry.addData("front right: ", frontRight);
-
-       /* if (gamepad1.x){
-            powerMultiplier = 1;
-        }
-        if (gamepad1.y){
-            powerMultiplier = 0.3;
-        }
-*/
-
-        if (gamepad1.right_bumper==false){
-            powerMultiplier = 1;
-            telemetry.addLine("fast");
-            telemetry.update();
-        }
-        else if (gamepad1.right_bumper==true){
-            powerMultiplier = 0.3;
-            telemetry.addLine("slow");
-            telemetry.update();
-        }
-
-
-        robot.frontLeft.setPower(frontLeft * powerMultiplier);
-        robot.frontRight.setPower(-frontRight * powerMultiplier);
-        robot.rearLeft.setPower(rearLeft * powerMultiplier);
-        robot.rearRight.setPower(-rearRight * powerMultiplier);
-
-
-    }
-
-    public void peripheralMove(){
-//////////////////servos///////////////////////////////
-//////////////dumper///////////////
-    if (gamepad2.x) {
-        robot.dumpServo.setPosition(180);
-    } else if (gamepad2.a){
-        robot.dumpServo.setPosition(90);
-    }
-//////////////Launcher///////////////
-     
-///////WOBBLE CLAW OPEN AND CLOSE///////////
-    
-///////WOBBLE ARM ROTATION//////////////
-        // TODO can potentially add an acceleration method
-        if (gamepad1.x){
-            robot.towerMotor.setPower(0.60);
-        }
-        else if (gamepad1.y) {
-            robot.towerMotor.setPower(.70);
-        }
-        else {
-            robot.towerMotor.setPower(0);
+} else if(gamepad1.x){
+    robot.frontLeft.setPower(0.8);
+}  else if(gamepad1.y){
+    robot.frontLeft.setPower(1);
+} else {
+    robot.frontLeft.setPower(0);
+}
         }
     }
 

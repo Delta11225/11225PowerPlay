@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testing.teleop;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -62,7 +62,7 @@ import java.util.Locale;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp test servo", group="Pushbot")
+@TeleOp(name="TeleOp test servo")
 //@Disabled
 public class TeleopTestServo extends LinearOpMode {
 
@@ -116,19 +116,22 @@ public class TeleopTestServo extends LinearOpMode {
     @Override
     public void runOpMode() {
         dumpServo=hardwareMap.servo.get("servo_dump");
+        double dumpPosition = 0.0;
+        double collectPosition = 0.7;
 
-        dumpServo.setPosition(0.7);
+        dumpServo.setPosition(dumpPosition);
 
         waitForStart();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             if (gamepad2.y) {
-                dumpServo.setPosition(0.7);
+               dumpServo.setPosition(dumpPosition);
             }
             if (gamepad2.a) {
-                dumpServo.setPosition(0);
+                dumpServo.setPosition(collectPosition);
             }
+
 
         }
 //////////////////servos///////////////////////////////
