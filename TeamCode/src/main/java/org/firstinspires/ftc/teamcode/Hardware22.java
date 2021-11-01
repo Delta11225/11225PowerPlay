@@ -74,6 +74,7 @@ public class Hardware22 {
     public WebcamName logitechWebcam = null;
     public DcMotor towerMotor = null;
     public Servo dumpServo = null;
+    public DcMotor collectionMotor = null;
 
 
 
@@ -116,6 +117,7 @@ public class Hardware22 {
         logitechWebcam = hwMap.get(WebcamName .class, "Webcam 1");
         towerMotor = hwMap.dcMotor.get ("tower_motor");
         dumpServo = hwMap.servo.get("servo_dump");
+        collectionMotor = hwMap.dcMotor.get("collection_motor");
 
 
         frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
