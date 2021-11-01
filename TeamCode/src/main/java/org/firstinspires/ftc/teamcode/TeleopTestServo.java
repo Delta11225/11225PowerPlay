@@ -116,19 +116,22 @@ public class TeleopTestServo extends LinearOpMode {
     @Override
     public void runOpMode() {
         dumpServo=hardwareMap.servo.get("servo_dump");
+        double dumpPosition = 0.0;
+        double collectPosition = 0.7;
 
-        dumpServo.setPosition(0.7);
+        dumpServo.setPosition(dumpPosition);
 
         waitForStart();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             if (gamepad2.y) {
-                dumpServo.setPosition(0.7);
+               dumpServo.setPosition(dumpPosition);
             }
             if (gamepad2.a) {
-                dumpServo.setPosition(0);
+                dumpServo.setPosition(collectPosition);
             }
+
 
         }
 //////////////////servos///////////////////////////////

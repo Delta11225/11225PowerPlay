@@ -110,24 +110,61 @@ public class Hardware22 {
 
         // Define and Initialize Motors
 
-        rearLeft = hwMap.dcMotor.get("rear_left");
-        frontLeft = hwMap.dcMotor.get("front_left");
-        frontRight = hwMap.dcMotor.get("front_right");
-        rearRight = hwMap.dcMotor.get("rear_right");
-        logitechWebcam = hwMap.get(WebcamName .class, "Webcam 1");
-        towerMotor = hwMap.dcMotor.get ("tower_motor");
-        dumpServo = hwMap.servo.get("servo_dump");
-        collectionMotor = hwMap.dcMotor.get("collection_motor");
+        // NEVER DO THIS. THIS IS FOR TESTING ONLY. REMOVE THIS LATER
+        // FIXME pls rollback when done
+        try {
+            rearLeft = hwMap.dcMotor.get("rear_left");
+        } catch (Exception e) {}
 
+        try {
+            frontLeft = hwMap.dcMotor.get("front_left");
+        } catch (Exception e) {}
 
-        frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        rearLeft.setDirection(DcMotor.Direction.FORWARD);
-        rearRight.setDirection(DcMotor.Direction.REVERSE);
+        try {
+            frontRight = hwMap.dcMotor.get("front_right");
+        } catch (Exception e) {}
+
+        try {
+            rearRight = hwMap.dcMotor.get("rear_right");
+        } catch (Exception e) {}
+
+        try {
+            logitechWebcam = hwMap.get(WebcamName .class, "Webcam 1");
+        } catch (Exception e) {}
+
+        try {
+            towerMotor = hwMap.dcMotor.get ("tower_motor");
+        } catch (Exception e) {}
+
+        try {
+            dumpServo = hwMap.servo.get("servo_dump");
+        } catch (Exception e) {}
+
+        try {
+            collectionMotor = hwMap.dcMotor.get("collection_motor");
+        } catch (Exception e) {}
+
+//        frontLeft = hwMap.dcMotor.get("front_left");
+//        frontRight = hwMap.dcMotor.get("front_right");
+//        rearRight = hwMap.dcMotor.get("rear_right");
+//        logitechWebcam = hwMap.get(WebcamName .class, "Webcam 1");
+//        towerMotor = hwMap.dcMotor.get ("tower_motor");
+//        dumpServo = hwMap.servo.get("servo_dump");
+//        collectionMotor = hwMap.dcMotor.get("collection_motor");
+
+        try {
+            frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+            frontRight.setDirection(DcMotor.Direction.REVERSE);
+            rearLeft.setDirection(DcMotor.Direction.FORWARD);
+            rearRight.setDirection(DcMotor.Direction.REVERSE);
+        } catch (Exception e) {}
+
         //GyroSensor = hwMap.gyroSensor.get("gyro");
         //colorSensor = hwMap.get(ColorSensor.class, "sensor_color");
+        try {
+            towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        } catch (Exception e) {}
 
-        towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
 
