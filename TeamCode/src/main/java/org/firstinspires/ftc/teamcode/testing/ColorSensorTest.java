@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testing;
 
 import android.graphics.Color;
 
@@ -9,7 +9,8 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 @Disabled
 @TeleOp
-public class ColorSensor extends LinearOpMode {
+@Deprecated
+public class ColorSensorTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         final float[] hsvValues = new float[3];

@@ -75,6 +75,7 @@ public class Hardware22 {
     public DcMotor towerMotor = null;
     public Servo dumpServo = null;
     public DcMotor collectionMotor = null;
+    public DcMotor liftMotor = null;
 
 
 
@@ -114,18 +115,22 @@ public class Hardware22 {
         // FIXME pls rollback when done
         try {
             rearLeft = hwMap.dcMotor.get("rear_left");
+            rearLeft.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception e) {}
 
         try {
             frontLeft = hwMap.dcMotor.get("front_left");
+            frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         } catch (Exception e) {}
 
         try {
             frontRight = hwMap.dcMotor.get("front_right");
+            frontRight.setDirection(DcMotor.Direction.REVERSE);
         } catch (Exception e) {}
 
         try {
             rearRight = hwMap.dcMotor.get("rear_right");
+            rearRight.setDirection(DcMotor.Direction.REVERSE);
         } catch (Exception e) {}
 
         try {
@@ -134,6 +139,7 @@ public class Hardware22 {
 
         try {
             towerMotor = hwMap.dcMotor.get ("tower_motor");
+            towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } catch (Exception e) {}
 
         try {
@@ -144,6 +150,10 @@ public class Hardware22 {
             collectionMotor = hwMap.dcMotor.get("collection_motor");
         } catch (Exception e) {}
 
+        try {
+            liftMotor = hwMap.dcMotor.get("lift_motor");
+        } catch (Exception e) {}
+
 //        frontLeft = hwMap.dcMotor.get("front_left");
 //        frontRight = hwMap.dcMotor.get("front_right");
 //        rearRight = hwMap.dcMotor.get("rear_right");
@@ -151,19 +161,20 @@ public class Hardware22 {
 //        towerMotor = hwMap.dcMotor.get ("tower_motor");
 //        dumpServo = hwMap.servo.get("servo_dump");
 //        collectionMotor = hwMap.dcMotor.get("collection_motor");
+//        liftMotor = hwMap.dcMotor.get("lift_motor");
 
-        try {
-            frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-            frontRight.setDirection(DcMotor.Direction.REVERSE);
-            rearLeft.setDirection(DcMotor.Direction.FORWARD);
-            rearRight.setDirection(DcMotor.Direction.REVERSE);
-        } catch (Exception e) {}
+//        try {
+//            frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+//            frontRight.setDirection(DcMotor.Direction.REVERSE);
+//            rearLeft.setDirection(DcMotor.Direction.FORWARD);
+//            rearRight.setDirection(DcMotor.Direction.REVERSE);
+//        } catch (Exception e) {}
 
         //GyroSensor = hwMap.gyroSensor.get("gyro");
         //colorSensor = hwMap.get(ColorSensor.class, "sensor_color");
-        try {
-            towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        } catch (Exception e) {}
+//        try {
+//            towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        } catch (Exception e) {}
 
 
 

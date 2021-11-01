@@ -27,13 +27,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testing.teleop;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Func;
@@ -61,11 +62,11 @@ import java.util.Locale;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Teleop Motor Test", group="Pushbot")
+@TeleOp(name="TeleOp test servo")
 //@Disabled
-public class TeleopFinal extends LinearOpMode {
+public class TeleopTestServo extends LinearOpMode {
 
-    Hardware21 robot = new Hardware21();
+    //Hardware22 robot = new Hardware22();
 
     BNO055IMU imu;
     Orientation angles;
@@ -73,58 +74,72 @@ public class TeleopFinal extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
+
+    Servo dumpServo = null;
+
+
     double frontLeft;
     double rearLeft;
     double frontRight;
     double rearRight;
 
+    double forward;
+    double right;
+    double clockwise;
+
+    double powerMultiplier = 1;
+    double deadZone = Math.abs(0.2);
+
+    double temp;
+    double side;
+
+    double currentAngle;
+
+    Boolean buttonPress=false;
+    Boolean servoSwitch=false;
+
+    Boolean buttonPress2=false;
+    Boolean servoSwitch2=false;
+
+    Boolean buttonPress3 = false;
+    Boolean servoSwitch3 = false;
+
+    Boolean aButtonPress = false;
+    Boolean launcherOn = false;
+
+    Boolean xButtonPress = false;
+    Boolean servoPosition = false;
+
+
 
 
     @Override
     public void runOpMode() {
+        dumpServo=hardwareMap.servo.get("servo_dump");
+        double dumpPosition = 0.0;
+        double collectPosition = 0.7;
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-
-        composeTelemetry();
-
-        robot.init(hardwareMap);
-
-        robot.frontLeft.setPower(0);
-
-
-
-        robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
-       /////////////////////////////
+        dumpServo.setPosition(dumpPosition);
 
         waitForStart();
-
-
-
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-if(gamepad1.a){
-    robot.frontLeft.setPower(.7);
 
-} else if(gamepad1.x){
-    robot.frontLeft.setPower(0.8);
-}  else if(gamepad1.y){
-    robot.frontLeft.setPower(1);
-} else {
-    robot.frontLeft.setPower(0);
-}
+            if (gamepad2.y) {
+               dumpServo.setPosition(dumpPosition);
+            }
+            if (gamepad2.a) {
+                dumpServo.setPosition(collectPosition);
+            }
+
+
         }
-    }
+//////////////////servos///////////////////////////////
+//////////////dumper///////////////
+//////////////Launcher///////////////
 
+///////WOBBLE CLAW OPEN AND CLOSE///////////
+    }
 
 
     //----------------------------------------------------------------------------------------------
