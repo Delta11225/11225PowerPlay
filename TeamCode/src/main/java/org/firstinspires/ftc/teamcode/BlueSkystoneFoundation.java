@@ -31,7 +31,8 @@ import java.util.List;
  *YES
  */
 @Autonomous(name= "Blue Skystone Foundation", group="Sky autonomous")
-//@Disabled//comment out this line before using
+@Disabled
+@Deprecated
 public class BlueSkystoneFoundation extends AutoMethodsYellow {
     HunterHardware robot = new HunterHardware();// Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
