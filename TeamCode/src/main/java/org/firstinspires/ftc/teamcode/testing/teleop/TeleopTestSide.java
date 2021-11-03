@@ -91,6 +91,9 @@ public class TeleopTestSide extends LinearOpMode {
 
     double currentAngle;
 
+    double dumpPosition = 0.7;
+    double collectPosition = 0.0;
+
     Boolean buttonPress=false;
     Boolean servoSwitch=false;
 
@@ -154,41 +157,26 @@ public class TeleopTestSide extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-
+            ControlConfig.update(gamepad1, gamepad2);
 
             telemetry.update();
 
             while (angles.firstAngle < 0 && opModeIsActive()) {
                 currentAngle = angles.firstAngle + 360;
                 telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
-                telemetry.update();
-                move();
-                peripheralMove();
             }
 
             while (angles.firstAngle >= 0 && opModeIsActive()) {
                 currentAngle = angles.firstAngle;
                 telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
-                telemetry.update();
-                move();
-                peripheralMove();
             }
+
+            telemetry.update();
+            move();
+            peripheralMove();
 
 
             telemetry.addLine("null angle");
-
-            // Set collection bucket servo position
-
-            if (gamepad2.y) {
-                robot.dumpServo.setPosition(dumpPosition);
-            }
-            if (gamepad2.a) {
-                robot.dumpServo.setPosition(collectPosition);
-            }
-
-            // Collector motor
-
-
         }
     }
 
@@ -200,9 +188,9 @@ public class TeleopTestSide extends LinearOpMode {
         telemetry.addData("CurrentAngle", currentAngle);
         telemetry.addData("Theta", theta);
 
-        forward =  gamepad1.left_stick_x;
-        right = gamepad1.left_stick_y;
-        clockwise = gamepad1.right_stick_x;
+        forward =  ControlConfig.forward;
+        right = ControlConfig.right;
+        clockwise = ControlConfig.clockwise;
 
         temp = (forward * Math.cos(theta) - right * Math.sin(theta));
         side = (forward * Math.sin(theta) + right * Math.cos(theta));
@@ -226,24 +214,19 @@ public class TeleopTestSide extends LinearOpMode {
         telemetry.addData("rear right: ", rearRight);
         telemetry.addData("front right: ", frontRight);
 
-       /* if (gamepad1.x){
-            powerMultiplier = 1;
-        }
-        if (gamepad1.y){
-            powerMultiplier = 0.3;
-        }
-*/
-
-        if (gamepad1.right_bumper==false){
+        // Handle speed control
+        if (ControlConfig.fast){
             powerMultiplier = 1;
             telemetry.addLine("fast");
-            telemetry.update();
-        }
-        else if (gamepad1.right_bumper==true){
+        } else if (ControlConfig.slow) {
             powerMultiplier = 0.3;
             telemetry.addLine("slow");
-            telemetry.update();
+        } else {
+            powerMultiplier = 0.5;
+            telemetry.addLine("normal");
         }
+
+        telemetry.update();
 
 
         robot.frontLeft.setPower(frontLeft * powerMultiplier);
@@ -255,27 +238,38 @@ public class TeleopTestSide extends LinearOpMode {
     }
 
     public void peripheralMove(){
-//////////////////servos///////////////////////////////
-//////////////dumper///////////////
-    if (gamepad2.x) {
-        robot.dumpServo.setPosition(180);
-    } else if (gamepad2.a){
-        robot.dumpServo.setPosition(90);
-    }
-//////////////Launcher///////////////
-     
-///////WOBBLE CLAW OPEN AND CLOSE///////////
-    
-///////WOBBLE ARM ROTATION//////////////
-        // TODO can potentially add an acceleration method
-        if (gamepad1.x){
-            robot.towerMotor.setPower(0.60);
+        // Dumping servo
+        if (ControlConfig.dumpServo) {
+            robot.dumpServo.setPosition(dumpPosition);
+        } else if (ControlConfig.collectServo) {
+            robot.dumpServo.setPosition(collectPosition);
         }
-        else if (gamepad1.y) {
-            robot.towerMotor.setPower(.70);
-        }
-        else {
+
+        // Tower motor
+        if (ControlConfig.duckWheelForward) {
+            robot.towerMotor.setPower(1.0);
+        } else if (ControlConfig.duckWheelBackward) {
+            robot.towerMotor.setPower(-1.0);
+        } else {
             robot.towerMotor.setPower(0);
+        }
+
+        // Lift motor
+        if (ControlConfig.liftBucket) {
+            robot.liftMotor.setPower(1.0);
+        } else if (ControlConfig.lowerBucket) {
+            robot.liftMotor.setPower(-1.0);
+        } else {
+            robot.liftMotor.setPower(0);
+        }
+
+        // Collection motor
+        if (ControlConfig.collectWheel) {
+            robot.collectionMotor.setPower(0.75);
+        } else if (ControlConfig.unCollectWheel) {
+            robot.collectionMotor.setPower(-1.0);
+        } else {
+            robot.collectionMotor.setPower(0);
         }
     }
 

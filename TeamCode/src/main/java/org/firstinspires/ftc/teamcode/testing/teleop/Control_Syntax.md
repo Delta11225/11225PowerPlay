@@ -1,5 +1,7 @@
 # Syntax for our drivers
 ## Gamepad 1
+* Left stick: movement
+* Right stick (x): turning
 * Right bumper: Spin collection wheel to collect
 * Left bumper: Spin collection wheel to spit out
 
