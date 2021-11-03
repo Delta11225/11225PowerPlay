@@ -112,7 +112,7 @@ public class TeleopPeripheralTest extends LinearOpMode {
 
             // Collection motor
             if (gamepad1.right_bumper) {
-                robot.collectionMotor.setPower(1.0);
+                robot.collectionMotor.setPower(0.75);
             } else if (gamepad1.left_bumper) {
                 robot.collectionMotor.setPower(-1.0);
             } else {
