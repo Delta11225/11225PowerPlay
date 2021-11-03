@@ -85,35 +85,37 @@ public class TeleopPeripheralTest extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
+            // Update controls
+            ControlConfig.update(gamepad1, gamepad2);
             // Dump servo
-            if (gamepad2.y) {
+            if (ControlConfig.dumpServo) {
                 robot.dumpServo.setPosition(dumpPosition);
-            } else if (gamepad2.a) {
+            } else if (ControlConfig.collectServo) {
                 robot.dumpServo.setPosition(collectPosition);
             }
 
             // Tower motor
-            if (gamepad2.right_bumper) {
+            if (ControlConfig.duckWheelForward) {
                 robot.towerMotor.setPower(1.0);
-            } else if (gamepad2.left_bumper) {
+            } else if (ControlConfig.duckWheelBackward) {
                 robot.towerMotor.setPower(-1.0);
             } else {
                 robot.towerMotor.setPower(0);
             }
 
             // Lift motor
-            if (gamepad2.dpad_up) {
+            if (ControlConfig.liftBucket) {
                 robot.liftMotor.setPower(1.0);
-            } else if (gamepad2.dpad_down) {
+            } else if (ControlConfig.lowerBucket) {
                 robot.liftMotor.setPower(-1.0);
             } else {
                 robot.liftMotor.setPower(0);
             }
 
             // Collection motor
-            if (gamepad1.right_bumper) {
+            if (ControlConfig.collectWheel) {
                 robot.collectionMotor.setPower(0.75);
-            } else if (gamepad1.left_bumper) {
+            } else if (ControlConfig.unCollectWheel) {
                 robot.collectionMotor.setPower(-1.0);
             } else {
                 robot.collectionMotor.setPower(0);
