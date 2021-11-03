@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode.testing.teleop;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
 
 /*
 This class handles control dispatching. Simply access any of these variables to get the
-status of that actions's corresponding control.
+status of that action's corresponding control.
 DO NOT instantiate this class. ALL VARIABLES ARE STATIC.
 AT THE BEGINNING of the teleop loop call this line of code: ControlConfig.update(gamepad1, gamepad2);
 IF YOU DON'T DO THIS THE CONTROLS WILL NOT BE REFRESHED.
@@ -34,7 +33,7 @@ public final class ControlConfig {
     public static boolean collectServo;
 
     public ControlConfig() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("I told you not to instatiate this. READ THE COMMENT");
+        throw new UnsupportedOperationException("I told you not to instantiate this. READ THE COMMENT");
     }
 
     public static void update(Gamepad pad1, Gamepad pad2) {
