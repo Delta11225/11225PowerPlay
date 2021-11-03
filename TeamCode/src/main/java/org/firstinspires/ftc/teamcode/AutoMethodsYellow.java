@@ -36,7 +36,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 /**
  * Created by robotics on 10/12/2017.
  */
-
+@Disabled
+@Deprecated
 public abstract class AutoMethodsYellow extends LinearOpMode {
 
     /* Declare OpMode members. */
