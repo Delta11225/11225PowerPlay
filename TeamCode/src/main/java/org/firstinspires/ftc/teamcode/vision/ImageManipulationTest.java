@@ -22,17 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * Created by maryjaneb  on 11/13/2016.
- *
- * nerverest ticks
- * 60 1680
- * 40 1120
- * 20 560
- *
- * monitor: 640 x 480
- *YES
- */
 @Autonomous
 
 //@Disabled//comment out this line before using
@@ -75,7 +64,7 @@ public class ImageManipulationTest extends LinearOpMode {
         webcam.setPipeline(new StageSwitchingPipeline());
 
 
-        webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);//display on RC
+        webcam.startStreaming(rows, cols, OpenCvCameraRotation.UPRIGHT);//display on DS
         //width, height
         //width = height in this case, because camera is in portrait mode.
 
@@ -95,28 +84,18 @@ public class ImageManipulationTest extends LinearOpMode {
             telemetry.update();
             sleep(500);
 
-            if (valLeft > 200) {
+            if (valLeft == 255) {
                 telemetry.addData("Position", "Left");
                 telemetry.update();
-                // move to 0 degrees.
-                servoTest.setPosition(0);
-                sleep(1000);
-            }
-            else if (valMid > 200) {
+                sleep(200); }
+            else if (valMid == 255) {
                 telemetry.addData("Position", "Middle");
                 telemetry.update();
-                // move to 90 degrees.
-                servoTest.setPosition(0.5);
-                sleep(1000);
-            }
-
-            else if (valRight > 200) {
+                sleep(200); }
+            else if (valRight == 255) {
                 telemetry.addData("Position", "Right");
                 telemetry.update();
-                // move to 180 degrees.
-                servoTest.setPosition(1);
-                sleep(1000);
-            }
+                sleep(200); }
 
 
             telemetry.update();
@@ -139,26 +118,21 @@ public class ImageManipulationTest extends LinearOpMode {
             detection,//includes outlines
             THRESHOLD,//b&w
             RAW_IMAGE,//displays raw view
+            YCbCr,//displays YCbCr
         }
 
-        private Stage stageToRenderToViewport = Stage.RAW_IMAGE;
+        private Stage stageToRenderToViewport = Stage.YCbCr;
         private Stage[] stages = Stage.values();
 
         @Override
         public void onViewportTapped()
         {
-            /*
-             * Note that this method is invoked from the UI thread
-             * so whatever we do here, we must do quickly.
-             */
 
             int currentStageNum = stageToRenderToViewport.ordinal();
-
             int nextStageNum = currentStageNum + 1;
-
             if(nextStageNum >= stages.length)
-            {
-                nextStageNum = 0;
+
+            { nextStageNum = 0;
             }
 
             stageToRenderToViewport = stages[nextStageNum];
@@ -168,20 +142,13 @@ public class ImageManipulationTest extends LinearOpMode {
         public Mat processFrame(Mat input)
         {
             contoursList.clear();
-            /*
-             * This pipeline finds the contours of yellow blobs such as the Gold Mineral
-             * from the Rover Ruckus game.
-             */
-
-            //color diff cb.
 
             Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);//converts rgb to ycrcb
-            Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);//takes cb difference and stores
-
-            //b&w
+            Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);//extracts cb channel as black and white RGB
             Imgproc.threshold(yCbCrChan2Mat, thresholdMat, 102, 255, Imgproc.THRESH_BINARY_INV);
-
-            //outline/contour
+            //any pixel with a hue value less than 102 is being set to 0 (yellow)
+            //any pixel with a hue value greater than 102 is being set to 255(blue)
+            //Then swaps the blue and the yellows with the binary inv line
             Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
             yCbCrChan2Mat.copyTo(all);//copies mat object
             //Imgproc.drawContours(all, contoursList, -1, new Scalar(255, 0, 0), 3, 8);//draws blue contours
@@ -252,7 +219,10 @@ public class ImageManipulationTest extends LinearOpMode {
                 {
                     return input;
                 }
-
+                case YCbCr:
+                {
+                    return yCbCrChan2Mat;
+                }
                 default:
                 {
                     return input;

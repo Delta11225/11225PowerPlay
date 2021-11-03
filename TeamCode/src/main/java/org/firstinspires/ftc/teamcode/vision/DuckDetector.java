@@ -29,17 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * Created by maryjaneb  on 11/13/2016.
- *
- * nerverest ticks
- * 60 1680
- * 40 1120
- * 20 560
- *
- * monitor: 640 x 480
- *YES
- */
+
+
 @Autonomous
 
 //@Disabled//comment out this line before using
