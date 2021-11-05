@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 /*
  * This is an example of a more complex path to really test the tuning.
  */
-//@Disabled
+@Disabled
 @Autonomous(group = "drive")
 public class TrajTests extends LinearOpMode {
 
@@ -24,8 +24,7 @@ public class TrajTests extends LinearOpMode {
     Hardware22 robot;
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Hardware22();
-        robot.init(hardwareMap);
+        robot = new Hardware22(hardwareMap);
         SampleMecanumDrive drive = robot.drive;
 
         Vector2d vector = new Vector2d(-40.75, 61.5);
