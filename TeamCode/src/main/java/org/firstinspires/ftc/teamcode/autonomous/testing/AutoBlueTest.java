@@ -37,13 +37,15 @@ public class AutoBlueTest extends LinearOpMode {
         Pose2d startPose = new Pose2d(vector, Math.toRadians(270));
 
         drive.setPoseEstimate(startPose);
-        ArrayList<Double[]> trajectory1 = new ArrayList<Double[]>();
+        ArrayList<Double[]> trajectory1 = new ArrayList<>();
         trajectory1.add(generator.generateTrajectoryListItem(-30, 47, 310, 0, PathType.SPLINE_TO_LINEAR));
         trajectory1.add(generator.generateTrajectoryListItem(-22, 36.5, PathType.LINE_TO_CONSTANT));
+        // Approaching to duck wheel
         trajectory1.add(generator.generateTrajectoryListItem(-60, 56.25, 0, PathType.LINE_TO_LINEAR));
+        // At duck wheel
         trajectory1.add(generator.generateTrajectoryListItem(-60, 56.25 + 1.7, 0, PathType.LINE_TO_LINEAR));
 
-        ArrayList<Double[]> trajectory2 = new ArrayList<Double[]>();
+        ArrayList<Double[]> trajectory2 = new ArrayList<>();
         trajectory2.add(generator.generateTrajectoryListItem(-50, 62.7, 0, PathType.LINE_TO_LINEAR));
         trajectory2.add(generator.generateTrajectoryListItem(50, 62.7, 0, PathType.LINE_TO_LINEAR));
 
