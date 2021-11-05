@@ -31,46 +31,47 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
 /**
  * This is NOT an opmode.
- *
+ * <p>
  * This class can be used to define all the specific hardware for a single robot.
  * In this case that robot is a Pushbot.
  * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
- *
+ * <p>
  * This hardware class assumes the following device names have been configured on the robot:
  * Note:  All names are lower case and some have single spaces between words.
- *
+ * <p>
  * Motor channel:  Left  drive motor:        "left_drive"
  * Motor channel:  Right drive motor:        "right_drive"
  * Motor channel:  Manipulator drive motor:  "left_arm"
  * Servo channel:  Servo to open left claw:  "left_hand"
  * Servo channel:  Servo to open right claw: "right_hand"
  */
- 
+
 public class Hardware22 {
 
-    private Telemetry telemetry;
-    public void init(Telemetry telemetry) {
-        this.telemetry = telemetry;
-    }
+//    private Telemetry telemetry;
+//    public void init(Telemetry telemetry) {
+//        this.telemetry = telemetry;
+//    }
 
 
     /* Public OpMode members. */
 
-    public DcMotor  rearLeft = null;
-    public DcMotor  rearRight = null;
-    public DcMotor  frontLeft = null;
-    public DcMotor  frontRight = null;
+    public DcMotor rearLeft = null;
+    public DcMotor rearRight = null;
+    public DcMotor frontLeft = null;
+    public DcMotor frontRight = null;
     public WebcamName logitechWebcam = null;
     public DcMotor towerMotor = null;
     public Servo dumpServo = null;
@@ -78,25 +79,25 @@ public class Hardware22 {
     public DcMotor liftMotor = null;
 
 
-
-
     //public com.qualcomm.robotcore.hardware.GyroSensor GyroSensor;
     //public ModernRoboticsI2cGyro   gyro;
     //public ColorSensor colorSensor;    // Hardware Device Object
 
 
-
     // The IMU sensor object
-    BNO055IMU imu;
+    private BNO055IMU imu;
 
     // State used for updating telemetry
-    Orientation angles;
-    Acceleration gravity;
+    private Orientation angles;
+    private Acceleration gravity;
 
 
     /* local OpMode members. */
-    HardwareMap hwMap = null;
+    private HardwareMap hwMap = null;
     private ElapsedTime runtime = new ElapsedTime();
+
+    // RoadRunner driver
+    public SampleMecanumDrive drive;
 
 
     /* Constructor */
@@ -115,44 +116,55 @@ public class Hardware22 {
         // FIXME pls rollback when done
         try {
             rearLeft = hwMap.dcMotor.get("rear_left");
-            rearLeft.setDirection(DcMotor.Direction.FORWARD);
-        } catch (Exception e) {}
+            rearLeft.setDirection(DcMotor.Direction.REVERSE);
+        } catch (Exception e) {
+        }
 
         try {
             frontLeft = hwMap.dcMotor.get("front_left");
-            frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        } catch (Exception e) {}
+            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+        } catch (Exception e) {
+        }
 
         try {
             frontRight = hwMap.dcMotor.get("front_right");
-            frontRight.setDirection(DcMotor.Direction.REVERSE);
-        } catch (Exception e) {}
+            frontRight.setDirection(DcMotor.Direction.FORWARD);
+        } catch (Exception e) {
+        }
 
         try {
             rearRight = hwMap.dcMotor.get("rear_right");
-            rearRight.setDirection(DcMotor.Direction.REVERSE);
-        } catch (Exception e) {}
+            rearRight.setDirection(DcMotor.Direction.FORWARD);
+        } catch (Exception e) {
+        }
 
         try {
-            logitechWebcam = hwMap.get(WebcamName .class, "Webcam 1");
-        } catch (Exception e) {}
+            logitechWebcam = hwMap.get(WebcamName.class, "Webcam 1");
+        } catch (Exception e) {
+        }
 
         try {
-            towerMotor = hwMap.dcMotor.get ("tower_motor");
+            towerMotor = hwMap.dcMotor.get("tower_motor");
             towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         try {
             dumpServo = hwMap.servo.get("servo_dump");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         try {
             collectionMotor = hwMap.dcMotor.get("collection_motor");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         try {
             liftMotor = hwMap.dcMotor.get("lift_motor");
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
+
+        drive = new SampleMecanumDrive(hwMap);
 
 //        frontLeft = hwMap.dcMotor.get("front_left");
 //        frontRight = hwMap.dcMotor.get("front_right");
@@ -163,62 +175,19 @@ public class Hardware22 {
 //        collectionMotor = hwMap.dcMotor.get("collection_motor");
 //        liftMotor = hwMap.dcMotor.get("lift_motor");
 
-//        try {
 //            frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
 //            frontRight.setDirection(DcMotor.Direction.REVERSE);
 //            rearLeft.setDirection(DcMotor.Direction.FORWARD);
 //            rearRight.setDirection(DcMotor.Direction.REVERSE);
-//        } catch (Exception e) {}
 
         //GyroSensor = hwMap.gyroSensor.get("gyro");
         //colorSensor = hwMap.get(ColorSensor.class, "sensor_color");
-//        try {
-//            towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        } catch (Exception e) {}
+        //towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
+    }
 
-
-            //public com.qualcomm.robotcore.hardware.GyroSensor GyroSensor;
-            //public ModernRoboticsI2cGyro   gyro;
-            //public ColorSensor colorSensor;    // Hardware Device Object
-
-
-
-            // The IMU sensor object
-            BNO055IMU imu;
-
-            // State used for updating telemetry
-            Orientation angles;
-            Acceleration gravity;
-
-
-            /* local OpMode members. */
-
-            }
-
-            /* Initialize standard Hardware interfaces */
-
-            }
-
-
-
-
-
-
-        //.02.032514armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        // Set all motors to zero power
-            /*
-            rearLeft.setPower(0);
-            rearRight.setPower(0);
-            frontLeft.setPower(0);
-            frontRight.setPower(0);
-            collectorLeft.setPower(0);
-            collectorRight.setPower(0);
-            armMotor.setPower(0);
-            */
-        // Set all motors to run without encoders.
-        // May want to use RUN_USING_ENCODERS if encoders are installed.
+}
 
 
 
