@@ -124,11 +124,12 @@ public class TeleopTestServo extends LinearOpMode {
         waitForStart();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            ControlConfig.update(gamepad1, gamepad2);
 
-            if (gamepad2.y) {
+            if (ControlConfig.dumpServo) {
                dumpServo.setPosition(dumpPosition);
             }
-            if (gamepad2.a) {
+            if (ControlConfig.collectServo) {
                 dumpServo.setPosition(collectPosition);
             }
 
