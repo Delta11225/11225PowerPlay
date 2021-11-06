@@ -39,6 +39,7 @@ proguard/
 captures/
 
 # IntelliJ
+.idea/ # Ignore entire .idea folder
 *.iml
 .idea/workspace.xml
 .idea/tasks.xml
