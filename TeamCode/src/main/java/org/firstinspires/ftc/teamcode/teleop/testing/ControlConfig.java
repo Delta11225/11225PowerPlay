@@ -13,7 +13,9 @@ Follow given controls to add extra actions.
 public final class ControlConfig {
     // Movement
     public static double forward;
+    public static double backward;
     public static double right;
+    public static double left;
     public static double clockwise;
 
     public static boolean slow;
@@ -39,7 +41,9 @@ public final class ControlConfig {
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls;
         forward = pad1.left_stick_y;
+        backward = -pad1.left_stick_y;
         right = pad1.left_stick_x;
+        left = -pad1.left_stick_x;
         clockwise = pad1.right_stick_x;
 
         fast = pad1.right_trigger > .1;

@@ -30,7 +30,7 @@ public class TrajectoryGenerator {
         }
 
         double pathDouble = pathType.getValue();
-        Double[] doubleArr = new Double[]{x, y, -1.0, -1.0, pathDouble};
+        Double[] doubleArr = new Double[]{x, y, heading, finalHeading, pathDouble};
         arr.add(doubleArr);
         return doubleArr;
     }

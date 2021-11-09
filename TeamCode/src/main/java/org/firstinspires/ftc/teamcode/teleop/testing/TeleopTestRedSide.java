@@ -64,7 +64,7 @@ import java.util.Locale;
 
 @TeleOp(name="TeleOp test side")
 //@Disabled
-public class TeleopTestSide extends LinearOpMode {
+public class TeleopTestRedSide extends LinearOpMode {
 
     Hardware22 robot;
 
@@ -148,8 +148,7 @@ public class TeleopTestSide extends LinearOpMode {
 
         robot.dumpServo.setPosition(collectPosition);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+        // End init phase
         waitForStart();
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
@@ -195,8 +194,8 @@ public class TeleopTestSide extends LinearOpMode {
         telemetry.addData("CurrentAngle", currentAngle);
         telemetry.addData("Theta", theta);
 
-        forward =  ControlConfig.forward;
-        right = ControlConfig.right;
+        forward = ControlConfig.right;
+        right = ControlConfig.backward;
         clockwise = ControlConfig.clockwise;
 
         temp = (forward * Math.cos(theta) - right * Math.sin(theta));
@@ -282,11 +281,9 @@ public class TeleopTestSide extends LinearOpMode {
         }
     }
 
-
-
-    //----------------------------------------------------------------------------------------------
-    // DO NOT WRITE CODE BELOW THIS LINE
-    //----------------------------------------------------------------------------------------------
+    /*-----------------------------------//
+    * DO NOT WRITE CODE BELOW THIS LINE  *
+    * -----------------------------------*/
     void composeTelemetry() {
 
         // At the beginning of each telemetry update, grab a bunch of data
