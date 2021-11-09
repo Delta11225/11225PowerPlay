@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.testing.teleop;
+package org.firstinspires.ftc.teamcode.teleop.testing;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -162,19 +162,26 @@ public class TeleopTestSide extends LinearOpMode {
             telemetry.update();
 
             while (angles.firstAngle < 0 && opModeIsActive()) {
+                ControlConfig.update(gamepad1, gamepad2);
+
+                telemetry.update();
+                move();
+                peripheralMove();
+
                 currentAngle = angles.firstAngle + 360;
                 telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
             }
 
             while (angles.firstAngle >= 0 && opModeIsActive()) {
+                ControlConfig.update(gamepad1, gamepad2);
+
+                telemetry.update();
+                move();
+                peripheralMove();
+
                 currentAngle = angles.firstAngle;
                 telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
             }
-
-            telemetry.update();
-            move();
-            peripheralMove();
-
 
             telemetry.addLine("null angle");
         }

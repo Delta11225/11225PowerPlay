@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.testing.teleop;
+package org.firstinspires.ftc.teamcode.teleop.testing;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -69,8 +69,8 @@ public class TeleopPeripheralTest extends LinearOpMode {
 
     Hardware22 robot = new Hardware22();
 
-    double dumpPosition = 0.7;
-    double collectPosition = 0.0;
+    double collectPosition = 0.67;
+    double dumpPosition = 0.0;
 
     @Override
     public void runOpMode() {
@@ -81,7 +81,7 @@ public class TeleopPeripheralTest extends LinearOpMode {
         // Dump servo
         robot.init(hardwareMap);
 
-        robot.dumpServo.setPosition(dumpPosition);
+        robot.dumpServo.setPosition(collectPosition);
 
         waitForStart();
         while (opModeIsActive()) {
@@ -104,9 +104,11 @@ public class TeleopPeripheralTest extends LinearOpMode {
             }
 
             // Lift motor
+            //TODO make it have set levels
             if (ControlConfig.liftBucket) {
                 robot.liftMotor.setPower(1.0);
             } else if (ControlConfig.lowerBucket) {
+                robot.dumpServo.setPosition(collectPosition);
                 robot.liftMotor.setPower(-1.0);
             } else {
                 robot.liftMotor.setPower(0);
