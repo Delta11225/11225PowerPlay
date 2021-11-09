@@ -182,7 +182,7 @@ public class TeleopTestSide extends LinearOpMode {
 
 
     public void move(){
-
+        ControlConfig.update(gamepad1, gamepad2);
         double theta = Math.toRadians(currentAngle);
 
         telemetry.addData("CurrentAngle", currentAngle);
@@ -238,6 +238,7 @@ public class TeleopTestSide extends LinearOpMode {
     }
 
     public void peripheralMove(){
+        ControlConfig.update(gamepad1, gamepad2);
         // Dumping servo
         if (ControlConfig.dumpServo) {
             robot.dumpServo.setPosition(dumpPosition);

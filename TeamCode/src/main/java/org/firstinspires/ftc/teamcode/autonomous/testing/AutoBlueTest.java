@@ -56,7 +56,7 @@ public class AutoBlueTest extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        Pose2d prev = generator.executeTrajectoryList(startPose, compiled1);
+        generator.executeTrajectoryList(compiled1);
 
         sleep(500);
         robot.towerMotor.setPower(.6);
@@ -64,6 +64,6 @@ public class AutoBlueTest extends LinearOpMode {
         robot.towerMotor.setPower(0);
         sleep(500);
 
-        generator.executeTrajectoryList(prev, compiled2);
+        generator.executeTrajectoryList(compiled2);
     }
 }
