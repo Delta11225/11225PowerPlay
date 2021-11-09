@@ -65,7 +65,6 @@ public class TrajectoryGenerator {
         return arr.get(arr.size() - 1).end();
     }
 
-    // TODO write this method
     public ArrayList<Trajectory> compileTrajectoryList(Pose2d start, ArrayList<Double[]> arr) {
         ArrayList<Trajectory> compiled = new ArrayList<>();
         Pose2d previous = start;

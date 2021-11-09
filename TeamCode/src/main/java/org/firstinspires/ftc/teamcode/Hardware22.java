@@ -110,7 +110,7 @@ public class Hardware22 {
         try {
             rearLeft = hardwareMap.dcMotor.get("rear_left");
             rearLeft.setDirection(DcMotor.Direction.REVERSE);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         try {
