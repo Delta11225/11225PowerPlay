@@ -67,7 +67,7 @@ import java.util.Locale;
 //@Disabled
 public class TeleopPeripheralTest extends LinearOpMode {
 
-    Hardware22 robot = new Hardware22();
+    Hardware22 robot;
 
     double collectPosition = 0.67;
     double dumpPosition = 0.0;
@@ -79,7 +79,7 @@ public class TeleopPeripheralTest extends LinearOpMode {
         // Lift motor
         // Collector motor
         // Dump servo
-        robot.init(hardwareMap);
+        robot = new Hardware22(hardwareMap);
 
         robot.dumpServo.setPosition(collectPosition);
 

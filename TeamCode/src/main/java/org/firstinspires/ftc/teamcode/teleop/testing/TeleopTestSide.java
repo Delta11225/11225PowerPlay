@@ -66,7 +66,7 @@ import java.util.Locale;
 //@Disabled
 public class TeleopTestSide extends LinearOpMode {
 
-    Hardware22 robot = new Hardware22();
+    Hardware22 robot;
 
     BNO055IMU imu;
     Orientation angles;
@@ -128,7 +128,7 @@ public class TeleopTestSide extends LinearOpMode {
 
         composeTelemetry();
 
-        robot.init(hardwareMap);
+        robot = new Hardware22(hardwareMap);
 
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
@@ -189,7 +189,7 @@ public class TeleopTestSide extends LinearOpMode {
 
 
     public void move(){
-
+        ControlConfig.update(gamepad1, gamepad2);
         double theta = Math.toRadians(currentAngle);
 
         telemetry.addData("CurrentAngle", currentAngle);
@@ -245,6 +245,7 @@ public class TeleopTestSide extends LinearOpMode {
     }
 
     public void peripheralMove(){
+        ControlConfig.update(gamepad1, gamepad2);
         // Dumping servo
         if (ControlConfig.dumpServo) {
             robot.dumpServo.setPosition(dumpPosition);

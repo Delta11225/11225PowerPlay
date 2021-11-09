@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.autonomous.testing.TrajectoryGenerator;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
 /**
@@ -93,78 +94,71 @@ public class Hardware22 {
 
 
     /* local OpMode members. */
-    private HardwareMap hwMap = null;
-    private ElapsedTime runtime = new ElapsedTime();
+    private final HardwareMap hwMap = null;
+    private final ElapsedTime runtime = new ElapsedTime();
 
     // RoadRunner driver
     public SampleMecanumDrive drive;
+    public TrajectoryGenerator generator;
 
 
     /* Constructor */
-    public Hardware22() {
-
-    }
-
-    /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap) {
-        // Save reference to Hardware map
-        hwMap = ahwMap;
-
-        // Define and Initialize Motors
-
-        // NEVER DO THIS. THIS IS FOR TESTING ONLY. REMOVE THIS LATER
-        // FIXME pls rollback when done
+    public Hardware22(HardwareMap hardwareMap) {
+        // Define and initialize motors
+        // NEVER DO THIS
+        // FIXME rollback when done
         try {
-            rearLeft = hwMap.dcMotor.get("rear_left");
+            rearLeft = hardwareMap.dcMotor.get("rear_left");
             rearLeft.setDirection(DcMotor.Direction.REVERSE);
         } catch (Exception e) {
         }
 
         try {
-            frontLeft = hwMap.dcMotor.get("front_left");
+            frontLeft = hardwareMap.dcMotor.get("front_left");
             frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         try {
-            frontRight = hwMap.dcMotor.get("front_right");
+            frontRight = hardwareMap.dcMotor.get("front_right");
             frontRight.setDirection(DcMotor.Direction.FORWARD);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         try {
-            rearRight = hwMap.dcMotor.get("rear_right");
+            rearRight = hardwareMap.dcMotor.get("rear_right");
             rearRight.setDirection(DcMotor.Direction.FORWARD);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         try {
-            logitechWebcam = hwMap.get(WebcamName.class, "Webcam 1");
-        } catch (Exception e) {
+            logitechWebcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+        } catch (Exception ignored) {
         }
 
         try {
-            towerMotor = hwMap.dcMotor.get("tower_motor");
+            towerMotor = hardwareMap.dcMotor.get("tower_motor");
             towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         try {
-            dumpServo = hwMap.servo.get("servo_dump");
-        } catch (Exception e) {
+            dumpServo = hardwareMap.servo.get("servo_dump");
+        } catch (Exception ignored) {
         }
 
         try {
-            collectionMotor = hwMap.dcMotor.get("collection_motor");
-        } catch (Exception e) {
+            collectionMotor = hardwareMap.dcMotor.get("collection_motor");
+        } catch (Exception ignored) {
         }
 
         try {
-            liftMotor = hwMap.dcMotor.get("lift_motor");
-        } catch (Exception e) {
+            liftMotor = hardwareMap.dcMotor.get("lift_motor");
+        } catch (Exception ignored) {
         }
 
-        drive = new SampleMecanumDrive(hwMap);
+        drive = new SampleMecanumDrive(hardwareMap);
+        generator = new TrajectoryGenerator(drive);
 
 //        frontLeft = hwMap.dcMotor.get("front_left");
 //        frontRight = hwMap.dcMotor.get("front_right");
@@ -184,9 +178,7 @@ public class Hardware22 {
         //colorSensor = hwMap.get(ColorSensor.class, "sensor_color");
         //towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
     }
-
 }
 
 
