@@ -49,11 +49,14 @@ public class AutoBlueTest extends LinearOpMode {
         trajectory2.add(generator.generateTrajectoryListItem(-50, 62.7, 0, PathType.LINE_TO_LINEAR));
         trajectory2.add(generator.generateTrajectoryListItem(50, 62.7, 0, PathType.LINE_TO_LINEAR));
 
+        ArrayList<Trajectory> compiled1 = generator.compileTrajectoryList(startPose, trajectory1);
+        ArrayList<Trajectory> compiled2 = generator.compileTrajectoryList(compiled1.get(compiled1.size() - 1).end(), trajectory2);
+
         waitForStart();
 
         if (isStopRequested()) return;
 
-        Pose2d prev = generator.executeTrajectoryList(startPose, trajectory1);
+        Pose2d prev = generator.executeTrajectoryList(startPose, compiled1);
 
         sleep(500);
         robot.towerMotor.setPower(.6);
@@ -61,6 +64,6 @@ public class AutoBlueTest extends LinearOpMode {
         robot.towerMotor.setPower(0);
         sleep(500);
 
-        generator.executeTrajectoryList(prev, trajectory2);
+        generator.executeTrajectoryList(prev, compiled2);
     }
 }
