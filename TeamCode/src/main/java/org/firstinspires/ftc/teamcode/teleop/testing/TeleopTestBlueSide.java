@@ -265,6 +265,7 @@ public class TeleopTestBlueSide extends LinearOpMode {
         if (ControlConfig.liftBucket) {
             robot.liftMotor.setPower(1.0);
         } else if (ControlConfig.lowerBucket) {
+            // FIXME this doesn't set dumpservo to the collect position
             robot.dumpServo.setPosition(collectPosition);
             robot.liftMotor.setPower(-1.0);
         } else {

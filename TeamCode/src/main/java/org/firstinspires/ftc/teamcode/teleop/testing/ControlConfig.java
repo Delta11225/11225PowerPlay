@@ -40,8 +40,8 @@ public final class ControlConfig {
 
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls;
-        forward = pad1.left_stick_y;
-        backward = -pad1.left_stick_y;
+        forward = -pad1.left_stick_y;
+        backward = pad1.left_stick_y;
         right = pad1.left_stick_x;
         left = -pad1.left_stick_x;
         clockwise = pad1.right_stick_x;
