@@ -38,16 +38,17 @@ public class AutoBlueTest extends LinearOpMode {
 
         drive.setPoseEstimate(startPose);
         ArrayList<Double[]> trajectory1 = new ArrayList<>();
-        trajectory1.add(generator.generateTrajectoryListItem(-30, 47, 310, 0, PathType.SPLINE_TO_LINEAR));
-        trajectory1.add(generator.generateTrajectoryListItem(-22, 36.5, PathType.LINE_TO_CONSTANT));
+        generator.generateTrajectoryListItem(-30, 47, 310, 0, PathType.SPLINE_TO_LINEAR, trajectory1);
+        generator.generateTrajectoryListItem(-22, 36.5, PathType.LINE_TO_CONSTANT, trajectory1);
         // Approaching to duck wheel
-        trajectory1.add(generator.generateTrajectoryListItem(-60, 56.25, 0, PathType.LINE_TO_LINEAR));
+        generator.generateTrajectoryListItem(-60, 56.25, 0, PathType.LINE_TO_LINEAR, trajectory1);
         // At duck wheel
-        trajectory1.add(generator.generateTrajectoryListItem(-60, 56.25 + 1.7, 0, PathType.LINE_TO_LINEAR));
+        generator.generateTrajectoryListItem(-60, 56.25 + 1.7, 0, PathType.LINE_TO_LINEAR, trajectory1);
+
 
         ArrayList<Double[]> trajectory2 = new ArrayList<>();
-        trajectory2.add(generator.generateTrajectoryListItem(-50, 62.7, 0, PathType.LINE_TO_LINEAR));
-        trajectory2.add(generator.generateTrajectoryListItem(50, 62.7, 0, PathType.LINE_TO_LINEAR));
+        generator.generateTrajectoryListItem(-50, 62.7, 0, PathType.LINE_TO_LINEAR, trajectory2);
+        generator.generateTrajectoryListItem(50, 62.7, 0, PathType.LINE_TO_LINEAR, trajectory2);
 
         ArrayList<Trajectory> compiled1 = generator.compileTrajectoryList(startPose, trajectory1);
         ArrayList<Trajectory> compiled2 = generator.compileTrajectoryList(compiled1.get(compiled1.size() - 1).end(), trajectory2);

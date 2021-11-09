@@ -143,10 +143,10 @@ public class TeleopTestSide extends LinearOpMode {
         robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
+        double collectPosition = 0.67;
         double dumpPosition = 0.0;
-        double collectPosition = 0.7;
 
-        robot.dumpServo.setPosition(dumpPosition);
+        robot.dumpServo.setPosition(collectPosition);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -266,6 +266,7 @@ public class TeleopTestSide extends LinearOpMode {
         if (ControlConfig.liftBucket) {
             robot.liftMotor.setPower(1.0);
         } else if (ControlConfig.lowerBucket) {
+            robot.dumpServo.setPosition(collectPosition);
             robot.liftMotor.setPower(-1.0);
         } else {
             robot.liftMotor.setPower(0);
