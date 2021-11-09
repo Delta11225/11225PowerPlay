@@ -62,7 +62,7 @@ import java.util.Locale;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp test side")
+@TeleOp(name="TeleOp test red side")
 //@Disabled
 public class TeleopTestRedSide extends LinearOpMode {
 
