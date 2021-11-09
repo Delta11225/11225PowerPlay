@@ -44,6 +44,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Hardware22;
 
 import java.util.Locale;
@@ -90,9 +91,6 @@ public class TeleopTestRedSide extends LinearOpMode {
     double side;
 
     double currentAngle;
-
-    double dumpPosition = 0.7;
-    double collectPosition = 0.0;
 
     Boolean buttonPress=false;
     Boolean servoSwitch=false;
@@ -143,10 +141,7 @@ public class TeleopTestRedSide extends LinearOpMode {
         robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
-        double collectPosition = 0.67;
-        double dumpPosition = 0.0;
-
-        robot.dumpServo.setPosition(collectPosition);
+        robot.dumpServo.setPosition(Constants.collectPosition);
 
         // End init phase
         waitForStart();
@@ -247,16 +242,16 @@ public class TeleopTestRedSide extends LinearOpMode {
         ControlConfig.update(gamepad1, gamepad2);
         // Dumping servo
         if (ControlConfig.dumpServo) {
-            robot.dumpServo.setPosition(dumpPosition);
+            robot.dumpServo.setPosition(Constants.dumpPosition);
         } else if (ControlConfig.collectServo) {
-            robot.dumpServo.setPosition(collectPosition);
+            robot.dumpServo.setPosition(Constants.collectPosition);
         }
 
         // Tower motor
         if (ControlConfig.duckWheelForward) {
-            robot.towerMotor.setPower(1.0);
+            robot.towerMotor.setPower(Constants.towerWheelSpeed);
         } else if (ControlConfig.duckWheelBackward) {
-            robot.towerMotor.setPower(-1.0);
+            robot.towerMotor.setPower(-Constants.towerWheelSpeed);
         } else {
             robot.towerMotor.setPower(0);
         }
@@ -265,7 +260,7 @@ public class TeleopTestRedSide extends LinearOpMode {
         if (ControlConfig.liftBucket) {
             robot.liftMotor.setPower(1.0);
         } else if (ControlConfig.lowerBucket) {
-            robot.dumpServo.setPosition(collectPosition);
+            robot.dumpServo.setPosition(Constants.collectPosition);
             robot.liftMotor.setPower(-1.0);
         } else {
             robot.liftMotor.setPower(0);

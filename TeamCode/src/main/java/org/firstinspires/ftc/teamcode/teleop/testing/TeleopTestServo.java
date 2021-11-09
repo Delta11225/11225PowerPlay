@@ -41,8 +41,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Constants;
 
 import java.util.Locale;
+
+import static org.firstinspires.ftc.teamcode.Constants.dumpPosition;
 
 /**
  * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
@@ -112,10 +115,8 @@ public class TeleopTestServo extends LinearOpMode {
     @Override
     public void runOpMode() {
         dumpServo=hardwareMap.servo.get("servo_dump");
-        double dumpPosition = 0.0;
-        double collectPosition = 0.7;
 
-        dumpServo.setPosition(dumpPosition);
+        dumpServo.setPosition(Constants.dumpPosition);
 
         waitForStart();
         // run until the end of the match (driver presses STOP)
@@ -126,7 +127,7 @@ public class TeleopTestServo extends LinearOpMode {
                dumpServo.setPosition(dumpPosition);
             }
             if (ControlConfig.collectServo) {
-                dumpServo.setPosition(collectPosition);
+                dumpServo.setPosition(Constants.collectPosition);
             }
 
 

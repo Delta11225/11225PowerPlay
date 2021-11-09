@@ -20,9 +20,6 @@ import java.util.ArrayList;
 //@Disabled
 @Autonomous(group = "drive")
 public class AutoBlueTest extends LinearOpMode {
-
-    public static double DISTANCE = 20; //in
-    // FIXME make this much MUCH better
     Hardware22 robot;
     SampleMecanumDrive drive;
     TrajectoryGenerator generator;
