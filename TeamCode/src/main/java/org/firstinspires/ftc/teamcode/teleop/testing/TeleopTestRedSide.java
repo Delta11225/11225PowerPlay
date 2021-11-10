@@ -92,24 +92,6 @@ public class TeleopTestRedSide extends LinearOpMode {
 
     double currentAngle;
 
-    Boolean buttonPress=false;
-    Boolean servoSwitch=false;
-
-    Boolean buttonPress2=false;
-    Boolean servoSwitch2=false;
-
-    Boolean buttonPress3 = false;
-    Boolean servoSwitch3 = false;
-
-    Boolean aButtonPress = false;
-    Boolean launcherOn = false;
-
-    Boolean xButtonPress = false;
-    Boolean servoPosition = false;
-
-
-
-
     @Override
     public void runOpMode() {
 
