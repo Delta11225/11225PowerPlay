@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Hardware22;
 import org.firstinspires.ftc.teamcode.autonomous.PathType;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.Constants;
 
 import java.nio.file.Path;
 import java.sql.Array;
@@ -57,7 +58,7 @@ public class AutoBlueTest extends LinearOpMode {
         generator.executeTrajectoryList(compiled1);
 
         sleep(500);
-        robot.towerMotor.setPower(.6);
+        robot.towerMotor.setPower(Constants.towerWheelSpeed);
         sleep(2000);
         robot.towerMotor.setPower(0);
         sleep(500);
