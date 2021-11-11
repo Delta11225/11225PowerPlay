@@ -20,17 +20,17 @@ public class TrajectoryGenerator {
      * @param x            - The x amount the trajectory should go
      * @param y            - The y amount the trajectory should go
      * @param heading      - The heading in degrees that the robot should end up at (if applicable)
-     * @param finalHeading
+     * @param endTangent
      * @param pathType     - The type of path used
      * @return - An integer array that can be appended to a trajectory path and executed
      */
-    public Double[] generateTrajectoryListItem(double x, double y, double heading, double finalHeading, PathType pathType, ArrayList<Double[]> arr) {
+    public Double[] generateTrajectoryListItem(double x, double y, double heading, double endTangent, PathType pathType, ArrayList<Double[]> arr) {
         if (pathType != PathType.SPLINE_TO_LINEAR) {
             throw new IllegalArgumentException("For this generator, path type must be splineToLinear");
         }
 
         double pathDouble = pathType.getValue();
-        Double[] doubleArr = new Double[]{x, y, heading, finalHeading, pathDouble};
+        Double[] doubleArr = new Double[]{x, y, heading, endTangent, pathDouble};
         arr.add(doubleArr);
         return doubleArr;
     }
