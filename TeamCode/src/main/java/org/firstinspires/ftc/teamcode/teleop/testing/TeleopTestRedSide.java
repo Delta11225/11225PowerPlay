@@ -250,7 +250,7 @@ public class TeleopTestRedSide extends LinearOpMode {
 
         // Collection motor
         if (ControlConfig.collectWheel) {
-            robot.collectionMotor.setPower(0.75);
+            robot.collectionMotor.setPower(1.0);
         } else if (ControlConfig.unCollectWheel) {
             robot.collectionMotor.setPower(-1.0);
         } else {
