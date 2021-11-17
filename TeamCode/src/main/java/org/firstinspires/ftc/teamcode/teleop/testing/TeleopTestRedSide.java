@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.testing.teleop;
+package org.firstinspires.ftc.teamcode.teleop.testing;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -44,6 +44,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Hardware22;
 
 import java.util.Locale;
@@ -62,11 +63,11 @@ import java.util.Locale;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOp test side")
+@TeleOp(name="TeleOp test red side")
 //@Disabled
-public class TeleopTestSide extends LinearOpMode {
+public class TeleopTestRedSide extends LinearOpMode {
 
-    Hardware22 robot = new Hardware22();
+    Hardware22 robot;
 
     BNO055IMU imu;
     Orientation angles;
@@ -91,27 +92,6 @@ public class TeleopTestSide extends LinearOpMode {
 
     double currentAngle;
 
-    double dumpPosition = 0.7;
-    double collectPosition = 0.0;
-
-    Boolean buttonPress=false;
-    Boolean servoSwitch=false;
-
-    Boolean buttonPress2=false;
-    Boolean servoSwitch2=false;
-
-    Boolean buttonPress3 = false;
-    Boolean servoSwitch3 = false;
-
-    Boolean aButtonPress = false;
-    Boolean launcherOn = false;
-
-    Boolean xButtonPress = false;
-    Boolean servoPosition = false;
-
-
-
-
     @Override
     public void runOpMode() {
 
@@ -128,7 +108,7 @@ public class TeleopTestSide extends LinearOpMode {
 
         composeTelemetry();
 
-        robot.init(hardwareMap);
+        robot = new Hardware22(hardwareMap);
 
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
@@ -143,13 +123,9 @@ public class TeleopTestSide extends LinearOpMode {
         robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
-        double dumpPosition = 0.0;
-        double collectPosition = 0.7;
+        robot.dumpServo.setPosition(Constants.collectPosition);
 
-        robot.dumpServo.setPosition(dumpPosition);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+        // End init phase
         waitForStart();
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
@@ -162,19 +138,26 @@ public class TeleopTestSide extends LinearOpMode {
             telemetry.update();
 
             while (angles.firstAngle < 0 && opModeIsActive()) {
+                ControlConfig.update(gamepad1, gamepad2);
+
+                telemetry.update();
+                move();
+                peripheralMove();
+
                 currentAngle = angles.firstAngle + 360;
                 telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
             }
 
             while (angles.firstAngle >= 0 && opModeIsActive()) {
+                ControlConfig.update(gamepad1, gamepad2);
+
+                telemetry.update();
+                move();
+                peripheralMove();
+
                 currentAngle = angles.firstAngle;
                 telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
             }
-
-            telemetry.update();
-            move();
-            peripheralMove();
-
 
             telemetry.addLine("null angle");
         }
@@ -182,14 +165,14 @@ public class TeleopTestSide extends LinearOpMode {
 
 
     public void move(){
-
+        ControlConfig.update(gamepad1, gamepad2);
         double theta = Math.toRadians(currentAngle);
 
         telemetry.addData("CurrentAngle", currentAngle);
         telemetry.addData("Theta", theta);
 
-        forward =  ControlConfig.forward;
-        right = ControlConfig.right;
+        forward = ControlConfig.right;
+        right = ControlConfig.backward;
         clockwise = ControlConfig.clockwise;
 
         temp = (forward * Math.cos(theta) - right * Math.sin(theta));
@@ -238,18 +221,19 @@ public class TeleopTestSide extends LinearOpMode {
     }
 
     public void peripheralMove(){
+        ControlConfig.update(gamepad1, gamepad2);
         // Dumping servo
         if (ControlConfig.dumpServo) {
-            robot.dumpServo.setPosition(dumpPosition);
+            robot.dumpServo.setPosition(Constants.dumpPosition);
         } else if (ControlConfig.collectServo) {
-            robot.dumpServo.setPosition(collectPosition);
+            robot.dumpServo.setPosition(Constants.collectPosition);
         }
 
         // Tower motor
         if (ControlConfig.duckWheelForward) {
-            robot.towerMotor.setPower(1.0);
+            robot.towerMotor.setPower(Constants.towerWheelSpeed);
         } else if (ControlConfig.duckWheelBackward) {
-            robot.towerMotor.setPower(-1.0);
+            robot.towerMotor.setPower(-Constants.towerWheelSpeed);
         } else {
             robot.towerMotor.setPower(0);
         }
@@ -258,6 +242,7 @@ public class TeleopTestSide extends LinearOpMode {
         if (ControlConfig.liftBucket) {
             robot.liftMotor.setPower(1.0);
         } else if (ControlConfig.lowerBucket) {
+            robot.dumpServo.setPosition(Constants.collectPosition);
             robot.liftMotor.setPower(-1.0);
         } else {
             robot.liftMotor.setPower(0);
@@ -265,7 +250,7 @@ public class TeleopTestSide extends LinearOpMode {
 
         // Collection motor
         if (ControlConfig.collectWheel) {
-            robot.collectionMotor.setPower(0.75);
+            robot.collectionMotor.setPower(1.0);
         } else if (ControlConfig.unCollectWheel) {
             robot.collectionMotor.setPower(-1.0);
         } else {
@@ -273,11 +258,9 @@ public class TeleopTestSide extends LinearOpMode {
         }
     }
 
-
-
-    //----------------------------------------------------------------------------------------------
-    // DO NOT WRITE CODE BELOW THIS LINE
-    //----------------------------------------------------------------------------------------------
+    /*-----------------------------------//
+    * DO NOT WRITE CODE BELOW THIS LINE  *
+    * -----------------------------------*/
     void composeTelemetry() {
 
         // At the beginning of each telemetry update, grab a bunch of data

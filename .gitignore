@@ -39,6 +39,7 @@ proguard/
 captures/
 
 # IntelliJ
+.idea/ # Ignore entire .idea folder
 *.iml
 .idea/workspace.xml
 .idea/tasks.xml
@@ -85,3 +86,6 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+compiler.xml
+misc.xml
