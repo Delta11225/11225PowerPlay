@@ -224,7 +224,7 @@ public class TeleopFinalRed extends LinearOpMode {
         // Lift motor
         // Prevent liftMotor from going below start position or going above top position
         // as that would throw off encoders or loosen slack on cable
-        if (ControlConfig.liftSlide && robot.liftMotor.getCurrentPosition() < liftEncoderStart + 3600) {
+        if (ControlConfig.liftSlide && robot.liftMotor.getCurrentPosition() < liftEncoderStart + Constants.highEncoder) {
             //added safety here to hold bucket in horizontal position when lifting so freight does not fall out as robot drives around field
             robot.liftMotor.setPower(ControlConfig.linSlideSlow ? Constants.slowMultiplier : 1.0);
         }
