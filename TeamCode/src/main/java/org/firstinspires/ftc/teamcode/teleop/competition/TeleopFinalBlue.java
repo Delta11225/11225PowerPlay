@@ -132,14 +132,11 @@ public class TeleopFinalBlue extends LinearOpMode {
 //        t1.start();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
             ControlConfig.update(gamepad1, gamepad2);
 
             telemetry.update();
 
             while (angles.firstAngle < 0 && opModeIsActive()) {
-
-
                 telemetry.update();
                 move();
                 peripheralMove();
@@ -149,8 +146,6 @@ public class TeleopFinalBlue extends LinearOpMode {
             }
 
             while (angles.firstAngle >= 0 && opModeIsActive()) {
-
-
                 telemetry.update();
                 move();
                 peripheralMove();
@@ -160,7 +155,6 @@ public class TeleopFinalBlue extends LinearOpMode {
             }
 
 //            telemetry.addLine("null angle");
-
         }
     }
 
@@ -302,7 +296,6 @@ public class TeleopFinalBlue extends LinearOpMode {
      * DO NOT WRITE CODE BELOW THIS LINE  *
      * -----------------------------------*/
     void composeTelemetry() {
-
         // At the beginning of each telemetry update, grab a bunch of data
         // from the IMU that we will then display in separate lines.
         telemetry.addAction(new Runnable() { @Override public void run()

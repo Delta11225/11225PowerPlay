@@ -70,9 +70,6 @@ public abstract class ControlConfig {
         initTseArm = pad1.x;
         collectTseArm = pad1.b;
 
-
-
-
         liftSlide = pad2.dpad_up;
         lowerSlide = pad2.dpad_down;
         runSlideToLowDump = pad2.x;
@@ -85,10 +82,5 @@ public abstract class ControlConfig {
         collectBucket = pad2.a;
 
         linearSlideOverride = pad2.left_bumper;
-
-
-
-
-
     }
 }

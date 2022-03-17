@@ -110,8 +110,6 @@ public class TeleopFinalRed extends LinearOpMode {
             telemetry.update();
 
             while (angles.firstAngle < 0 && opModeIsActive()) {
-
-
                 telemetry.update();
                 move();
                 peripheralMove();
@@ -269,8 +267,6 @@ public class TeleopFinalRed extends LinearOpMode {
         }
         robot.tseServo.setPosition(tsePos);
     }
-
-
 
 
     /*-----------------------------------//

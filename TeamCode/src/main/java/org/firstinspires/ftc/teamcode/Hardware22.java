@@ -61,7 +61,6 @@ public class Hardware22 {
     public DcMotor collectionMotor = null;
     public DcMotor liftMotor = null;
 
-
     private BNO055IMU imu;
 
     // State used for updating telemetry
