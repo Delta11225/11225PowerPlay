@@ -44,7 +44,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 /**
  * PLEASE follow these instructions when adding new hardware:
  * IF you are TESTING, please wrap each individual call to the hardware map in a try-catch block,
- * IGNORING any errors. This prevents robot total failiure even if some hardware is disconnected.
+ * IGNORING any errors. This prevents robot total failure even if some hardware is disconnected.
  * REMOVE THE TRY CATCH BLOCKS BEFORE COMPETITION.
  * ENSURE each INDIVIDUAL CALL to the hardware map is in its OWN try-catch block.
  */
