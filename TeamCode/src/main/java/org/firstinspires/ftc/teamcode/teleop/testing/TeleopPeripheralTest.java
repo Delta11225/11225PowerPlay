@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Hardware22;
+import org.firstinspires.ftc.teamcode.teleop.competition.ControlConfig;
 
 @TeleOp(name="TeleOp test peripherals")
 @Disabled

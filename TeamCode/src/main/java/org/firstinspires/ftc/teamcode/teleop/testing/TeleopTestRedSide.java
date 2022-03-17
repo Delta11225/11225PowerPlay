@@ -46,6 +46,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Hardware22;
+import org.firstinspires.ftc.teamcode.teleop.competition.ControlConfig;
 
 import java.util.Locale;
 
@@ -223,25 +224,25 @@ public class TeleopTestRedSide extends LinearOpMode {
     public void peripheralMove(){
         ControlConfig.update(gamepad1, gamepad2);
         // Dumping servo
-        if (ControlConfig.dumpServo) {
+        if (ControlConfig.duckWheelRed) {
             robot.dumpServo.setPosition(Constants.dumpPosition);
-        } else if (ControlConfig.collectServo) {
+        } else if (ControlConfig.collectBucket) {
             robot.dumpServo.setPosition(Constants.collectPosition);
         }
 
         // Tower motor
-        if (ControlConfig.duckWheelForward) {
+        if (ControlConfig.duckWheelBlue) {
             robot.towerMotor.setPower(Constants.towerWheelSpeed);
-        } else if (ControlConfig.duckWheelBackward) {
+        } else if (ControlConfig.dumpBucket) {
             robot.towerMotor.setPower(-Constants.towerWheelSpeed);
         } else {
             robot.towerMotor.setPower(0);
         }
 
         // Lift motor
-        if (ControlConfig.liftBucket) {
+        if (ControlConfig.linSlideSlow) {
             robot.liftMotor.setPower(1.0);
-        } else if (ControlConfig.lowerBucket) {
+        } else if (ControlConfig.linearSlideOverride) {
             robot.dumpServo.setPosition(Constants.collectPosition);
             robot.liftMotor.setPower(-1.0);
         } else {

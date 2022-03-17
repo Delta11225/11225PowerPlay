@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Hardware22;
+import org.firstinspires.ftc.teamcode.teleop.competition.ControlConfig;
 
 import java.util.Locale;
 

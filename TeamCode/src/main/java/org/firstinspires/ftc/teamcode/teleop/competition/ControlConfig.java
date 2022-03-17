@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleop.testing;
+package org.firstinspires.ftc.teamcode.teleop.competition;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
@@ -72,7 +72,6 @@ public abstract class ControlConfig {
 
         liftSlide = pad2.dpad_up;
         lowerSlide = pad2.dpad_down;
-        runSlideToLowDump = pad2.x;
         linSlideSlow = pad2.right_trigger > .1;
 
         duckWheelBlue = pad2.right_bumper;
