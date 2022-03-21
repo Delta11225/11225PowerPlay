@@ -223,7 +223,7 @@ public class AutoFinal extends LinearOpMode {
         telemetry.addData("Encoder", robot.liftMotor.getCurrentPosition());
         telemetry.update();
 
-    ////////////////GLITCH REPAIR/////////////////////////////////
+        /*--------------------GLITCH REPAIR (DO NOT REMOVE)------------------------------*/
         // run the encoder 2 encoder counts (doesnt work) but gets us through the glitch :)
         int encoderGlitchTarget;
         encoderGlitchTarget = liftEncoderStart + 2;
@@ -242,7 +242,7 @@ public class AutoFinal extends LinearOpMode {
         robot.liftMotor.setPower(0);
         robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-    ///////////END GLITCH REPAIR//////////////////////////////////////////////
+        /*--------------------GLITCH REPAIR (DO NOT REMOVE)------------------------------*/
 
         int encoderUpTarget;
         encoderUpTarget = liftEncoderStart + encTarget;

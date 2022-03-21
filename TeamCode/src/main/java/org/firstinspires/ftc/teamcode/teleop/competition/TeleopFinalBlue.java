@@ -57,6 +57,10 @@ public class TeleopFinalBlue extends LinearOpMode {
 
     double tsePos = Constants.tseArmInitPosition;
     double liftEncoderStart;
+
+    double duckWheelSpeed = 0;
+    double duckWheelMaxSpeed = Constants.towerWheelSpeed;
+
     @Override
     public void runOpMode() {
 
@@ -229,9 +233,15 @@ public class TeleopFinalBlue extends LinearOpMode {
 
         // Tower motor
         if (ControlConfig.duckWheelBlue) {
-            robot.towerMotor.setPower((Constants.towerWheelSpeed));
+            robot.towerMotor.setPower(duckWheelSpeed);
+
+            duckWheelSpeed += .5;
+            if (duckWheelSpeed > duckWheelMaxSpeed) {
+                duckWheelSpeed = duckWheelMaxSpeed;
+            }
         } else {
             robot.towerMotor.setPower(0);
+            duckWheelSpeed = 0;
         }
 
         // Set dumpServo to hold position if above certain encoder count
