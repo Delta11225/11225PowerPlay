@@ -27,6 +27,8 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
+import kotlin.NotImplementedError;
+
 /*
  * This is an example of a more complex path to really test the tuning.
  */
@@ -371,6 +373,9 @@ public class AutoFinal extends LinearOpMode {
                 parkingMethod = ParkingMethod.WALL;
                 break;
             } else if (gamepad2.a) {
+                if (startPosition == Position.BACK) {
+                    throw new NotImplementedError("This route doesn't exist moron");
+                }
                 parkingMethod = ParkingMethod.STORAGE;
                 break;
             }
