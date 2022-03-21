@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous.competition;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -90,10 +91,10 @@ public class AutoFinal extends LinearOpMode {
 
 
         //code needed for camera to display on FTC Dashboard
-       // FtcDashboard dashboard = FtcDashboard.getInstance();
-        //telemetry = dashboard.getTelemetry();
-        //FtcDashboard.getInstance().startCameraStream(webcam, 10);
-        //telemetry.update();
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = dashboard.getTelemetry();
+        FtcDashboard.getInstance().startCameraStream(webcam, 10);
+        telemetry.update();
         //this is next level. ms weyrens, that's irresponsible
 
         //initialize motors
@@ -212,9 +213,11 @@ public class AutoFinal extends LinearOpMode {
             encTarget = Constants.highEncoder;
             telemetry.addLine("Dump top");
         } else if (elementPosition == ElementPosition.MIDDLE) {
+            sleep(1000);
             encTarget = Constants.midEncoder;
             telemetry.addLine("Dump middle");
         } else {
+            sleep(2000);
             encTarget = Constants.lowEncoder;
             telemetry.addLine("Dump bottom");
         }
@@ -356,6 +359,7 @@ public class AutoFinal extends LinearOpMode {
         telemetry.addLine("Parking Method?");
         telemetry.addLine("Wall = dpad Right");
         telemetry.addLine("Barrier = dpad Left");
+        telemetry.addLine("Storage = gamepad a");
         telemetry.update();
 
         while (!isStopRequested()) {
@@ -365,6 +369,9 @@ public class AutoFinal extends LinearOpMode {
                 break;
             } else if (gamepad2.dpad_right) {
                 parkingMethod = ParkingMethod.WALL;
+                break;
+            } else if (gamepad2.a) {
+                parkingMethod = ParkingMethod.STORAGE;
                 break;
             }
         }

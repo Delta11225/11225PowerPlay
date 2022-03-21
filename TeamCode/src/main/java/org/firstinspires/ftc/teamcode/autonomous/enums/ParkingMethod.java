@@ -2,7 +2,8 @@ package org.firstinspires.ftc.teamcode.autonomous.enums;
 
 public enum ParkingMethod {
     WALL("wall"),
-    BARRIER("barrier")
+    BARRIER("barrier"),
+    STORAGE("storage")
     ;
 
     private final String text;

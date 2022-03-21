@@ -88,10 +88,11 @@ public class BlueTrajectoryGenerator extends TrajectoryGenerator {
                 generateTrajectoryListItem(50, 76, 0, PathType.LINE_TO_LINEAR, trajectory3);
             } else if (parkingMethod == ParkingMethod.BARRIER) {
                 // Forward movement to avoid carossel
-                // FIXME IMPORTANT make this so that it doesn't hit TSE
                 generateTrajectoryListItem(-50, 47, 0, PathType.LINE_TO_LINEAR, trajectory3);
                 // Forward move to warehouse over barrier
                 generateTrajectoryListItem(50, 47, 0, PathType.LINE_TO_LINEAR, trajectory3);
+            } else if (parkingMethod == ParkingMethod.STORAGE) {
+                generateTrajectoryListItem(-58, 38, 0, PathType.LINE_TO_LINEAR, trajectory3);
             }
 
             ArrayList<Trajectory> compTraj1 = compileTrajectoryList(startPose, trajectory1);
