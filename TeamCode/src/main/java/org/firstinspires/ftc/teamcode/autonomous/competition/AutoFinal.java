@@ -202,11 +202,9 @@ public class AutoFinal extends LinearOpMode {
             encTarget = Constants.highEncoder;
             telemetry.addLine("Dump top");
         } else if (elementPosition == ElementPosition.MIDDLE) {
-            sleep(1000);
             encTarget = Constants.midEncoder;
             telemetry.addLine("Dump middle");
         } else {
-            sleep(2000);
             encTarget = Constants.lowEncoder;
             telemetry.addLine("Dump bottom");
         }
