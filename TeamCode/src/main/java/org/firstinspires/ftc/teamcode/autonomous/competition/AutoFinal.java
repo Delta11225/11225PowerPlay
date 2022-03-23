@@ -71,10 +71,10 @@ public class AutoFinal extends LinearOpMode {
         getUserInput();
 
         ArrayList<ArrayList<Trajectory>> trajs;
-        double towerSpeed = Constants.towerWheelSpeed;
+        double towerSpeed = Constants.towerWheelSpeedAuto;
 
         if (color == Color.RED) {
-            towerSpeed = -(Constants.towerWheelSpeed);
+            towerSpeed = -(Constants.towerWheelSpeedAuto);
             generator = new RedTrajectoryGenerator(drive, startPosition, parkingMethod);
             trajs = ((RedTrajectoryGenerator) generator).generateTrajectories();
         } else {
@@ -275,6 +275,15 @@ public class AutoFinal extends LinearOpMode {
         robot.liftMotor.setPower(0);
         robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Sleep for timing consistency. Moved here because it used to be before slide raised and that
+        // caused significant distress for the team.
+        if (elementPosition == ElementPosition.MIDDLE) {
+            sleep(1000);
+            encTarget = Constants.midEncoder;
+        } else {
+            encTarget = Constants.lowEncoder;
+        }
     }
 
     private void determineDuckPosition() {

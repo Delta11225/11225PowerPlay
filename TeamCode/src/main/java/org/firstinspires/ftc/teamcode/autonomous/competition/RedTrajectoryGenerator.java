@@ -93,7 +93,7 @@ public class RedTrajectoryGenerator extends TrajectoryGenerator {
                 // Forward move to warehouse over barrier
                 generateTrajectoryListItem(50, -44, 0, PathType.LINE_TO_LINEAR, trajectory3);
             }  else if (parkingMethod == ParkingMethod.STORAGE) {
-                generateTrajectoryListItem(-58, -38, 0, PathType.LINE_TO_LINEAR, trajectory3);
+                generateTrajectoryListItem(-62, -35, 0, PathType.LINE_TO_LINEAR, trajectory3);
             }
 
             ArrayList<Trajectory> compTraj1 = compileTrajectoryList(startPose, trajectory1);

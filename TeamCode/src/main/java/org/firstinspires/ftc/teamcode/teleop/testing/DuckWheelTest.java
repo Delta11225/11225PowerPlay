@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.teleop.competition.ControlConfig;
 @TeleOp
 @Disabled
 public class DuckWheelTest extends LinearOpMode {
-    double duckWheelMaxSpeed = Constants.towerWheelSpeed;
+    double duckWheelMaxSpeed = Constants.towerWheelSpeedEndgame;
     Hardware22 robot;
     boolean buttonUnpressed = true;
     double duckWheelSpeed = 0;

@@ -196,9 +196,9 @@ public class TeleopTestBlueSideNewTSE extends LinearOpMode {
 
         // Tower motor
         if (ControlConfig.duckWheelBlue) {
-            robot.towerMotor.setPower(Constants.towerWheelSpeed);
+            robot.towerMotor.setPower(Constants.towerWheelSpeedEndgame);
         } else if (ControlConfig.duckWheelRed) {
-            robot.towerMotor.setPower(-Constants.towerWheelSpeed);
+            robot.towerMotor.setPower(-Constants.towerWheelSpeedEndgame);
         } else {
             robot.towerMotor.setPower(0);
         }

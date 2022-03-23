@@ -61,7 +61,7 @@ public class AutoBlueTest extends LinearOpMode {
         generator.executeTrajectoryList(compiled1);
 
         sleep(500);
-        robot.towerMotor.setPower(Constants.towerWheelSpeed);
+        robot.towerMotor.setPower(Constants.towerWheelSpeedEndgame);
         sleep(2000);
         robot.towerMotor.setPower(0);
         sleep(500);

@@ -24,7 +24,8 @@ public abstract class Constants {
     public final static double slowMultiplier = 0.15;
     public final static double superfastMultiplier = 1.0;
 
-    public final static double towerWheelSpeed = .6;
+    public final static double towerWheelSpeedEndgame = .6009;
+    public final static double towerWheelSpeedAuto = .420;
 
     public final static double tseStep = 0.0005;
 

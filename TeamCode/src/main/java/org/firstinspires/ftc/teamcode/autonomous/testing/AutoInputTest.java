@@ -101,10 +101,10 @@ public class AutoInputTest extends LinearOpMode {
         getUserInput();
 
         ArrayList<ArrayList<Trajectory>> trajs;
-        double towerSpeed = Constants.towerWheelSpeed;
+        double towerSpeed = Constants.towerWheelSpeedEndgame;
 
         if (color == Color.RED) {
-            towerSpeed =-Constants.towerWheelSpeed;
+            towerSpeed =-Constants.towerWheelSpeedEndgame;
             generator = new RedTrajectoryGenerator(drive, position, parkingMethod);
             trajs = ((RedTrajectoryGenerator) generator).generateTrajectories();
         } else {

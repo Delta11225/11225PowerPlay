@@ -57,7 +57,7 @@ public class TeleopFinalRed extends LinearOpMode {
     double liftEncoderStart;
 
     double duckWheelSpeed = 0;
-    double duckWheelMaxSpeed = -Constants.towerWheelSpeed;
+    double duckWheelMaxSpeed = -Constants.towerWheelSpeedEndgame;
 
     @Override
     public void runOpMode() {
