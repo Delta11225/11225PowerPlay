@@ -160,7 +160,7 @@ public class AutoFinal extends LinearOpMode {
             }
 
             @Override
-            public void onError(int er1rorCode) { return; }
+            public void onError(int errorCode) { return; }
         });
 
         //the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
@@ -168,7 +168,6 @@ public class AutoFinal extends LinearOpMode {
 
 //        telemetry.addData("Values", valLeft+"   "+valMid);
 //        telemetry.update();
-
 
         //code needed for camera to display on FTC Dashboard
         FtcDashboard dashboard = FtcDashboard.getInstance();
