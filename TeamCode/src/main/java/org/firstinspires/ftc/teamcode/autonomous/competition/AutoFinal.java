@@ -136,9 +136,10 @@ public class AutoFinal extends LinearOpMode {
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
-        long durationSeconds = duration / (long) Math.pow(10,9); // Future proof this number
+        // This dumbness is b/c java doesn't provide an easy way to round to a certain number of decimal places
+        double durationSeconds = Math.round((duration / (double) Math.pow(10,9)) * 100.0) / 100.0;
 
-        telemetry.addData("Time Elapsed:", durationSeconds);
+        telemetry.addData("Time Elapsed", durationSeconds);
         telemetry.update();
 
         sleep(2000);
