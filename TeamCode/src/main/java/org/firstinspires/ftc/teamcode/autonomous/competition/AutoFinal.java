@@ -62,50 +62,12 @@ public class AutoFinal extends LinearOpMode {
     private int liftEncoderStart;
     //Telemetry telemetry;
     OpenCvCamera webcam;
+    SampleMecanumDrive drive;
+    TrajectoryGenerator generator;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new Hardware22(hardwareMap);
-        SampleMecanumDrive drive = robot.drive;
-        TrajectoryGenerator generator;
-
-        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        OpenCvCamera webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-                webcam.setPipeline(new SamplePipeline());
-            }
-
-            @Override
-            public void onError(int er1rorCode) { return; }
-        });
-
-        //the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
-         //If this line is uncommented you will not recieve telemetry
-
-//        telemetry.addData("Values", valLeft+"   "+valMid);
-//        telemetry.update();
-
-
-        //code needed for camera to display on FTC Dashboard
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
-        FtcDashboard.getInstance().startCameraStream(webcam, 10);
-        telemetry.update();
-        //this is next level. ms weyrens, that's irresponsible
-
-        //initialize motors
-        robot.dumpServo.setPosition(Constants.collectPosition);
-
-        //set start position for linear slide encoder
-        //robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        initVars();
         getUserInput();
 
         ArrayList<ArrayList<Trajectory>> trajs;
@@ -119,29 +81,6 @@ public class AutoFinal extends LinearOpMode {
             generator = new BlueTrajectoryGenerator(drive, startPosition, parkingMethod);
             trajs = ((BlueTrajectoryGenerator) generator).generateTrajectories();
         }
-
-        // Prompt users to check if auto is good
-        telemetry.addLine("Did you check camera stream? Press B");
-        telemetry.update();
-        while (!isStopRequested() && !gamepad2.b) {}
-
-        telemetry.addLine("Did you preload a box? Press A");
-        telemetry.update();
-        while (!isStopRequested() && !gamepad2.a) {}
-
-        telemetry.addLine("Are the linear slide and TSE arm down? Press X");
-        telemetry.update();
-        while (!isStopRequested() && !gamepad2.x) {}
-
-        // Set start position for linear slide encoder BEFORE wait for start
-        // For some reason, if this isn't done, linear slide won't work (this was The Big Issue)
-        //robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.liftMotor.setPower(1.0);
-        robot.liftMotor.setPower(0.0);
-        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftEncoderStart = robot.liftMotor.getCurrentPosition();
 
         // Confirm auto settings
         telemetry.addLine("Init complete, ready to run");
@@ -203,6 +142,54 @@ public class AutoFinal extends LinearOpMode {
         telemetry.update();
 
         sleep(2000);
+    }
+
+    private void initVars() {robot = new Hardware22(hardwareMap);
+        drive = robot.drive;
+
+        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+                webcam.setPipeline(new SamplePipeline());
+            }
+
+            @Override
+            public void onError(int er1rorCode) { return; }
+        });
+
+        //the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
+        //If this line is uncommented you will not recieve telemetry
+
+//        telemetry.addData("Values", valLeft+"   "+valMid);
+//        telemetry.update();
+
+
+        //code needed for camera to display on FTC Dashboard
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = dashboard.getTelemetry();
+        FtcDashboard.getInstance().startCameraStream(webcam, 10);
+        telemetry.update();
+        //this is next level. ms weyrens, that's irresponsible
+
+        //initialize motors
+        robot.dumpServo.setPosition(Constants.collectPosition);
+
+        robot.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.liftMotor.setPower(1.0);
+        robot.liftMotor.setPower(0.0);
+        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftEncoderStart = robot.liftMotor.getCurrentPosition();
+
+        //set start position for linear slide encoder
+        //robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     private void dumpPreloaded() {
@@ -405,6 +392,19 @@ public class AutoFinal extends LinearOpMode {
         }
         telemetry.addLine("Delay confirmed, " + delay);
         telemetry.update();
+
+        // Prompt users to check if auto is good
+        telemetry.addLine("Did you check camera stream? Press B");
+        telemetry.update();
+        while (!isStopRequested() && !gamepad2.b) {}
+
+        telemetry.addLine("Did you preload a box? Press A");
+        telemetry.update();
+        while (!isStopRequested() && !gamepad2.a) {}
+
+        telemetry.addLine("Are the linear slide and TSE arm down? Press X");
+        telemetry.update();
+        while (!isStopRequested() && !gamepad2.x) {}
     }
 
 
