@@ -57,6 +57,7 @@ public abstract class ControlConfig {
         right = pad1.left_stick_x;
         left = -pad1.left_stick_x;
         clockwise = pad1.right_stick_x;
+//        clockwise = pad1.right_stick_y;
 
         fast = pad1.left_bumper;
         slow = pad1.right_bumper;

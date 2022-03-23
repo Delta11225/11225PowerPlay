@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop.competition;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -99,6 +100,10 @@ public class TeleopFinalRed extends LinearOpMode {
 
         liftEncoderStart = robot.liftMotor.getCurrentPosition();
 
+        // TODO remove, presence of this throws error when run on FTC dashboard
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = dashboard.getTelemetry();
+        telemetry.update();
         // End init phase
         waitForStart();
 
@@ -111,13 +116,17 @@ public class TeleopFinalRed extends LinearOpMode {
 
             telemetry.update();
 
+            // TODO remove
+            telemetry.addData("Gamepad 1", gamepad1.toString());
+            telemetry.update();
+
             while (angles.firstAngle < 0 && opModeIsActive()) {
                 telemetry.update();
                 move();
                 peripheralMove();
 
                 currentAngle = angles.firstAngle + 360;
-//                telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
+//                telemetry.addData("currentAngle loop 1"b [  , "%.1f", currentAngle);
             }
 
             while (angles.firstAngle >= 0 && opModeIsActive()) {
