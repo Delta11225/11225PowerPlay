@@ -215,7 +215,7 @@ public class TeleopFinalRed extends LinearOpMode {
         if (ControlConfig.duckWheelRed) {
             robot.towerMotor.setPower(duckWheelSpeed);
 
-            duckWheelSpeed += .5;
+            duckWheelSpeed += Constants.duckAccelIncrement;
             if (duckWheelSpeed > duckWheelMaxSpeed) {
                 duckWheelSpeed = duckWheelMaxSpeed;
             }

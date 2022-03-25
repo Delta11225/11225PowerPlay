@@ -26,6 +26,7 @@ public abstract class Constants {
 
     public final static double towerWheelSpeedEndgame = .6009;
     public final static double towerWheelSpeedAuto = .420;
+    public final static double duckAccelIncrement = 0.05;
 
     public final static double tseStep = 0.0005;
 
