@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.autonomous.competition;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -171,10 +170,10 @@ public class AutoFinal extends LinearOpMode {
 //        telemetry.update();
 
         //code needed for camera to display on FTC Dashboard
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-        telemetry = dashboard.getTelemetry();
-        FtcDashboard.getInstance().startCameraStream(webcam, 10);
-        telemetry.update();
+//        FtcDashboard dashboard = FtcDashboard.getInstance();
+//        telemetry = dashboard.getTelemetry();
+//        FtcDashboard.getInstance().startCameraStream(webcam, 10);
+//        telemetry.update();
         //this is next level. ms weyrens, that's irresponsible
 
         //initialize motors
