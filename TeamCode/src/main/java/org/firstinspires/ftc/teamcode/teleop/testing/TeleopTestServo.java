@@ -72,6 +72,8 @@ public class TeleopTestServo extends LinearOpMode {
                 pos += 0.001;
 //                telemetry.addLine("Got here");
 //                sleep(10);
+            } else if (gamepad2.b) {
+                pos -= 0.001;
             }
             robot.tseServo.setPosition(pos);
             telemetry.addData("Pos", pos);
