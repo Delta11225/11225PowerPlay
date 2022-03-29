@@ -61,6 +61,8 @@ public class TeleopFinalBlue extends LinearOpMode {
     double duckWheelSpeed = 0;
     double duckWheelMaxSpeed = Constants.towerWheelSpeedEndgame;
 
+    boolean hasSpoken = false;
+
     @Override
     public void runOpMode() {
 
@@ -224,6 +226,14 @@ public class TeleopFinalBlue extends LinearOpMode {
         ControlConfig.update(gamepad1, gamepad2);
         telemetry.addData("Encoder count, min 1100 to dump", robot.liftMotor.getCurrentPosition() - liftEncoderStart);
         telemetry.update();
+
+        if (!hasSpoken && ControlConfig.dumpBucket) {
+            telemetry.speak("Dump");
+            hasSpoken = true;
+        } else if (!ControlConfig.dumpBucket) {
+            hasSpoken = false;
+        }
+
         // Dumping servo
         if (ControlConfig.dumpBucket && robot.liftMotor.getCurrentPosition() > liftEncoderStart + 1100) {
             robot.dumpServo.setPosition(Constants.dumpPosition);
