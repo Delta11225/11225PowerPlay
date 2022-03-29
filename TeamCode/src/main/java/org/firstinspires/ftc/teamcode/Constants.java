@@ -8,7 +8,7 @@ package org.firstinspires.ftc.teamcode;
  */
 public abstract class Constants {
     public final static double dumpPosition = 0.0;
-    public final static double collectPosition = 0.65;
+    public final static double collectPosition = 0.73;
     public final static double holdPosition = 0.35;
 
     public final static double tseArmInitPosition = 0.47;

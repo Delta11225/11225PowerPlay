@@ -241,7 +241,7 @@ public class TeleopFinalRed extends LinearOpMode {
         else if (ControlConfig.lowerSlide && ControlConfig.linearSlideOverride) {
             robot.dumpServo.setPosition(Constants.collectPosition);
             // sleep(300);
-            robot.liftMotor.setPower(ControlConfig.linSlideSlow ? -Constants.slowMultiplier : -1.0);
+            robot.liftMotor.setPower(-Constants.slowMultiplier);
             //reset liftEncoderStart to current postition!!!
             liftEncoderStart = robot.liftMotor.getCurrentPosition();
         } else if (ControlConfig.lowerSlide && robot.liftMotor.getCurrentPosition() > liftEncoderStart + 10) {
