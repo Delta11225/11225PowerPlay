@@ -13,10 +13,11 @@ public class TeleopTestSound extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        int bruhId = hardwareMap.appContext.getResources().getIdentifier("bruh", "raw", hardwareMap.appContext.getPackageName());
+        bruhID = hardwareMap.appContext.getResources().getIdentifier("bruh_mp3", "raw", hardwareMap.appContext.getPackageName());
 
-        if (bruhID != 0)
-            bruhFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, bruhId);
+        if (bruhID != 0) {
+            bruhFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, bruhID);
+        }
 
         telemetry.addData("sound resource", bruhFound ? "Found" : "NOT found\n Add bruh.mp3 to /src/main/res/raw" );
 
@@ -26,8 +27,8 @@ public class TeleopTestSound extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-
-            if (bruhFound && (isX = gamepad1.x) && !wasX) {
+            isX = gamepad1.x;
+            if (bruhFound && isX && !wasX) {
                 SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, bruhID);
                 telemetry.addData("Playing", "bruh");
                 telemetry.update();

@@ -47,8 +47,9 @@ public abstract class ControlConfig {
     public static boolean initTseArm;
     public static boolean collectTseArm;
 
-
     public static boolean linSlideSlow;
+
+    public static boolean playMotivSound;
 
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls;
@@ -82,5 +83,7 @@ public abstract class ControlConfig {
         collectBucket = pad2.a;
 
         linearSlideOverride = pad2.left_bumper;
+
+        playMotivSound = pad1.left_stick_button || pad1.right_stick_button || pad2.left_stick_button || pad2.right_stick_button;
     }
 }

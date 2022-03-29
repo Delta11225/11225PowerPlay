@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop.competition;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -61,7 +62,7 @@ public class TeleopFinalBlue extends LinearOpMode {
     double duckWheelSpeed = 0;
     double duckWheelMaxSpeed = Constants.towerWheelSpeedEndgame;
 
-    boolean hasSpoken = false;
+    boolean motivated = false;
 
     @Override
     public void runOpMode() {
@@ -145,6 +146,7 @@ public class TeleopFinalBlue extends LinearOpMode {
                 telemetry.update();
                 move();
                 peripheralMove();
+                handleMotivation();
 
                 currentAngle = angles.firstAngle + 360;
 //                telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
@@ -154,6 +156,7 @@ public class TeleopFinalBlue extends LinearOpMode {
                 telemetry.update();
                 move();
                 peripheralMove();
+                handleMotivation();
 
                 currentAngle = angles.firstAngle;
 //                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
@@ -162,7 +165,6 @@ public class TeleopFinalBlue extends LinearOpMode {
 //            telemetry.addLine("null angle");
         }
     }
-
 
     public void move(){
         ControlConfig.update(gamepad1, gamepad2);
@@ -224,18 +226,13 @@ public class TeleopFinalBlue extends LinearOpMode {
 
     public void peripheralMove(){
         ControlConfig.update(gamepad1, gamepad2);
-        telemetry.addData("Encoder count, min 1100 to dump", robot.liftMotor.getCurrentPosition() - liftEncoderStart);
+        double currentLinSlidePos = robot.liftMotor.getCurrentPosition() - liftEncoderStart;
+
+        telemetry.addData("Encoder count, min 1100 to dump", currentLinSlidePos);
         telemetry.update();
 
-        if (!hasSpoken && ControlConfig.dumpBucket) {
-            telemetry.speak("Dump");
-            hasSpoken = true;
-        } else if (!ControlConfig.dumpBucket) {
-            hasSpoken = false;
-        }
-
         // Dumping servo
-        if (ControlConfig.dumpBucket && robot.liftMotor.getCurrentPosition() > liftEncoderStart + 1100) {
+        if (ControlConfig.dumpBucket && robot.liftMotor.getCurrentPosition() > liftEncoderStart + Constants.lowestDump) {
             robot.dumpServo.setPosition(Constants.dumpPosition);
         } else if (ControlConfig.collectBucket) {
             robot.dumpServo.setPosition(Constants.collectPosition);
@@ -309,6 +306,20 @@ public class TeleopFinalBlue extends LinearOpMode {
         robot.tseServo.setPosition(tsePos);
     }
 
+    public void handleMotivation() {
+        if (ControlConfig.playMotivSound && !motivated) {
+            int motivNum = (int)(Math.random() * (Constants.motivationQuantity));
+            int motivID = hardwareMap.appContext.getResources().getIdentifier("motivate_" + motivNum, "raw", hardwareMap.appContext.getPackageName());
+
+            boolean motivFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, motivID);
+            if (motivFound) {
+                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, motivID);
+            }
+            motivated = true;
+        } else if (!ControlConfig.playMotivSound) {
+            motivated = false;
+        }
+    }
 
 
     /*-----------------------------------//

@@ -205,7 +205,7 @@ public class TeleopFinalRed extends LinearOpMode {
         telemetry.update();
 
         // Dumping bucket servo
-        if (ControlConfig.dumpBucket && robot.liftMotor.getCurrentPosition() > liftEncoderStart + 1100) {
+        if (ControlConfig.dumpBucket && robot.liftMotor.getCurrentPosition() > liftEncoderStart + Constants.lowestDump) {
             robot.dumpServo.setPosition(Constants.dumpPosition);
         } else if (ControlConfig.collectBucket) {
             robot.dumpServo.setPosition(Constants.collectPosition);

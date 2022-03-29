@@ -33,4 +33,7 @@ public abstract class Constants {
     public final static int lowEncoder = 1100;
     public final static int midEncoder = 2170;
     public final static int highEncoder = 3470;
+
+    public final static double lowestDump = 1100;
+    public final static int motivationQuantity = 4;
 }
