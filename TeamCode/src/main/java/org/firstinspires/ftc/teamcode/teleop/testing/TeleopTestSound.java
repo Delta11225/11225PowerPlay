@@ -23,6 +23,8 @@ public class TeleopTestSound extends LinearOpMode {
         telemetry.addData(">", "Press X to play sounds.");
         telemetry.update();
 
+        waitForStart();
+
         while (opModeIsActive()) {
 
             if (bruhFound && (isX = gamepad1.x) && !wasX) {
