@@ -32,7 +32,7 @@ import kotlin.NotImplementedError;
  * This is an example of a more complex path to really test the tuning.
  */
 //@Disabled
-@Autonomous(name="Auto final")
+@Autonomous(name="Auto final", preselectTeleOp="TeleOp final blue")
 public class AutoFinal extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
 

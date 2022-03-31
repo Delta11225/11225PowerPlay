@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop.competition;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -58,6 +59,8 @@ public class TeleopFinalRed extends LinearOpMode {
 
     double duckWheelSpeed = 0;
     double duckWheelMaxSpeed = -Constants.towerWheelSpeedEndgame;
+
+    boolean motivated = false;
 
     @Override
     public void runOpMode() {
@@ -118,6 +121,7 @@ public class TeleopFinalRed extends LinearOpMode {
                 telemetry.update();
                 move();
                 peripheralMove();
+                handleMotivation();
 
                 currentAngle = angles.firstAngle + 360;
 //                telemetry.addData("currentAngle loop 1"b [  , "%.1f", currentAngle);
@@ -129,6 +133,7 @@ public class TeleopFinalRed extends LinearOpMode {
                 telemetry.update();
                 move();
                 peripheralMove();
+                handleMotivation();
 
                 currentAngle = angles.firstAngle;
 //                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
@@ -277,6 +282,21 @@ public class TeleopFinalRed extends LinearOpMode {
             tsePos = Constants.tseArmCollectPosition;
         }
         robot.tseServo.setPosition(tsePos);
+    }
+
+    public void handleMotivation() {
+        if (ControlConfig.playMotivSound && !motivated) {
+            int motivNum = (int)(Math.random() * (Constants.motivationQuantity));
+            int motivID = hardwareMap.appContext.getResources().getIdentifier("motivate_" + motivNum, "raw", hardwareMap.appContext.getPackageName());
+
+            boolean motivFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, motivID);
+            if (motivFound) {
+                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, motivID);
+            }
+            motivated = true;
+        } else if (!ControlConfig.playMotivSound) {
+            motivated = false;
+        }
     }
 
 
