@@ -34,23 +34,13 @@ import kotlin.NotImplementedError;
 //@Disabled
 @Autonomous(name="Auto final", preselectTeleOp="TeleOp final blue")
 public class AutoFinal extends LinearOpMode {
+    // FIXME remove unnecessary globals
     private final ElapsedTime runtime = new ElapsedTime();
 
     //-1 for debug, but we can keep it like this because if it works, it should change to either 0 or 255
     private static int valMid = -1;
     //private static int valLeft = -1;
     private static int valRight = -1;
-
-    private static float rectHeight = 1f/8f;
-    private static float rectWidth =  1f/8f;
-
-    private static float offsetX = 0f/8f;//changing this moves the three rects and the three circles left or right, range : (-2, 2) not inclusive
-    private static float offsetY = 0f/8f;//changing this moves the three rects and circles up or down, range: (-4, 4) not inclusive
-
-    private static float[] rightPos = {7f/8f+offsetX, 4f/8f+offsetY};//0 = col, 1 = row
-    private static float[] midPos = {3f/8f+offsetX, 4f/8f+offsetY};
-    //  private static float[] rightPos = {7f/8f+offsetX, 4f/8f+offsetY};
-    //moves all rectangles right or left by amount. units are in ratio to monitor
 
     private Hardware22 robot;
     Color color;
@@ -414,13 +404,21 @@ public class AutoFinal extends LinearOpMode {
     }
 
 
-    class SamplePipeline extends OpenCvPipeline {
+    static class SamplePipeline extends OpenCvPipeline {
         Mat yCbCr = new Mat();
         Mat yMat = new Mat();
         Mat CbMat = new Mat();
         Mat CrMat = new Mat();
         Mat thresholdMat = new Mat();
         Mat all = new Mat();
+
+        private static final float offsetX = 0f/8f;//changing this moves the three rects and the three circles left or right, range : (-2, 2) not inclusive
+        private static final float offsetY = 0f/8f;//changing this moves the three rects and circles up or down, range: (-4, 4) not inclusive
+
+        private static final float[] rightPos = {7f/8f+offsetX, 4f/8f+offsetY};//0 = col, 1 = row
+        private static final float[] midPos = {3f/8f+offsetX, 4f/8f+offsetY};
+        //  private static float[] rightPos = {7f/8f+offsetX, 4f/8f+offsetY};
+        //moves all rectangles right or left by amount. units are in ratio to monitor
 
         @Override
         public Mat processFrame(Mat input)
@@ -468,23 +466,25 @@ public class AutoFinal extends LinearOpMode {
                             input.rows()*(leftPos[1]+rectHeight/2)),
                     new Scalar(0, 255, 0), 3);
                     */
+            float rectHeight = 1f / 8f;
+            float rectWidth = 1f / 8f;
             Imgproc.rectangle(//3-5
                     all,
                     new Point(
-                            input.cols()*(midPos[0]-rectWidth/2),
-                            input.rows()*(midPos[1]-rectHeight/2)),
+                            input.cols()*(midPos[0]- rectWidth /2),
+                            input.rows()*(midPos[1]- rectHeight /2)),
                     new Point(
-                            input.cols()*(midPos[0]+rectWidth/2),
-                            input.rows()*(midPos[1]+rectHeight/2)),
+                            input.cols()*(midPos[0]+ rectWidth /2),
+                            input.rows()*(midPos[1]+ rectHeight /2)),
                     new Scalar(0, 255, 0), 3);
             Imgproc.rectangle(//5-7
                     all,
                     new Point(
-                            input.cols()*(rightPos[0]-rectWidth/2),
-                            input.rows()*(rightPos[1]-rectHeight/2)),
+                            input.cols()*(rightPos[0]- rectWidth /2),
+                            input.rows()*(rightPos[1]- rectHeight /2)),
                     new Point(
-                            input.cols()*(rightPos[0]+rectWidth/2),
-                            input.rows()*(rightPos[1]+rectHeight/2)),
+                            input.cols()*(rightPos[0]+ rectWidth /2),
+                            input.rows()*(rightPos[1]+ rectHeight /2)),
                     new Scalar(0, 255, 0), 3);
 
 
