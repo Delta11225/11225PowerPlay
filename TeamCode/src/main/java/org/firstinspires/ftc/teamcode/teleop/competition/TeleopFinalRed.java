@@ -22,7 +22,6 @@ import java.util.Locale;
 
 @TeleOp(name="TeleOp final red")
 //@Disabled
-// TODO consider adding button to ignore all safeties
 public class TeleopFinalRed extends LinearOpMode {
 
     Hardware22 robot;
@@ -118,31 +117,32 @@ public class TeleopFinalRed extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         elapsedTime.reset();
         while (opModeIsActive()) {
-
             ControlConfig.update(gamepad1, gamepad2);
 
+//            while (angles.firstAngle < 0 && opModeIsActive()) {
+//                telemetry.update();
+//                move();
+//                peripheralMove();
+//                handleMotivation();
+//
+//                currentAngle = angles.firstAngle + 360;
+////                telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
+//            }
+
+//            while (angles.firstAngle >= 0 && opModeIsActive()) {
             telemetry.update();
+            move();
+            peripheralMove();
+            handleMotivation();
+//
+//                currentAngle = angles.firstAngle;
+////                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
+//            }
 
-            while (angles.firstAngle < 0 && opModeIsActive()) {
-                telemetry.update();
-                move();
-                peripheralMove();
-                handleMotivation();
-
+            if (angles.firstAngle < 0) {
                 currentAngle = angles.firstAngle + 360;
-//                telemetry.addData("currentAngle loop 1"b [  , "%.1f", currentAngle);
-            }
-
-            while (angles.firstAngle >= 0 && opModeIsActive()) {
-
-
-                telemetry.update();
-                move();
-                peripheralMove();
-                handleMotivation();
-
+            } else {
                 currentAngle = angles.firstAngle;
-//                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
             }
 
 //            telemetry.addLine("null angle");

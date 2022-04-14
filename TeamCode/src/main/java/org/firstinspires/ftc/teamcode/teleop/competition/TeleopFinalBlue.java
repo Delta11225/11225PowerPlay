@@ -23,6 +23,7 @@ import java.util.Locale;
 @TeleOp(name="TeleOp final blue")
 //@Disabled
 public class TeleopFinalBlue extends LinearOpMode {
+    // FIXME in the future reduce number of global vars
 
     Hardware22 robot;
 
@@ -146,26 +147,30 @@ public class TeleopFinalBlue extends LinearOpMode {
         while (opModeIsActive()) {
             ControlConfig.update(gamepad1, gamepad2);
 
+//            while (angles.firstAngle < 0 && opModeIsActive()) {
+//                telemetry.update();
+//                move();
+//                peripheralMove();
+//                handleMotivation();
+//
+//                currentAngle = angles.firstAngle + 360;
+////                telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
+//            }
+
+//            while (angles.firstAngle >= 0 && opModeIsActive()) {
             telemetry.update();
+            move();
+            peripheralMove();
+            handleMotivation();
+//
+//                currentAngle = angles.firstAngle;
+////                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
+//            }
 
-            while (angles.firstAngle < 0 && opModeIsActive()) {
-                telemetry.update();
-                move();
-                peripheralMove();
-                handleMotivation();
-
+            if (angles.firstAngle < 0) {
                 currentAngle = angles.firstAngle + 360;
-//                telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
-            }
-
-            while (angles.firstAngle >= 0 && opModeIsActive()) {
-                telemetry.update();
-                move();
-                peripheralMove();
-                handleMotivation();
-
+            } else {
                 currentAngle = angles.firstAngle;
-//                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
             }
 
 //            telemetry.addLine("null angle");
