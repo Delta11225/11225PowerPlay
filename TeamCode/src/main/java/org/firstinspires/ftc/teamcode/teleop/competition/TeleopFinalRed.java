@@ -62,6 +62,11 @@ public class TeleopFinalRed extends LinearOpMode {
 
     boolean motivated = false;
 
+    private boolean hasRumbled = false;
+    private boolean didRumble1 = false;
+
+    private ElapsedTime elapsedTime = new ElapsedTime();
+
     @Override
     public void runOpMode() {
 
@@ -111,6 +116,7 @@ public class TeleopFinalRed extends LinearOpMode {
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         currentAngle = 0;
         // run until the end of the match (driver presses STOP)
+        elapsedTime.reset();
         while (opModeIsActive()) {
 
             ControlConfig.update(gamepad1, gamepad2);
@@ -209,11 +215,23 @@ public class TeleopFinalRed extends LinearOpMode {
         telemetry.addData("Encoder count, min 1100 to dump", robot.liftMotor.getCurrentPosition() - liftEncoderStart);
         telemetry.update();
 
-        // Dumping bucket servo
-        if (ControlConfig.dumpBucket && robot.liftMotor.getCurrentPosition() > liftEncoderStart + Constants.lowestDump) {
+        double currentPos = robot.liftMotor.getCurrentPosition();
+        double threshold = liftEncoderStart + Constants.lowestDump;
+
+        // Dumping servo
+        if (ControlConfig.dumpBucket && currentPos > threshold) {
             robot.dumpServo.setPosition(Constants.dumpPosition);
         } else if (ControlConfig.collectBucket) {
             robot.dumpServo.setPosition(Constants.collectPosition);
+        }
+
+        // Handle rumbling for dump servo
+        // Rumble if cross threshold and not rumbled before
+        if (!hasRumbled && (currentPos > threshold) && (currentPos < threshold + 40)) {
+            hasRumbled = true;
+            gamepad2.rumble(.5, 0, 250);
+        } else {
+            hasRumbled = false;
         }
 
         // Tower motor
@@ -282,6 +300,16 @@ public class TeleopFinalRed extends LinearOpMode {
             tsePos = Constants.tseArmCollectPosition;
         }
         robot.tseServo.setPosition(tsePos);
+
+        int rumbleThresh1 = 75;
+
+        if (!didRumble1 && Math.floor(elapsedTime.seconds()) == rumbleThresh1) {
+            gamepad2.rumbleBlips(3);
+            didRumble1 = true;
+        }
+
+        telemetry.addData("Time elapsed", Math.floor(elapsedTime.seconds()));
+        telemetry.update();
     }
 
     public void handleMotivation() {

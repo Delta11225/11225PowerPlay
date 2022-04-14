@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.teleop.testing;
 
 import com.qualcomm.ftccommon.SoundPlayer;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp
+@Disabled
 public class TeleopTestSound extends LinearOpMode {
     boolean isX = false;
     boolean wasX = false;

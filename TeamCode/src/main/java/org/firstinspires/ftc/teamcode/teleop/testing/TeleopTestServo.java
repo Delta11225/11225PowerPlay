@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop.testing;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Hardware22;
 import java.util.Locale;
 
 @TeleOp(name="TeleOp test servo")
+@Disabled
 public class TeleopTestServo extends LinearOpMode {
 
     //Hardware22 robot = new Hardware22();

@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.teleop.testing;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -65,7 +66,7 @@ import java.util.Locale;
  */
 
 @TeleOp(name="TeleOp test red side")
-//@Disabled
+@Disabled
 public class TeleopTestRedSide extends LinearOpMode {
 
     Hardware22 robot;

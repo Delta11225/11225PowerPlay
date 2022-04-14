@@ -63,6 +63,11 @@ public class TeleopFinalBlue extends LinearOpMode {
     double duckWheelMaxSpeed = Constants.towerWheelSpeedEndgame;
 
     boolean motivated = false;
+    boolean hasRumbled = false;
+
+    boolean didRumble1 = false;
+
+    ElapsedTime elapsedTime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -137,6 +142,7 @@ public class TeleopFinalBlue extends LinearOpMode {
 //        });
 //        t1.start();
         // run until the end of the match (driver presses STOP)
+        elapsedTime.reset();
         while (opModeIsActive()) {
             ControlConfig.update(gamepad1, gamepad2);
 
@@ -231,11 +237,23 @@ public class TeleopFinalBlue extends LinearOpMode {
         telemetry.addData("Encoder count, min 1100 to dump", currentLinSlidePos);
         telemetry.update();
 
+        double currentPos = robot.liftMotor.getCurrentPosition();
+        double threshold = liftEncoderStart + Constants.lowestDump;
+
         // Dumping servo
-        if (ControlConfig.dumpBucket && robot.liftMotor.getCurrentPosition() > liftEncoderStart + Constants.lowestDump) {
+        if (ControlConfig.dumpBucket && currentPos > threshold) {
             robot.dumpServo.setPosition(Constants.dumpPosition);
         } else if (ControlConfig.collectBucket) {
             robot.dumpServo.setPosition(Constants.collectPosition);
+        }
+
+        // Handle rumbling for dump servo
+        // Rumble if cross threshold and not rumbled before
+        if (!hasRumbled && (currentPos > threshold) && (currentPos < threshold + 40)) {
+            hasRumbled = true;
+            gamepad2.rumble(.5, 0, 250);
+        } else {
+            hasRumbled = false;
         }
 
         // Tower motor
@@ -283,9 +301,9 @@ public class TeleopFinalBlue extends LinearOpMode {
         // Collection motor
         // Prevent collect wheel from working if bucket is not down
         if (ControlConfig.collectWheel && robot.liftMotor.getCurrentPosition() <= liftEncoderStart + 100) {
-            robot.collectionMotor.setPower(1.0);
-        } else if (ControlConfig.unCollectWheel) {
             robot.collectionMotor.setPower(-1.0);
+        } else if (ControlConfig.unCollectWheel) {
+            robot.collectionMotor.setPower(1.0);
         } else {
             robot.collectionMotor.setPower(0);
         }
@@ -304,6 +322,17 @@ public class TeleopFinalBlue extends LinearOpMode {
             tsePos = Constants.tseArmCollectPosition;
         }
         robot.tseServo.setPosition(tsePos);
+
+        // Rumble if time has elapsed
+        int rumbleThresh1 = 75;
+
+        if (!didRumble1 && Math.floor(elapsedTime.seconds()) == rumbleThresh1) {
+            gamepad2.rumbleBlips(3);
+            didRumble1 = true;
+        }
+
+        telemetry.addData("Time elapsed", Math.floor(elapsedTime.seconds()));
+        telemetry.update();
     }
 
     public void handleMotivation() {

@@ -82,7 +82,7 @@ public abstract class ControlConfig {
         dumpBucket = pad2.y;
         collectBucket = pad2.a;
 
-        linearSlideOverride = pad2.left_bumper;
+        linearSlideOverride = pad2.left_bumper || pad2.right_stick_button; // For compatibility reasons
 
         playMotivSound = pad1.left_stick_button || pad1.right_stick_button || pad2.left_stick_button || pad2.right_stick_button;
     }
