@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autonomous.enums;
+package org.firstinspires.ftc.teamcode.competition.types;
 
 public enum ParkingMethod {
     WALL("wall"),

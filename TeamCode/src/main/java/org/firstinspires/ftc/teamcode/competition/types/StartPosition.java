@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.autonomous.enums;
+package org.firstinspires.ftc.teamcode.competition.types;
 
-public enum Position {
+public enum StartPosition {
     FRONT("front"),
     BACK("back")
     ;
 
     private final String text;
 
-    Position(final String text) {
+    StartPosition(final String text) {
         this.text = text;
     }
 

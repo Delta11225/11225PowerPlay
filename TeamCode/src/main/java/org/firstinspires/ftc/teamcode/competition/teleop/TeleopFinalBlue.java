@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleop.competition;
+package org.firstinspires.ftc.teamcode.competition.teleop;
 
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -15,8 +15,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Hardware22;
+import org.firstinspires.ftc.teamcode.competition.util.Constants;
+import org.firstinspires.ftc.teamcode.competition.util.Hardware22;
+import org.firstinspires.ftc.teamcode.competition.util.ControlConfig;
 
 import java.util.Locale;
 

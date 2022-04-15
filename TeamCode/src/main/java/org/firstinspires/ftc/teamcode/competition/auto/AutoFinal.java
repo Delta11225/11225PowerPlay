@@ -1,18 +1,21 @@
-package org.firstinspires.ftc.teamcode.autonomous.competition;
+package org.firstinspires.ftc.teamcode.competition.auto;
 
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Hardware22;
-import org.firstinspires.ftc.teamcode.autonomous.enums.Color;
-import org.firstinspires.ftc.teamcode.autonomous.enums.ElementPosition;
-import org.firstinspires.ftc.teamcode.autonomous.enums.ParkingMethod;
-import org.firstinspires.ftc.teamcode.autonomous.enums.Position;
+import org.firstinspires.ftc.teamcode.competition.types.Color;
+import org.firstinspires.ftc.teamcode.competition.types.ElementPosition;
+import org.firstinspires.ftc.teamcode.competition.types.ParkingMethod;
+import org.firstinspires.ftc.teamcode.competition.types.StartPosition;
+import org.firstinspires.ftc.teamcode.competition.util.AutoState;
+import org.firstinspires.ftc.teamcode.competition.util.BlueTrajectoryGenerator;
+import org.firstinspires.ftc.teamcode.competition.util.Constants;
+import org.firstinspires.ftc.teamcode.competition.util.Hardware22;
+import org.firstinspires.ftc.teamcode.competition.util.RedTrajectoryGenerator;
+import org.firstinspires.ftc.teamcode.competition.util.TrajectoryGenerator;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -34,42 +37,36 @@ import kotlin.NotImplementedError;
 //@Disabled
 @Autonomous(name="Auto final", preselectTeleOp="TeleOp final blue")
 public class AutoFinal extends LinearOpMode {
-    // FIXME remove unnecessary globals
-    private final ElapsedTime runtime = new ElapsedTime();
-
     //-1 for debug, but we can keep it like this because if it works, it should change to either 0 or 255
     private static int valMid = -1;
     //private static int valLeft = -1;
     private static int valRight = -1;
-
-    private Hardware22 robot;
-    Color color;
-    Position startPosition;
-    ParkingMethod parkingMethod;
-    ElementPosition elementPosition;
-    long delay = 0;
-    private int liftEncoderStart;
     //Telemetry telemetry;
-    OpenCvCamera webcam;
-    SampleMecanumDrive drive;
-    TrajectoryGenerator generator;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        initVars();
-        getUserInput();
+        Hardware22 robot = new Hardware22(hardwareMap);
+        SampleMecanumDrive drive = robot.drive;
+
+        OpenCvCamera webcam = initCamera();
+        initMotors(robot);
+        int liftEncoderStart = robot.liftMotor.getCurrentPosition();
+
+
+        AutoState state = getUserInput();
+        Color color = state.color;
+        StartPosition startPosition = state.position;
+        ParkingMethod parkingMethod = state.parkMethod;
+        long delay = state.delay;
+
+        double towerSpeed = Constants.towerWheelSpeedAuto;
+        if (color == Color.RED) {
+            towerSpeed = -towerSpeed;
+        }
 
         ArrayList<ArrayList<Trajectory>> trajs;
-        double towerSpeed = Constants.towerWheelSpeedAuto;
 
-        if (color == Color.RED) {
-            towerSpeed = -(Constants.towerWheelSpeedAuto);
-            generator = new RedTrajectoryGenerator(drive, startPosition, parkingMethod);
-            trajs = ((RedTrajectoryGenerator) generator).generateTrajectories();
-        } else {
-            generator = new BlueTrajectoryGenerator(drive, startPosition, parkingMethod);
-            trajs = ((BlueTrajectoryGenerator) generator).generateTrajectories();
-        }
+        trajs = generateTrajs(drive, color, startPosition, parkingMethod);
 
         // Confirm auto settings
         telemetry.addLine("Init complete, ready to run");
@@ -87,16 +84,11 @@ public class AutoFinal extends LinearOpMode {
         // game starts
         robot.tseServo.setPosition(Constants.tseArmInitPosition);
 
-
         long startTime = System.nanoTime();
 
-        telemetry.addData("Color", color);
-        telemetry.addData("Position", startPosition);
-        telemetry.addData("Delay", delay);
-        telemetry.update();
         sleep(delay);
 
-        determineDuckPosition();
+        ElementPosition elementPosition = determineDuckPosition();
 
         //added this here to try to fix lifter in autonomous
         robot.liftMotor.setPower(0);
@@ -105,14 +97,16 @@ public class AutoFinal extends LinearOpMode {
         telemetry.addLine("Traj 1");
         telemetry.addData("Position", elementPosition);
         telemetry.update();
-        generator.executeTrajectoryList(trajs.get(0)); // going to shipping hub
+
+        TrajectoryGenerator.executeTrajectoryList(drive, trajs.get(0)); // going to shipping hub
+
         telemetry.addLine("Traj 2");
         telemetry.update();
 
-        dumpPreloaded();
+        dumpPreloaded(robot, liftEncoderStart, elementPosition);
 
-        if (startPosition == Position.FRONT) {
-            generator.executeTrajectoryList(trajs.get(1)); // going to duck wheel
+        if (startPosition == StartPosition.FRONT) {
+            TrajectoryGenerator.executeTrajectoryList(drive, trajs.get(1)); // going to duck wheel
             sleep(300);
             robot.towerMotor.setPower(towerSpeed);
             sleep(3000);
@@ -121,7 +115,7 @@ public class AutoFinal extends LinearOpMode {
 
         telemetry.addLine("Traj 3");
         telemetry.update();
-        generator.executeTrajectoryList(trajs.get(2)); // going to park in warehouse
+        TrajectoryGenerator.executeTrajectoryList(drive, trajs.get(2)); // going to park in warehouse
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
@@ -134,14 +128,38 @@ public class AutoFinal extends LinearOpMode {
         sleep(2000);
     }
 
-    private void initVars() {
-        robot = new Hardware22(hardwareMap);
-        drive = robot.drive;
+    private ArrayList<ArrayList<Trajectory>> generateTrajs(SampleMecanumDrive drive, Color color, StartPosition startPosition, ParkingMethod parkingMethod) {
+        ArrayList<ArrayList<Trajectory>> trajs;
+        if (color == Color.RED) {
+            RedTrajectoryGenerator generator = new RedTrajectoryGenerator(drive, startPosition, parkingMethod);
+            trajs = generator.generateTrajectories();
+        } else {
+            BlueTrajectoryGenerator generator = new BlueTrajectoryGenerator(drive, startPosition, parkingMethod);
+            trajs = generator.generateTrajectories();
+        }
+        return trajs;
+    }
+
+    private void initMotors(Hardware22 robot) {
+        //initialize motors
+        robot.dumpServo.setPosition(Constants.collectPosition);
+
+        robot.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.liftMotor.setPower(1.0);
+        robot.liftMotor.setPower(0.0);
+        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+        //set start position for linear slide encoder
+        //robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    private OpenCvCamera initCamera() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        OpenCvCamera webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -155,6 +173,8 @@ public class AutoFinal extends LinearOpMode {
             }
         });
 
+        return webcam;
+
         //the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
         //If this line is uncommented you will not recieve telemetry
 
@@ -167,23 +187,9 @@ public class AutoFinal extends LinearOpMode {
 //        FtcDashboard.getInstance().startCameraStream(webcam, 10);
 //        telemetry.update();
         //this is next level. ms weyrens, that's irresponsible
-
-        //initialize motors
-        robot.dumpServo.setPosition(Constants.collectPosition);
-
-        robot.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.liftMotor.setPower(1.0);
-        robot.liftMotor.setPower(0.0);
-        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftEncoderStart = robot.liftMotor.getCurrentPosition();
-
-        //set start position for linear slide encoder
-        //robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    private void dumpPreloaded() {
+    private void dumpPreloaded(Hardware22 robot, int liftEncoderStart, ElementPosition elementPosition) {
         // Encoder Counts, Bottom: 1100
         // Middle 2170
         // Top 3470
@@ -275,8 +281,8 @@ public class AutoFinal extends LinearOpMode {
         }
     }
 
-    private void determineDuckPosition() {
-        //duck detection
+    private ElementPosition determineDuckPosition() {
+        ElementPosition elementPosition = null;
         if (valRight == 255) {
             telemetry.addData("Position", "Right");
             telemetry.update();
@@ -293,85 +299,49 @@ public class AutoFinal extends LinearOpMode {
             elementPosition = ElementPosition.LEFT;
             sleep(200);
         }
+
+        return elementPosition;
     }
 
-    public void getUserInput() {
+    public AutoState getUserInput() {
         gamepad2.reset();
 
-        // Color
-        telemetry.addLine("Color?");
-        telemetry.addLine("Blue = X or Square");
-        telemetry.addLine("Red = B or Circle");
-        telemetry.update();
-
-        while (!isStopRequested()) {
-            // This is for some reason required as otherwise we can only run autonomous once
-            // before we need to restart the robot. Included at the beginning of each while loop
-            gamepad2.toString();
-            if (gamepad2.x) {
-                color = Color.BLUE;
-                break;
-            } else if (gamepad2.b) {
-                color = Color.RED;
-                break;
-            }
-        }
-        telemetry.addLine("Color confirmed, " + color);
-        telemetry.update();
-
+        Color color = getColor();
         sleep(100);
 
-        // Position
-        telemetry.addLine("Position");
-        telemetry.addLine("Front = dpad Up, no delay time");
-        telemetry.addLine("Back = dpad Down");
+        StartPosition startPosition = getPosition();
+        sleep(100);
+
+        ParkingMethod parkingMethod = getParkMethod(startPosition);
+        sleep(100);
+
+        long delay = getDelay();
+        sleep(100);
+
+        confirmAutoGood();
+
+        return new AutoState(color, startPosition, parkingMethod, delay);
+    }
+
+    private void confirmAutoGood() {
+        // Prompt users to check if auto is good
+        telemetry.addLine("Did you check camera stream? Press b or Circle");
         telemetry.update();
+        while (!isStopRequested() && !gamepad2.b) {}
 
-        while (!isStopRequested()) {
-            gamepad2.toString();
-            if (gamepad2.dpad_up) {
-                startPosition = Position.FRONT;
-                break;
-            } else if (gamepad2.dpad_down) {
-                startPosition = Position.BACK;
-                break;
-            }
-        }
-
-        telemetry.addLine("Position confirmed, " + startPosition);
+        telemetry.addLine("Did you preload a box? Press a or X");
         telemetry.update();
-        sleep(500);
+        while (!isStopRequested() && !gamepad2.a) {}
 
-        // Parking method
-        telemetry.addLine("Parking Method?");
-        telemetry.addLine("Wall = dpad Right");
-        telemetry.addLine("Barrier = dpad Left");
-        telemetry.addLine("Storage = gamepad a or X");
+        telemetry.addLine("Are the linear slide and TSE arm down? Press x or Square");
         telemetry.update();
+        while (!isStopRequested() && !gamepad2.x) {}
+    }
 
-        while (!isStopRequested()) {
-            gamepad2.toString();
-            if (gamepad2.dpad_left) {
-                parkingMethod = ParkingMethod.BARRIER;
-                break;
-            } else if (gamepad2.dpad_right) {
-                parkingMethod = ParkingMethod.WALL;
-                break;
-            } else if (gamepad2.a) {
-                if (startPosition == Position.BACK) {
-                    throw new NotImplementedError("This route doesn't exist moron");
-                }
-                parkingMethod = ParkingMethod.STORAGE;
-                break;
-            }
-        }
-
-        telemetry.addLine("Parking method confirmed, " + parkingMethod);
-        telemetry.update();
-        sleep(500);
-
-        // Delay
+    private long getDelay() {
         boolean buttonUnpressed = true;
+        long delay = 0;
+
         while (!isStopRequested()) {
             gamepad2.toString();
             telemetry.addData("Delay? RB to add 10 ms, LB to add 100ms, y or Triangle done", delay);
@@ -390,19 +360,90 @@ public class AutoFinal extends LinearOpMode {
         }
         telemetry.addLine("Delay confirmed, " + delay);
         telemetry.update();
+        return delay;
+    }
 
-        // Prompt users to check if auto is good
-        telemetry.addLine("Did you check camera stream? Press b or Circle");
+    private ParkingMethod getParkMethod(StartPosition startPosition) {
+        telemetry.addLine("Parking Method?");
+        telemetry.addLine("Wall = dpad Right");
+        telemetry.addLine("Barrier = dpad Left");
+        telemetry.addLine("Storage = gamepad a or X");
         telemetry.update();
-        while (!isStopRequested() && !gamepad2.b) {}
 
-        telemetry.addLine("Did you preload a box? Press a or X");
-        telemetry.update();
-        while (!isStopRequested() && !gamepad2.a) {}
+        ParkingMethod parkingMethod = null;
 
-        telemetry.addLine("Are the linear slide and TSE arm down? Press x or Square");
+        while (!isStopRequested()) {
+            gamepad2.toString();
+            if (gamepad2.dpad_left) {
+                parkingMethod = ParkingMethod.BARRIER;
+                break;
+            } else if (gamepad2.dpad_right) {
+                parkingMethod = ParkingMethod.WALL;
+                break;
+            } else if (gamepad2.a) {
+                if (startPosition == StartPosition.BACK) {
+                    throw new NotImplementedError("This route doesn't exist moron");
+                }
+                parkingMethod = ParkingMethod.STORAGE;
+                break;
+            }
+        }
+
+        telemetry.addLine("Parking method confirmed, " + parkingMethod);
         telemetry.update();
-        while (!isStopRequested() && !gamepad2.x) {}
+
+        return parkingMethod;
+    }
+
+    private StartPosition getPosition() {
+        telemetry.addLine("Position");
+        telemetry.addLine("Front = dpad Up, no delay time");
+        telemetry.addLine("Back = dpad Down");
+        telemetry.update();
+
+        StartPosition startPosition = null;
+
+        while (!isStopRequested()) {
+            gamepad2.toString();
+            if (gamepad2.dpad_up) {
+                startPosition = StartPosition.FRONT;
+                break;
+            } else if (gamepad2.dpad_down) {
+                startPosition = StartPosition.BACK;
+                break;
+            }
+        }
+
+        telemetry.addLine("Position confirmed, " + startPosition);
+        telemetry.update();
+
+        return startPosition;
+    }
+
+    private Color getColor() {
+        telemetry.addLine("Color?");
+        telemetry.addLine("Blue = X or Square");
+        telemetry.addLine("Red = B or Circle");
+        telemetry.update();
+
+        Color color = null;
+
+        while (!isStopRequested()) {
+            // This is for some reason required as otherwise we can only run autonomous once
+            // before we need to restart the robot. Included at the beginning of each while loop
+            gamepad2.toString();
+            if (gamepad2.x) {
+                color = Color.BLUE;
+                break;
+            } else if (gamepad2.b) {
+                color = Color.RED;
+                break;
+            }
+        }
+        telemetry.addLine("Color confirmed, " + color);
+        telemetry.update();
+
+        return color;
     }
 
 

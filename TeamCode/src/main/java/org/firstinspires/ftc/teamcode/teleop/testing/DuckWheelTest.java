@@ -6,9 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Hardware22;
-import org.firstinspires.ftc.teamcode.teleop.competition.ControlConfig;
+import org.firstinspires.ftc.teamcode.competition.util.Constants;
+import org.firstinspires.ftc.teamcode.competition.util.Hardware22;
+import org.firstinspires.ftc.teamcode.competition.util.ControlConfig;
 
 @TeleOp
 @Disabled

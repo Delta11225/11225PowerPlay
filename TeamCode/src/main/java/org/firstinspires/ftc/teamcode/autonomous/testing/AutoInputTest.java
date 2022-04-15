@@ -8,15 +8,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Hardware22;
-import org.firstinspires.ftc.teamcode.autonomous.competition.BlueTrajectoryGenerator;
-import org.firstinspires.ftc.teamcode.autonomous.competition.RedTrajectoryGenerator;
-import org.firstinspires.ftc.teamcode.autonomous.competition.TrajectoryGenerator;
-import org.firstinspires.ftc.teamcode.autonomous.enums.Color;
-import org.firstinspires.ftc.teamcode.autonomous.enums.ElementPosition;
-import org.firstinspires.ftc.teamcode.autonomous.enums.ParkingMethod;
-import org.firstinspires.ftc.teamcode.autonomous.enums.Position;
+import org.firstinspires.ftc.teamcode.competition.util.Constants;
+import org.firstinspires.ftc.teamcode.competition.util.Hardware22;
+import org.firstinspires.ftc.teamcode.competition.util.BlueTrajectoryGenerator;
+import org.firstinspires.ftc.teamcode.competition.util.RedTrajectoryGenerator;
+import org.firstinspires.ftc.teamcode.competition.util.TrajectoryGenerator;
+import org.firstinspires.ftc.teamcode.competition.types.Color;
+import org.firstinspires.ftc.teamcode.competition.types.ElementPosition;
+import org.firstinspires.ftc.teamcode.competition.types.ParkingMethod;
+import org.firstinspires.ftc.teamcode.competition.types.StartPosition;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -57,7 +57,7 @@ public class AutoInputTest extends LinearOpMode {
 
     private Hardware22 robot;
     Color color;
-    Position position;
+    StartPosition position;
     ParkingMethod parkingMethod;
     ElementPosition elementPosition;
     long delay = 0;
@@ -131,13 +131,13 @@ public class AutoInputTest extends LinearOpMode {
         telemetry.addLine("Traj 1");
         telemetry.addData("Position", elementPosition);
         telemetry.update();
-        generator.executeTrajectoryList(trajs.get(0)); // going to shipping hub
+        TrajectoryGenerator.executeTrajectoryList(drive, trajs.get(0)); // going to shipping hub
         telemetry.addLine("Traj 2");
         telemetry.update();
 
         dumpPreloaded();
-        if (position == Position.FRONT) {
-            generator.executeTrajectoryList(trajs.get(1)); // going to duck wheel
+        if (position == StartPosition.FRONT) {
+            TrajectoryGenerator.executeTrajectoryList(drive, trajs.get(1)); // going to duck wheel
             sleep(300);
             robot.towerMotor.setPower(towerSpeed);
             sleep(2750);
@@ -146,7 +146,7 @@ public class AutoInputTest extends LinearOpMode {
 
         telemetry.addLine("Traj 3");
         telemetry.update();
-        generator.executeTrajectoryList(trajs.get(2)); // going to park in warehouse
+        TrajectoryGenerator.executeTrajectoryList(drive, trajs.get(2)); // going to park in warehouse
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
@@ -256,10 +256,10 @@ public class AutoInputTest extends LinearOpMode {
 
         while (true) {
             if (gamepad2.dpad_up) {
-                position = Position.FRONT;
+                position = StartPosition.FRONT;
                 break;
             } else if (gamepad2.dpad_down) {
-                position = Position.BACK;
+                position = StartPosition.BACK;
                 break;
             }
         }

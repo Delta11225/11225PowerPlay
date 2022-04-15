@@ -8,10 +8,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Hardware22;
-import org.firstinspires.ftc.teamcode.autonomous.competition.TrajectoryGenerator;
-import org.firstinspires.ftc.teamcode.autonomous.enums.PathType;
+import org.firstinspires.ftc.teamcode.competition.util.Constants;
+import org.firstinspires.ftc.teamcode.competition.util.Hardware22;
+import org.firstinspires.ftc.teamcode.competition.util.TrajectoryGenerator;
+import org.firstinspires.ftc.teamcode.competition.types.PathType;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -121,7 +121,7 @@ public class AutoBlueTestWithObjectDetect extends LinearOpMode {
         telemetry.update();
 
 //        if (isStopRequested()) return;
-        generator.executeTrajectoryList(compiled1);
+        TrajectoryGenerator.executeTrajectoryList(drive, compiled1);
 
         sleep(500);
         robot.towerMotor.setPower(Constants.towerWheelSpeedEndgame);
@@ -129,7 +129,7 @@ public class AutoBlueTestWithObjectDetect extends LinearOpMode {
         robot.towerMotor.setPower(0);
         sleep(500);
 
-        generator.executeTrajectoryList(compiled2);
+        TrajectoryGenerator.executeTrajectoryList(drive, compiled2);
     }
     class SamplePipeline extends OpenCvPipeline {
         Mat yCbCr = new Mat();

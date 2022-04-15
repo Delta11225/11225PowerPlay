@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Hardware22;
-import org.firstinspires.ftc.teamcode.autonomous.competition.TrajectoryGenerator;
-import org.firstinspires.ftc.teamcode.autonomous.enums.Color;
-import org.firstinspires.ftc.teamcode.autonomous.enums.ElementPosition;
-import org.firstinspires.ftc.teamcode.autonomous.enums.ParkingMethod;
-import org.firstinspires.ftc.teamcode.autonomous.enums.Position;
+import org.firstinspires.ftc.teamcode.competition.util.Hardware22;
+import org.firstinspires.ftc.teamcode.competition.util.TrajectoryGenerator;
+import org.firstinspires.ftc.teamcode.competition.types.Color;
+import org.firstinspires.ftc.teamcode.competition.types.ElementPosition;
+import org.firstinspires.ftc.teamcode.competition.types.ParkingMethod;
+import org.firstinspires.ftc.teamcode.competition.types.StartPosition;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -27,7 +27,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 public class AutoSlideTest extends LinearOpMode {
 
     Color color;
-    Position position;
+    StartPosition position;
     ParkingMethod parkingMethod;
     ElementPosition elementPosition;
     private Hardware22 robot;
