@@ -134,7 +134,8 @@ public class AutoFinal extends LinearOpMode {
         sleep(2000);
     }
 
-    private void initVars() {robot = new Hardware22(hardwareMap);
+    private void initVars() {
+        robot = new Hardware22(hardwareMap);
         drive = robot.drive;
 
         robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -150,7 +151,8 @@ public class AutoFinal extends LinearOpMode {
             }
 
             @Override
-            public void onError(int errorCode) { return; }
+            public void onError(int errorCode) {
+            }
         });
 
         //the maximum resolution you can stream at and still get up to 30FPS is 480p (640x480).
@@ -298,8 +300,8 @@ public class AutoFinal extends LinearOpMode {
 
         // Color
         telemetry.addLine("Color?");
-        telemetry.addLine("Blue = X");
-        telemetry.addLine("Red = B");
+        telemetry.addLine("Blue = X or Square");
+        telemetry.addLine("Red = B or Circle");
         telemetry.update();
 
         while (!isStopRequested()) {
@@ -344,7 +346,7 @@ public class AutoFinal extends LinearOpMode {
         telemetry.addLine("Parking Method?");
         telemetry.addLine("Wall = dpad Right");
         telemetry.addLine("Barrier = dpad Left");
-        telemetry.addLine("Storage = gamepad a");
+        telemetry.addLine("Storage = gamepad a or X");
         telemetry.update();
 
         while (!isStopRequested()) {
@@ -372,7 +374,7 @@ public class AutoFinal extends LinearOpMode {
         boolean buttonUnpressed = true;
         while (!isStopRequested()) {
             gamepad2.toString();
-            telemetry.addData("Delay? RB to add 10 ms, LB to add 100ms, y done", delay);
+            telemetry.addData("Delay? RB to add 10 ms, LB to add 100ms, y or Triangle done", delay);
             telemetry.update();
             if (gamepad2.right_bumper && buttonUnpressed) {
                 delay += 10;
@@ -390,15 +392,15 @@ public class AutoFinal extends LinearOpMode {
         telemetry.update();
 
         // Prompt users to check if auto is good
-        telemetry.addLine("Did you check camera stream? Press B");
+        telemetry.addLine("Did you check camera stream? Press b or Circle");
         telemetry.update();
         while (!isStopRequested() && !gamepad2.b) {}
 
-        telemetry.addLine("Did you preload a box? Press A");
+        telemetry.addLine("Did you preload a box? Press a or X");
         telemetry.update();
         while (!isStopRequested() && !gamepad2.a) {}
 
-        telemetry.addLine("Are the linear slide and TSE arm down? Press X");
+        telemetry.addLine("Are the linear slide and TSE arm down? Press x or Square");
         telemetry.update();
         while (!isStopRequested() && !gamepad2.x) {}
     }

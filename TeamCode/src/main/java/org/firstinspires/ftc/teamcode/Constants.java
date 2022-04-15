@@ -30,7 +30,7 @@ public abstract class Constants {
 
     public final static double tseStep = 0.0005;
 
-    public final static int lowEncoder = 1100;
+    public final static int lowEncoder = 1120;
     public final static int midEncoder = 2170;
     public final static int highEncoder = 3470;
 
