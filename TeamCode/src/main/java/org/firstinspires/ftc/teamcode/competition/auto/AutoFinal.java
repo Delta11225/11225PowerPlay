@@ -149,9 +149,6 @@ public class AutoFinal extends LinearOpMode {
         robot.liftMotor.setPower(1.0);
         robot.liftMotor.setPower(0.0);
         robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
         //set start position for linear slide encoder
         //robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

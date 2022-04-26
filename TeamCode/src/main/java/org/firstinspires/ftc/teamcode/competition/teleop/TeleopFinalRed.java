@@ -280,9 +280,9 @@ public class TeleopFinalRed extends LinearOpMode {
         // Collection motor
         // Prevent collect wheel from working if bucket is not down
         if (ControlConfig.collectWheel && robot.liftMotor.getCurrentPosition() <= liftEncoderStart + 100) {
-            robot.collectionMotor.setPower(1.0);
-        } else if (ControlConfig.unCollectWheel) {
             robot.collectionMotor.setPower(-1.0);
+        } else if (ControlConfig.unCollectWheel) {
+            robot.collectionMotor.setPower(1.0);
         } else {
             robot.collectionMotor.setPower(0);
         }

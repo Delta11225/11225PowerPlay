@@ -35,7 +35,7 @@ public class RedTrajectoryGenerator extends TrajectoryGenerator {
             drive.setPoseEstimate(startPose);
 
             // moving to the shipping hub
-            generateTrajectoryListItem(-16.5, -39, 90, PathType.LINE_TO_LINEAR, trajectory1);
+            generateTrajectoryListItem(-16.5, -39.5, 90, PathType.LINE_TO_LINEAR, trajectory1);
             if (parkingMethod == ParkingMethod.WALL) {
                 // Forward movement to avoid carossel
                 //  generateTrajectoryListItem(-50, 56.25, 0, PathType.LINE_TO_LINEAR, trajectory3);
