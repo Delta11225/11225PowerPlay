@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.competition.types;
+package org.firstinspires.ftc.teamcode.util;
 
 import java.util.HashMap;
 import java.util.Map;

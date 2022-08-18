@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.competition.util;
+package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
