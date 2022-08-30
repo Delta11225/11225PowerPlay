@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
 
 import java.util.ArrayList;
 
@@ -25,14 +26,14 @@ class TrajectorySequenceFactory {
 
    public TrajectorySequenceFactory(SampleMecanumDrive drive, Telemetry telemetry, Pose2d startPose) {
       // The Double arrays here have the following structure:
-      //  [x, y, heading, pathType, endTangent]
+      //  [x, y, heading, pathType, endTangent (will be -999 if not applicable)]
        this.internalPathRepresentation= new ArrayList<>();
        this.drive = drive;
        this.telemetry = telemetry;
        this.startPose = startPose;
 
-       // If first navigation is a delta instead of a pose, we need this for reference
-       internalPathRepresentation.add(new Double[]{startPose.getX(), startPose.getY(), startPose.getHeading(), -1d});
+       // If first navigation is a delta instead of a pose, we need this as a starting reference
+       internalPathRepresentation.add(new Double[]{startPose.getX(), startPose.getY(), startPose.getHeading(), -999d});
    }
 
    public TrajectorySequenceFactory navigateTo(Pose2d pose) {
@@ -51,7 +52,17 @@ class TrajectorySequenceFactory {
    }
 
    public TrajectorySequenceFactory navigateTo(Vector2d delta, PathType pathType) {
-      return this.navigateTo(new Pose2d(delta.getX(), delta.getY(), getLatestPose().getHeading()), pathType, endTangentDefault);
+      return this.navigateTo(
+              new Pose2d(delta.getX(),
+              delta.getY(),
+              getLatestPose().getHeading()),
+              pathType,
+              // If the pathType is a spline movement type (NOT spline heading), then we need to
+              // pass the default end tangent into the method, otherwise we need to put -999 as that
+              // signifies that there is no endTangent. Technically, this is not strictly required,
+              // but it helps with readability.
+              pathType == PathType.SPLINE_TO_SPLINE || pathType == PathType.SPLINE_TO_LINEAR ? endTangentDefault : -999d
+      );
    }
 
    private Pose2d getLatestPose() {
@@ -61,11 +72,12 @@ class TrajectorySequenceFactory {
 
    public TrajectorySequence build() {
       TrajectorySequenceBuilder builder;
+      TrajectorySequence sequence = null;
+      Trajectory traj = null;
 
-      // Test for continuity
+      // Test for path continuity
       try {
          TrajectoryBuilder builderTest = null;
-         Trajectory traj = null;
 
          for (Double[] posArr : internalPathRepresentation) {
             Pose2d currPose = composePoseFromArr(posArr);
@@ -91,13 +103,27 @@ class TrajectorySequenceFactory {
             traj = builderTest.build();
          }
       } catch (PathContinuityViolationException e) {
-         throw new NotImplementedError();
+         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
+         telemetry.addLine("<p style='color:yellow;'>TEST</p>");
+         telemetry.update();
+         traj = null;
 //         throw e;
       }
-      return null;
+      if (traj == null) {
+         throw new NotImplementedError();
+      } else {
+         sequence = drive.trajectorySequenceBuilder(composePoseFromArr(internalPathRepresentation.get(0)))
+                 .addTrajectory(traj)
+                 .build();
+      }
+      return sequence;
    }
 
    private Pose2d composePoseFromArr(Double[] posArr) {
       return new Pose2d(posArr[0], posArr[1], posArr[2]);
+   }
+
+   public static void setDefaultEndTangent(double endTangentDefault) {
+      TrajectorySequenceFactory.endTangentDefault = endTangentDefault;
    }
 }
