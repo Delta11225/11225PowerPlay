@@ -8,10 +8,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Autonomous
-class TelemetryTest extends OpMode {
+public class TelemetryTest extends OpMode {
     @Override
     public void init() {
-        telemetry = FtcDashboard.getInstance().getTelemetry();
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
     }
 
