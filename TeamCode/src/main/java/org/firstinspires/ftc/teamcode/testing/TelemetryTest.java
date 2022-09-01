@@ -11,12 +11,16 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class TelemetryTest extends OpMode {
     @Override
     public void init() {
+        telemetry = FtcDashboard.getInstance().getTelemetry();
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
     }
 
     @Override
     public void loop() {
-        telemetry.addLine("<h1>TEST<h1>");
+        telemetry.addLine("<b><p " +
+                "style='color: #daa052;'>" +
+                "TEST" +
+                "</p></b>");
         telemetry.addLine("test2");
     }
 }
