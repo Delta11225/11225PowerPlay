@@ -31,7 +31,7 @@ public class WebcamTest extends OpMode {
     @Override
     public void init() {
         telemetry.addData("Status", "Initialising");
-        telemetry = FtcDashboard.getInstance().getTelemetry();
+        telemetry = new TelemWrapper(telemetry, FtcDashboard.getInstance().getTelemetry());
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "webcam1"); // TODO check this
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
