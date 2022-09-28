@@ -77,71 +77,71 @@ public class Hardware22 {
     public Hardware22(HardwareMap hardwareMap) {
         // Define and initialize motors
         // NEVER DO THIS
-//        try {
+        try {
         rearLeft = hardwareMap.dcMotor.get("rear_left");
         rearLeft.setDirection(DcMotor.Direction.REVERSE);
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         frontLeft = hardwareMap.dcMotor.get("front_left");
         frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         frontRight = hardwareMap.dcMotor.get("front_right");
         frontRight.setDirection(DcMotor.Direction.FORWARD);
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         rearRight = hardwareMap.dcMotor.get("rear_right");
         rearRight.setDirection(DcMotor.Direction.FORWARD);
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         logitechWebcam = hardwareMap.get(WebcamName.class, "Webcam 1");
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         towerMotor = hardwareMap.dcMotor.get("tower_motor");
         towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         dumpServo = hardwareMap.servo.get("servo_dump");
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         tseServo = hardwareMap.servo.get("tse_servo");
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
 
-//        try {
+        try {
         collectionMotor = hardwareMap.dcMotor.get("collection_motor");
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         liftMotor = hardwareMap.dcMotor.get("lift_motor");
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         drive = new SampleMecanumDrive(hardwareMap);
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
 
-//        try {
+        try {
         generator = new TrajectoryGenerator(drive);
-//        } catch (Exception ignored) {
-//        }
+        } catch (Exception ignored) {
+        }
     }
 }
 
