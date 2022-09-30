@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.path.PathContinuityViolationException;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.noahbres.meepmeep.roadrunner.DriveShim;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
@@ -22,6 +23,7 @@ import kotlin.NotImplementedError;
  * a chain to navigate either to absolute positions or with vector position changes.
  */
 public class TrajectorySequenceFactory {
+    private final boolean doTelem;
     // Splines take this as an argument, so we have this for default value methods.
     private Double endTangentDefault = 0d;
 
@@ -46,6 +48,7 @@ public class TrajectorySequenceFactory {
         this.drive = drive;
         this.telemetry = telemetry;
         this.startPose = startPose;
+        this.doTelem = true;
 
         // If first navigation is a delta instead of a pose, we need this as a starting reference
         internalPathRepresentation.add(new Double[]{startPose.getX(), startPose.getY(), startPose.getHeading(), -1d, -999d});
@@ -156,9 +159,11 @@ public class TrajectorySequenceFactory {
                 traj = builderTest.build();
             }
         } catch (PathContinuityViolationException e) {
-            telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
-            telemetry.addLine("<p style='color: #daa052;'>WARNING. Path is not continuous.</p>");
-            telemetry.update();
+            if (doTelem) {
+                telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
+                telemetry.addLine("<p style='color: #daa052;'>WARNING. Path is not continuous.</p>");
+                telemetry.update();
+            }
             traj = null;
 //         throw e;
         }
