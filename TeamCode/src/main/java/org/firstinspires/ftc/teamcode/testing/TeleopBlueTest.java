@@ -21,9 +21,9 @@ import org.firstinspires.ftc.teamcode.util.Hardware22;
 
 import java.util.Locale;
 
-@TeleOp(name="TeleOp final blue")
 //@Disabled
-public class TeleopFinalBlue extends LinearOpMode {
+@TeleOp
+public class TeleopBlueTest extends LinearOpMode {
     // FIXME in the future reduce number of global vars
     // TODO add button combination to override things
     // TODO like maybe right joystick button and a, b, x, or y
@@ -71,6 +71,8 @@ public class TeleopFinalBlue extends LinearOpMode {
 
     boolean didRumble1 = false;
 
+    double offset = 0;
+
     ElapsedTime elapsedTime = new ElapsedTime();
 
     @Override
@@ -101,86 +103,31 @@ public class TeleopFinalBlue extends LinearOpMode {
         robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
-//        robot.dumpServo.setPosition(Constants.collectPosition);
-//        robot.tseServo.setPosition(Constants.tseArmInitPosition);
-//
-//        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        robot.frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        robot.frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        robot.rearLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        robot.rearRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//
-//        robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        liftEncoderStart = robot.liftMotor.getCurrentPosition();
-
         // End init phase
         waitForStart();
 
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         currentAngle = 0;
-//
-//        LiftThread liftThread = new LiftThread();
-//        new Thread(liftThread).start();
 
-//        Thread t1 = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (opModeIsActive()) {
-//                    if (ControlConfig.runSlideToLowDump) {
-//                        robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-////                        telemetry.addLine("Got here");
-//                        telemetry.update();
-//                        robot.liftMotor.setTargetPosition((int) (liftEncoderStart + 1100));
-//                        robot.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//                        robot.liftMotor.setPower(1.0);
-//                        slideReturning = true;
-//                        telemetry.addLine(String.valueOf(slideReturning));
-//                        telemetry.update();
-//                    }
-//
-//                    while (opModeIsActive() && robot.liftMotor.isBusy()) {}
-//                    slideReturning = false;
-//                }
-//            }
-//        });
-//        t1.start();
-        // run until the end of the match (driver presses STOP)
         elapsedTime.reset();
         while (opModeIsActive()) {
             ControlConfig.update(gamepad1, gamepad2);
 
-//            while (angles.firstAngle < 0 && opModeIsActive()) {
-//                telemetry.update();
-//                move();
-//                peripheralMove();
-//                handleMotivation();
-//
-//                currentAngle = angles.firstAngle + 360;
-////                telemetry.addData("currentAngle loop 1", "%.1f", currentAngle);
-//            }
-
-//            while (angles.firstAngle >= 0 && opModeIsActive()) {
             telemetry.update();
             move();
 //            peripheralMove();
 //            handleMotivation();
-//
-//                currentAngle = angles.firstAngle;
-////                telemetry.addData("currentAngle loop 2", "%.1f", currentAngle);
-//            }
 
             if (angles.firstAngle < 0) {
                 currentAngle = angles.firstAngle + 360;
             } else {
                 currentAngle = angles.firstAngle;
             }
-
-//            telemetry.addLine("null angle");
         }
     }
 
-    public void move(){
+    public void move() {
+
         ControlConfig.update(gamepad1, gamepad2);
         double theta = Math.toRadians(currentAngle);
 
