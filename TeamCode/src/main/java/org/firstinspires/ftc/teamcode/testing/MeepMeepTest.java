@@ -29,10 +29,10 @@ public class MeepMeepTest {
                                 .build()
                 );
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_FREIGHTFRENZY_ADI_DARK)
-                .setDarkMode(true)
-                .setBackgroundAlpha(0.95f)
-                .addEntity(myBot)
-                .start();
+//        meepMeep.setBackground(MeepMeep.Background.FIELD_FREIGHTFRENZY_ADI_DARK)
+//                .setDarkMode(true)
+//                .setBackgroundAlpha(0.95f)
+//                .addEntity(myBot)
+//                .start();
     }
 }
