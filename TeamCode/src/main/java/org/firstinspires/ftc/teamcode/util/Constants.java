@@ -19,10 +19,10 @@ public abstract class Constants {
 //    public final static double tseArmDeployPosition = 0.2;
 //    public final static double tseArmReleasePosition = 0.3;
 
-    public final static double fastMultiplier = 0.5;
-    public final static double normalMultiplier = 0.2;
-    public final static double slowMultiplier = 0.1;
-    public final static double superSlowMultiplier = 0.05;
+    public final static double fastMultiplier = 0.8;
+    public final static double normalMultiplier = 0.4;
+    public final static double slowMultiplier = 0.3;
+    public final static double superSlowMultiplier = 0.2;
 
     public final static double towerWheelSpeedEndgame = .6009;
     public final static double towerWheelSpeedAuto = .420;
