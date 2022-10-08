@@ -1,18 +1,18 @@
-package com.delta.meepmeeptest;
+package com.example.meepmeep;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class MeepMeepTest {
+public class MeepMeep {
     public static void main(String[] args) {
-        TrajectorySequenceFactory traj = new TrajectorySequenceFactory();
-        MeepMeep meepMeep = new MeepMeep(800);
+
+//        TrajectorySequenceFactory traj = new TrajectorySequenceFactory(new Pose2d(0, 0, 0));
+        com.noahbres.meepmeep.MeepMeep meepMeep = new com.noahbres.meepmeep.MeepMeep(800);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(57.5 * 0.9, 30, 5.398889 * 0.9, Math.toRadians(180), 12.12)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
                                 .forward(30)
@@ -26,10 +26,10 @@ public class MeepMeepTest {
                                 .build()
                 );
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_FREIGHTFRENZY_ADI_DARK)
-                .setDarkMode(true)
-                .setBackgroundAlpha(0.95f)
-                .addEntity(myBot)
-                .start();
+//        meepMeep.setBackground(MeepMeep.Background.FIELD_FREIGHTFRENZY_ADI_DARK)
+//                .setDarkMode(true)
+//                .setBackgroundAlpha(0.95f)
+//                .addEntity(myBot)
+//                .start();
     }
 }
