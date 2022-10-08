@@ -71,7 +71,7 @@ public class Hardware22 {
 
     // RoadRunner driver
     public SampleMecanumDrive drive;
-    public TrajectoryGenerator generator;
+    public TrajectoryGeneratorOld generator;
 
 
     public Hardware22(HardwareMap hardwareMap) {
@@ -139,7 +139,7 @@ public class Hardware22 {
         }
 
         try {
-        generator = new TrajectoryGenerator(drive);
+        generator = new TrajectoryGeneratorOld(drive);
         } catch (Exception ignored) {
         }
     }

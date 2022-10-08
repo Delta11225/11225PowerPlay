@@ -22,6 +22,7 @@ import kotlin.NotImplementedError;
  * it (hopefully) a little bit easier. Initialize an instance and call .navigateTo methods in
  * a chain to navigate either to absolute positions or with vector position changes.
  */
+@Deprecated
 public class TrajectorySequenceFactory {
     private final boolean doTelem;
     // Splines take this as an argument, so we have this for default value methods.

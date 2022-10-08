@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Wrapper for telemetry. Takes FTC telemetry and Dashboard telemetry and passes method calls to
  * both.
  */
+@Deprecated
 class TelemWrapper implements Telemetry {
     private Telemetry dashboardTelem = null;
     private Telemetry originalTelem = null;

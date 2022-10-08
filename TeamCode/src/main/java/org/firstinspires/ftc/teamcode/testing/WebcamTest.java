@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.testing;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.autonomous.ParkingPosition;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -20,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+@Disabled
 @Autonomous
 public class WebcamTest extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
@@ -70,7 +73,7 @@ public class WebcamTest extends LinearOpMode {
 
         private int channelIndexLast = -1;
         private Double[] rawVals = new Double[] {0d, 0d, 0d};
-        private Position posLast = Position.HOW_ON_EARTH;
+        private ParkingPosition posLast = ParkingPosition.HOW_ON_EARTH;
 
         Mat displayMat = new Mat();
         Mat rMat = new Mat(); // Channel 0
@@ -149,12 +152,12 @@ public class WebcamTest extends LinearOpMode {
 
             // A mapping between channel index (r,g,b) and position (1,2,3). Change it if mapping
             // changes.
-            HashMap<Integer, Position> posMappings = new HashMap<>();
-            posMappings.put(0, Position.THREE);
-            posMappings.put(1, Position.ONE);
-            posMappings.put(2, Position.TWO);
+            HashMap<Integer, ParkingPosition> posMappings = new HashMap<>();
+            posMappings.put(0, ParkingPosition.THREE);
+            posMappings.put(1, ParkingPosition.ONE);
+            posMappings.put(2, ParkingPosition.TWO);
 
-            posLast = posMappings.getOrDefault(maxAt, Position.HOW_ON_EARTH);
+            posLast = posMappings.getOrDefault(maxAt, ParkingPosition.HOW_ON_EARTH);
 
             // Set these for debugging
             rawVals = vals;
@@ -170,7 +173,7 @@ public class WebcamTest extends LinearOpMode {
             return rawVals;
         }
 
-        public Position getLastPos() {
+        public ParkingPosition getLastPos() {
             return posLast;
         }
     }

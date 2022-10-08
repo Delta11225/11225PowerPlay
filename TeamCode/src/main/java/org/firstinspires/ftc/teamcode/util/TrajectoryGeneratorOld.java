@@ -9,10 +9,11 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
 import java.util.ArrayList;
 
-public class TrajectoryGenerator {
+@Deprecated
+public class TrajectoryGeneratorOld {
     SampleMecanumDrive drive;
 
-    public TrajectoryGenerator(SampleMecanumDrive drive) {
+    public TrajectoryGeneratorOld(SampleMecanumDrive drive) {
         this.drive = drive;
     }
 
