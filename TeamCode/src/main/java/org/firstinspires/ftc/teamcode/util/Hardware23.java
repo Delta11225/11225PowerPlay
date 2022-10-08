@@ -49,86 +49,80 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
  */
 public class Hardware23 {
 
+    private final HardwareMap hwMap = null;
+    private final ElapsedTime runtime = new ElapsedTime();
     public DcMotor rearLeft = null;
     public DcMotor rearRight = null;
     public DcMotor frontLeft = null;
     public DcMotor frontRight = null;
     public WebcamName logitechWebcam = null;
-
     public DcMotor linearSlide = null;
     public Servo rightClaw = null;
     public Servo leftClaw = null;
-
-
-    private BNO055IMU imu;
-
-    // State used for updating telemetry
-    private Orientation angles;
-    private Acceleration gravity;
-
-    private final HardwareMap hwMap = null;
-    private final ElapsedTime runtime = new ElapsedTime();
-
     // RoadRunner driver
     public SampleMecanumDrive drive;
     public TrajectoryGeneratorOld generator;
+    private BNO055IMU imu;
+    // State used for updating telemetry
+    private Orientation angles;
+    private Acceleration gravity;
 
 
     public Hardware23(HardwareMap hardwareMap) {
         // Define and initialize motors
         // NEVER DO THIS
         try {
-        rearLeft = hardwareMap.dcMotor.get("rear_left");
-        rearLeft.setDirection(DcMotor.Direction.REVERSE);
+            rearLeft = hardwareMap.dcMotor.get("rear_left");
+            rearLeft.setDirection(DcMotor.Direction.REVERSE);
         } catch (Exception ignored) {
         }
 
         try {
-        frontLeft = hardwareMap.dcMotor.get("front_left");
-        frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+            frontLeft = hardwareMap.dcMotor.get("front_left");
+            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         } catch (Exception ignored) {
         }
 
         try {
-        frontRight = hardwareMap.dcMotor.get("front_right");
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
+            frontRight = hardwareMap.dcMotor.get("front_right");
+            frontRight.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception ignored) {
         }
 
         try {
-        rearRight = hardwareMap.dcMotor.get("rear_right");
-        rearRight.setDirection(DcMotor.Direction.FORWARD);
+            rearRight = hardwareMap.dcMotor.get("rear_right");
+            rearRight.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception ignored) {
         }
 
         try {
-        logitechWebcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+            logitechWebcam = hardwareMap.get(WebcamName.class, "Webcam 1");
         } catch (Exception ignored) {
         }
 
         try {
-        linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
-        linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
+            linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } catch (Exception ignored) {
         }
 
         try {
-        rightClaw = hardwareMap.get(Servo.class, "right_claw");
+            rightClaw = hardwareMap.get(Servo.class, "right_claw");
         } catch (Exception ignored) {
         }
 
         try {
-        leftClaw = hardwareMap.get(Servo.class, "left_claw");
+            leftClaw = hardwareMap.get(Servo.class, "left_claw");
         } catch (Exception ignored) {
         }
 
         try {
-        drive = new SampleMecanumDrive(hardwareMap);
+            drive = new SampleMecanumDrive(hardwareMap);
         } catch (Exception ignored) {
         }
 
         try {
-        generator = new TrajectoryGeneratorOld(drive);
+            generator = new TrajectoryGeneratorOld(drive);
         } catch (Exception ignored) {
         }
     }

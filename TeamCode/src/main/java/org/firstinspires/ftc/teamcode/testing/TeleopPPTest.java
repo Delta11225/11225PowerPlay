@@ -35,8 +35,6 @@ public class TeleopPPTest extends LinearOpMode {
     Orientation angles;
     Acceleration gravity;
 
-    private ElapsedTime runtime = new ElapsedTime();
-
     double frontLeft;
     double rearLeft;
     double frontRight;
@@ -45,13 +43,11 @@ public class TeleopPPTest extends LinearOpMode {
     double forward;
     double right;
     double clockwise;
-
     double powerMultiplier = 1;
     double deadZone = Math.abs(0.2);
 
     double temp;
     double side;
-
     double currentAngle;
 
     boolean tseArmActive = false;
@@ -69,24 +65,22 @@ public class TeleopPPTest extends LinearOpMode {
 
     boolean motivated = false;
     boolean hasRumbled = false;
-
     boolean didRumble1 = false;
 
     double offset = 0;
-
     int holdPosition;
-
     ElapsedTime elapsedTime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -169,13 +163,13 @@ public class TeleopPPTest extends LinearOpMode {
         if (ControlConfig.slow && ControlConfig.fast) {
             powerMultiplier = Constants.superSlowMultiplier;
 //            telemetry.addLine("super fast");
-        } else if (ControlConfig.fast){
+        } else if (ControlConfig.fast) {
             powerMultiplier = Constants.fastMultiplier;
 //            telemetry.addLine("fast");
         } else if (ControlConfig.slow) {
             powerMultiplier = Constants.slowMultiplier;
 //            telemetry.addLine("slow");
-        }  else {
+        } else {
             powerMultiplier = Constants.normalMultiplier;
 //            telemetry.addLine("normal");
         }
@@ -192,7 +186,7 @@ public class TeleopPPTest extends LinearOpMode {
 
     }
 
-    public void peripheralMove(){
+    public void peripheralMove() {
         ControlConfig.update(gamepad1, gamepad2);
 
         /////////////////////////////LINEAR SLIDE//////////////////////////////
@@ -224,21 +218,21 @@ public class TeleopPPTest extends LinearOpMode {
 
 ////////////////////GRABBER////////////////////////////////////////////////////////
 
-            // A button = open claw, b button = closed claw
-            if (gamepad1.a){
-                robot.rightClaw.setPosition(0.95); // Right claw open
-                robot.leftClaw.setPosition(0.0); // Left claw open
-            }
-            if (gamepad1.b){
-                robot.rightClaw.setPosition(0.70); // Right claw closed
-                robot.leftClaw.setPosition(0.25); // Left claw closed
-            }
+        // A button = open claw, b button = closed claw
+        if (gamepad1.a) {
+            robot.rightClaw.setPosition(0.95); // Right claw open
+            robot.leftClaw.setPosition(0.0); // Left claw open
+        }
+        if (gamepad1.b) {
+            robot.rightClaw.setPosition(0.70); // Right claw closed
+            robot.leftClaw.setPosition(0.25); // Left claw closed
+        }
 
     }
 
     public void handleMotivation() {
         if (ControlConfig.playMotivSound && !motivated) {
-            int motivNum = (int)(Math.random() * (Constants.motivationQuantity));
+            int motivNum = (int) (Math.random() * (Constants.motivationQuantity));
             int motivID = hardwareMap.appContext.getResources().getIdentifier("motivate_" + motivNum, "raw", hardwareMap.appContext.getPackageName());
 
             boolean motivFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, motivID);
@@ -258,14 +252,15 @@ public class TeleopPPTest extends LinearOpMode {
     void composeTelemetry() {
         // At the beginning of each telemetry update, grab a bunch of data
         // from the IMU that we will then display in separate lines.
-        telemetry.addAction(new Runnable() { @Override public void run()
-        {
-            // Acquiring the angles is relatively expensive; we don't want
-            // to do that in each of the three items that need that info, as that's
-            // three times the necessary expense.
-            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            gravity  = imu.getGravity();
-        }
+        telemetry.addAction(new Runnable() {
+            @Override
+            public void run() {
+                // Acquiring the angles is relatively expensive; we don't want
+                // to do that in each of the three items that need that info, as that's
+                // three times the necessary expense.
+                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                gravity = imu.getGravity();
+            }
         });
 
 //        telemetry.addLine()
@@ -323,7 +318,7 @@ public class TeleopPPTest extends LinearOpMode {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
 
-    String formatDegrees(double degrees){
+    String formatDegrees(double degrees) {
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
 
