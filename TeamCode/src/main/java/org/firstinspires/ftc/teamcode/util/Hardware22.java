@@ -75,6 +75,7 @@ public class Hardware22 {
 
 
     public Hardware22(HardwareMap hardwareMap) {
+        drive = new SampleMecanumDrive(hardwareMap);
         // Define and initialize motors
         // NEVER DO THIS
         try {
