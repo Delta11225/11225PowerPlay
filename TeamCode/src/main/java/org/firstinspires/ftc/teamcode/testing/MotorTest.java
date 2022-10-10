@@ -13,6 +13,7 @@ public class MotorTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Hardware22 robot = new Hardware22(hardwareMap);
         waitForStart();
+        telemetry.addData("yrdy", 1);
         while (opModeIsActive()) {
             robot.frontLeft.setPower(1);
         }
