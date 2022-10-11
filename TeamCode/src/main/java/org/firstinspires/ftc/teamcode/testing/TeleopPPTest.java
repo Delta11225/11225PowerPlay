@@ -6,6 +6,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -102,9 +103,9 @@ public class TeleopPPTest extends LinearOpMode {
         robot.rearRight.setPower(0);
 
         robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
+        robot.frontRight.setDirection(DcMotor.Direction.FORWARD);
         robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
-        robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
+        robot.rearRight.setDirection(DcMotor.Direction.FORWARD);
 
         robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -120,7 +121,7 @@ public class TeleopPPTest extends LinearOpMode {
 
             telemetry.update();
             move();
-//            peripheralMove();
+            peripheralMove();
 //            handleMotivation();
 
             if (angles.firstAngle < 0) {
@@ -139,9 +140,9 @@ public class TeleopPPTest extends LinearOpMode {
 //        telemetry.addData("CurrentAngle", currentAngle);
 //        telemetry.addData("Theta", theta);
 
-        forward = ControlConfig.forward;
-        right = ControlConfig.right;
-        clockwise = ControlConfig.clockwise;
+        forward =  -gamepad1.left_stick_y ;
+        right = gamepad1.left_stick_x;
+        clockwise = gamepad1.right_stick_x;
 
         temp = (forward * Math.cos(theta) - right * Math.sin(theta));
         side = (forward * Math.sin(theta) + right * Math.cos(theta));
@@ -181,13 +182,14 @@ public class TeleopPPTest extends LinearOpMode {
         }
 
         telemetry.addData("Power:", powerMultiplier);
+        telemetry.addData ("Angle:", currentAngle);
 
         telemetry.update();
 
         robot.frontLeft.setPower(frontLeft * powerMultiplier);
-        robot.frontRight.setPower(-frontRight * powerMultiplier);
+        robot.frontRight.setPower(frontRight * powerMultiplier);
         robot.rearLeft.setPower(rearLeft * powerMultiplier);
-        robot.rearRight.setPower(-rearRight * powerMultiplier);
+        robot.rearRight.setPower(rearRight * powerMultiplier);
 
 
     }

@@ -71,64 +71,57 @@ public class Hardware23 {
 
     // RoadRunner driver
     public SampleMecanumDrive drive;
-    public TrajectoryGeneratorOld generator;
-
 
     public Hardware23(HardwareMap hardwareMap) {
         // Define and initialize motors
         // NEVER DO THIS
         try {
-        rearLeft = hardwareMap.dcMotor.get("rear_left");
-        rearLeft.setDirection(DcMotor.Direction.REVERSE);
+            rearLeft = hardwareMap.dcMotor.get("rear_left");
+            rearLeft.setDirection(DcMotor.Direction.REVERSE);
         } catch (Exception ignored) {
         }
 
         try {
-        frontLeft = hardwareMap.dcMotor.get("front_left");
-        frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+            frontLeft = hardwareMap.dcMotor.get("front_left");
+            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         } catch (Exception ignored) {
         }
 
         try {
-        frontRight = hardwareMap.dcMotor.get("front_right");
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
+            frontRight = hardwareMap.dcMotor.get("front_right");
+            frontRight.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception ignored) {
         }
 
         try {
-        rearRight = hardwareMap.dcMotor.get("rear_right");
-        rearRight.setDirection(DcMotor.Direction.FORWARD);
+            rearRight = hardwareMap.dcMotor.get("rear_right");
+            rearRight.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception ignored) {
         }
 
         try {
-        logitechWebcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+            logitechWebcam = hardwareMap.get(WebcamName.class, "Webcam 1");
         } catch (Exception ignored) {
         }
 
         try {
-        linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
-        linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            linearSlide = hardwareMap.dcMotor.get("linear_slide");
+            linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } catch (Exception ignored) {
         }
 
         try {
-        rightClaw = hardwareMap.get(Servo.class, "right_claw");
+            rightClaw = hardwareMap.get(Servo.class, "right_claw");
         } catch (Exception ignored) {
         }
 
         try {
-        leftClaw = hardwareMap.get(Servo.class, "left_claw");
+            leftClaw = hardwareMap.get(Servo.class, "left_claw");
         } catch (Exception ignored) {
         }
 
         try {
-        drive = new SampleMecanumDrive(hardwareMap);
-        } catch (Exception ignored) {
-        }
-
-        try {
-        generator = new TrajectoryGeneratorOld(drive);
+            drive = new SampleMecanumDrive(hardwareMap);
         } catch (Exception ignored) {
         }
     }
