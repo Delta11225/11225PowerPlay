@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.testing;
 
-import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -23,7 +22,7 @@ import java.util.Locale;
 
 //@Disabled
 @TeleOp
-public class TeleopFinal extends LinearOpMode {
+public class TeleopFinal extends OpMode {
     // FIXME in the future reduce number of global vars
     // TODO add button combination to override things
     // TODO like maybe right joystick button and a, b, x, or y
@@ -49,19 +48,6 @@ public class TeleopFinal extends LinearOpMode {
     double side;
     double currentAngle;
 
-    boolean tseArmActive = false;
-    boolean tseRodActive = false;
-    boolean unpressed = true;
-    boolean liftmode = true;
-
-    volatile boolean slideReturning = false;
-
-    double tsePos = Constants.tseArmInitPosition;
-    double liftEncoderStart;
-
-    double duckWheelSpeed = 0;
-    double duckWheelMaxSpeed = Constants.towerWheelSpeedEndgame;
-
     boolean motivated = false;
     boolean hasRumbled = false;
     boolean didRumble1 = false;
@@ -69,10 +55,10 @@ public class TeleopFinal extends LinearOpMode {
     double offset = 0;
     int holdPosition;
     ElapsedTime elapsedTime = new ElapsedTime();
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
 
     @Override
-    public void runOpMode() {
+    public void init() {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -94,33 +80,35 @@ public class TeleopFinal extends LinearOpMode {
         robot.rearLeft.setPower(0);
         robot.rearRight.setPower(0);
 
-        robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
-        robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
-        robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
+//        robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
+//        robot.frontRight.setDirection(DcMotor.Direction.FORWARD);
+//        robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
+//        robot.rearRight.setDirection(DcMotor.Direction.FORWARD);
 
         robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 
-        // End init phase
-        waitForStart();
-
+    @Override
+    public void start() {
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         currentAngle = 0;
 
         elapsedTime.reset();
-        while (opModeIsActive()) {
-            ControlConfig.update(gamepad1, gamepad2);
+    }
 
-            telemetry.update();
-            move();
-//            peripheralMove();
-//            handleMotivation();
+    @Override
+    public void loop() {
+        ControlConfig.update(gamepad1, gamepad2);
 
-            if (angles.firstAngle < 0) {
-                currentAngle = angles.firstAngle + 360;
-            } else {
-                currentAngle = angles.firstAngle;
-            }
+        telemetry.update();
+        move();
+        peripheralMove();
+
+        if (angles.firstAngle < 0) {
+            currentAngle = angles.firstAngle + 360;
+        } else {
+            currentAngle = angles.firstAngle;
         }
     }
 
@@ -189,20 +177,20 @@ public class TeleopFinal extends LinearOpMode {
         ControlConfig.update(gamepad1, gamepad2);
 
         /////////////////////////////LINEAR SLIDE//////////////////////////////
-        if (gamepad1.dpad_up && robot.linearSlide.getCurrentPosition() < 1555) {
+        if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.linearSlide.setPower(0.5);
-            if (robot.linearSlide.getCurrentPosition() > 1555) {
-                holdPosition = 1555;
+            if (robot.linearSlide.getCurrentPosition() > Constants.liftEncoderMax) {
+                holdPosition = Constants.liftEncoderMax;
             } else {
                 holdPosition = robot.linearSlide.getCurrentPosition();
             }
-        } else if (gamepad1.dpad_down && robot.linearSlide.getCurrentPosition() > 0) {
+        } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.linearSlide.setPower(-0.4);
             holdPosition = robot.linearSlide.getCurrentPosition();
         } else {
-            if (robot.linearSlide.getCurrentPosition() < 1555 && robot.linearSlide.getCurrentPosition() > 600) {
+            if (robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax && robot.linearSlide.getCurrentPosition() > 600) {
                 robot.linearSlide.setTargetPosition(holdPosition);
                 robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.linearSlide.setPower(0.05);
@@ -218,32 +206,16 @@ public class TeleopFinal extends LinearOpMode {
 ////////////////////GRABBER////////////////////////////////////////////////////////
 
         // A button = open claw, b button = closed claw
-        if (gamepad1.a) {
-            robot.rightClaw.setPosition(0.95); // Right claw open
-            robot.leftClaw.setPosition(0.0); // Left claw open
+        if (ControlConfig.openClaw) {
+            robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
+            robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
         }
-        if (gamepad1.b) {
-            robot.rightClaw.setPosition(0.70); // Right claw closed
-            robot.leftClaw.setPosition(0.25); // Left claw closed
+        if (ControlConfig.closeClaw) {
+            robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
+            robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
         }
 
     }
-
-    public void handleMotivation() {
-        if (ControlConfig.playMotivSound && !motivated) {
-            int motivNum = (int) (Math.random() * (Constants.motivationQuantity));
-            int motivID = hardwareMap.appContext.getResources().getIdentifier("motivate_" + motivNum, "raw", hardwareMap.appContext.getPackageName());
-
-            boolean motivFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, motivID);
-            if (motivFound) {
-                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, motivID);
-            }
-            motivated = true;
-        } else if (!ControlConfig.playMotivSound) {
-            motivated = false;
-        }
-    }
-
 
     /*-----------------------------------//
      * DO NOT WRITE CODE BELOW THIS LINE  *
