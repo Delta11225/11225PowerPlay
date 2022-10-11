@@ -17,24 +17,22 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.ControlConfig;
-import org.firstinspires.ftc.teamcode.util.Hardware22;
+import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 import java.util.Locale;
 
 //@Disabled
 @TeleOp
-public class TeleopBlueTest extends LinearOpMode {
+public class TeleopFinal extends LinearOpMode {
     // FIXME in the future reduce number of global vars
     // TODO add button combination to override things
     // TODO like maybe right joystick button and a, b, x, or y
 
-    Hardware22 robot;
+    Hardware23 robot;
 
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
-
-    private ElapsedTime runtime = new ElapsedTime();
 
     double frontLeft;
     double rearLeft;
@@ -44,13 +42,11 @@ public class TeleopBlueTest extends LinearOpMode {
     double forward;
     double right;
     double clockwise;
-
     double powerMultiplier = 1;
     double deadZone = Math.abs(0.2);
 
     double temp;
     double side;
-
     double currentAngle;
 
     boolean tseArmActive = false;
@@ -68,22 +64,22 @@ public class TeleopBlueTest extends LinearOpMode {
 
     boolean motivated = false;
     boolean hasRumbled = false;
-
     boolean didRumble1 = false;
 
     double offset = 0;
-
+    int holdPosition;
     ElapsedTime elapsedTime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -91,7 +87,7 @@ public class TeleopBlueTest extends LinearOpMode {
 
         composeTelemetry();
 
-        robot = new Hardware22(hardwareMap);
+        robot = new Hardware23(hardwareMap);
 
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
@@ -102,6 +98,8 @@ public class TeleopBlueTest extends LinearOpMode {
         robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
         robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
+
+        robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // End init phase
         waitForStart();
@@ -134,8 +132,8 @@ public class TeleopBlueTest extends LinearOpMode {
 //        telemetry.addData("CurrentAngle", currentAngle);
 //        telemetry.addData("Theta", theta);
 
-        forward = ControlConfig.left;
-        right = ControlConfig.forward;
+        forward = ControlConfig.forward;
+        right = ControlConfig.right;
         clockwise = ControlConfig.clockwise;
 
         temp = (forward * Math.cos(theta) - right * Math.sin(theta));
@@ -164,13 +162,13 @@ public class TeleopBlueTest extends LinearOpMode {
         if (ControlConfig.slow && ControlConfig.fast) {
             powerMultiplier = Constants.superSlowMultiplier;
 //            telemetry.addLine("super fast");
-        } else if (ControlConfig.fast){
+        } else if (ControlConfig.fast) {
             powerMultiplier = Constants.fastMultiplier;
 //            telemetry.addLine("fast");
         } else if (ControlConfig.slow) {
             powerMultiplier = Constants.slowMultiplier;
 //            telemetry.addLine("slow");
-        }  else {
+        } else {
             powerMultiplier = Constants.normalMultiplier;
 //            telemetry.addLine("normal");
         }
@@ -187,110 +185,65 @@ public class TeleopBlueTest extends LinearOpMode {
 
     }
 
-    public void peripheralMove(){
+    public void peripheralMove() {
         ControlConfig.update(gamepad1, gamepad2);
-        double currentLinSlidePos = robot.liftMotor.getCurrentPosition() - liftEncoderStart;
 
-        telemetry.addData("Encoder count, min 1100 to dump", currentLinSlidePos);
-        telemetry.update();
-
-        double currentPos = robot.liftMotor.getCurrentPosition();
-        double threshold = liftEncoderStart + Constants.lowestDump;
-
-        // Dumping servo
-        if (ControlConfig.dumpBucket && currentPos > threshold) {
-            robot.dumpServo.setPosition(Constants.dumpPosition);
-        } else if (ControlConfig.collectBucket) {
-            robot.dumpServo.setPosition(Constants.collectPosition);
-        }
-
-        // Handle rumbling for dump servo
-        // Rumble if cross threshold and not rumbled before
-        if (!hasRumbled && (currentPos > threshold) && (currentPos < threshold + 40)) {
-            hasRumbled = true;
-            gamepad2.rumble(.5, 0, 250);
-        } else {
-            hasRumbled = false;
-        }
-
-        // Tower motor
-        if (ControlConfig.duckWheelBlue) {
-            robot.towerMotor.setPower(duckWheelSpeed);
-
-            duckWheelSpeed += Constants.duckAccelIncrement;
-            if (duckWheelSpeed > duckWheelMaxSpeed) {
-                duckWheelSpeed = duckWheelMaxSpeed;
-            }
-        } else {
-            robot.towerMotor.setPower(0);
-            duckWheelSpeed = 0;
-        }
-
-        // Set dumpServo to hold position if above certain encoder count
-        // For now, this has been deemed unnecessary
-        if (ControlConfig.liftSlide) { // && robot.liftMotor.getCurrentPosition() > liftEncoderStart + 200) {
-            robot.dumpServo.setPosition(Constants.holdPosition);
-        }
-
-        // Lift motor
-        // Prevent liftMotor from going below start position or going above top position
-        // as that would throw off encoders or loosen slack on cable
-        if (ControlConfig.liftSlide && robot.liftMotor.getCurrentPosition() < liftEncoderStart + Constants.highEncoder) {
-            //added safety here to hold bucket in horizontal position when lifting so freight does not fall out as robot drives around field
-            robot.liftMotor.setPower(ControlConfig.linSlideSlow ? Constants.slowMultiplier : 1.0);
-        }
-        //////SAFETY IN CASE LINEAR SLIDE STARTS UP!!!!
-        else if (ControlConfig.lowerSlide && ControlConfig.linearSlideOverride) {
-            robot.dumpServo.setPosition(Constants.collectPosition);
-            // sleep(300);
-            robot.liftMotor.setPower(-Constants.slowMultiplier);
-            //reset liftEncoderStart to current postition!!!
-            liftEncoderStart = robot.liftMotor.getCurrentPosition();
-        } else if (ControlConfig.lowerSlide && robot.liftMotor.getCurrentPosition() > liftEncoderStart + 10) {
-            robot.dumpServo.setPosition(Constants.collectPosition);
-            // sleep(300);
-            robot.liftMotor.setPower(ControlConfig.linSlideSlow ? -Constants.slowMultiplier : -1.0);
-        } else {
-            robot.liftMotor.setPower(0);
-            robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-
-        // Collection motor
-        // Prevent collect wheel from working if bucket is not down
-        if (ControlConfig.collectWheel && robot.liftMotor.getCurrentPosition() <= liftEncoderStart + 100) {
-                robot.collectionMotor.setPower(-1.0);
-            } else if (ControlConfig.unCollectWheel) {
-                robot.collectionMotor.setPower(1.0);
+        /////////////////////////////LINEAR SLIDE//////////////////////////////
+        if (gamepad1.dpad_up && robot.linearSlide.getCurrentPosition() < 1555) {
+            robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.linearSlide.setPower(0.5);
+            if (robot.linearSlide.getCurrentPosition() > 1555) {
+                holdPosition = 1555;
             } else {
-                robot.collectionMotor.setPower(0);
+                holdPosition = robot.linearSlide.getCurrentPosition();
+            }
+        } else if (gamepad1.dpad_down && robot.linearSlide.getCurrentPosition() > 0) {
+            robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.linearSlide.setPower(-0.4);
+            holdPosition = robot.linearSlide.getCurrentPosition();
+        } else {
+            if (robot.linearSlide.getCurrentPosition() < 1555 && robot.linearSlide.getCurrentPosition() > 600) {
+                robot.linearSlide.setTargetPosition(holdPosition);
+                robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.linearSlide.setPower(0.05);
+                //linearSlide.setPower(0);
+            } else {
+                robot.linearSlide.setPower(0);
+                robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            telemetry.addData("encoder", robot.linearSlide.getCurrentPosition());
+            telemetry.update();
         }
 
-        // TSE Arm
-        if (ControlConfig.raiseTseArm) {
-            tsePos -= Constants.tseStep;
-        } else if (ControlConfig.lowerTseArm) {
-            tsePos += Constants.tseStep;
-            // Not anymore, we got dem hi tork servos
-            // Necessary, as otherwise the servos don't have enough torque
-//            sleep(500);
-        } else if (ControlConfig.initTseArm) {
-            tsePos = Constants.tseArmInitPosition;
-        } else if (ControlConfig.collectTseArm) {
-            tsePos = Constants.tseArmCollectPosition;
+////////////////////GRABBER////////////////////////////////////////////////////////
+
+        // A button = open claw, b button = closed claw
+        if (gamepad1.a) {
+            robot.rightClaw.setPosition(0.95); // Right claw open
+            robot.leftClaw.setPosition(0.0); // Left claw open
         }
-        robot.tseServo.setPosition(tsePos);
-
-        // Rumble if time has elapsed
-        int rumbleThresh1 = 75;
-
-        if (!didRumble1 && Math.floor(elapsedTime.seconds()) == rumbleThresh1) {
-            gamepad2.rumbleBlips(3);
-            didRumble1 = true;
+        if (gamepad1.b) {
+            robot.rightClaw.setPosition(0.70); // Right claw closed
+            robot.leftClaw.setPosition(0.25); // Left claw closed
         }
 
-        telemetry.addData("Time elapsed", Math.floor(elapsedTime.seconds()));
-        telemetry.update();
     }
+
+    public void handleMotivation() {
+        if (ControlConfig.playMotivSound && !motivated) {
+            int motivNum = (int) (Math.random() * (Constants.motivationQuantity));
+            int motivID = hardwareMap.appContext.getResources().getIdentifier("motivate_" + motivNum, "raw", hardwareMap.appContext.getPackageName());
+
+            boolean motivFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, motivID);
+            if (motivFound) {
+                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, motivID);
+            }
+            motivated = true;
+        } else if (!ControlConfig.playMotivSound) {
+            motivated = false;
+        }
+    }
+
 
     /*-----------------------------------//
      * DO NOT WRITE CODE BELOW THIS LINE  *
@@ -298,14 +251,15 @@ public class TeleopBlueTest extends LinearOpMode {
     void composeTelemetry() {
         // At the beginning of each telemetry update, grab a bunch of data
         // from the IMU that we will then display in separate lines.
-        telemetry.addAction(new Runnable() { @Override public void run()
-        {
-            // Acquiring the angles is relatively expensive; we don't want
-            // to do that in each of the three items that need that info, as that's
-            // three times the necessary expense.
-            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            gravity  = imu.getGravity();
-        }
+        telemetry.addAction(new Runnable() {
+            @Override
+            public void run() {
+                // Acquiring the angles is relatively expensive; we don't want
+                // to do that in each of the three items that need that info, as that's
+                // three times the necessary expense.
+                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                gravity = imu.getGravity();
+            }
         });
 
 //        telemetry.addLine()
@@ -363,7 +317,7 @@ public class TeleopBlueTest extends LinearOpMode {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
 
-    String formatDegrees(double degrees){
+    String formatDegrees(double degrees) {
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
 

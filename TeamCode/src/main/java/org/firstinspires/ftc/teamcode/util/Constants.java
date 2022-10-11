@@ -36,4 +36,15 @@ public abstract class Constants {
 
     public final static double lowestDump = 1100;
     public final static int motivationQuantity = 4;
+
+    public final static int autoLiftEncoderStart = 40;
+
+    public final static double rightClawOpen = 0.95;
+    public final static double rightClawClosed = 0.7;
+
+    public final static double leftClawOpen = 0.0;
+    public final static double leftClawClosed = 0.25;
+
+    // TODO fix this
+    public final static int liftEncoderMax = 2100;
 }
