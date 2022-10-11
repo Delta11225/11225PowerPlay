@@ -71,7 +71,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
-    private Boolean[] encoderReverseMask = new Boolean[]{true, true, false, false};
+    private Boolean[] encoderReverseMask = new Boolean[]{false, false, false, false};
 
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;

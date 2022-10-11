@@ -47,18 +47,18 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
  * REMOVE THE TRY CATCH BLOCKS BEFORE COMPETITION.
  * ENSURE each INDIVIDUAL CALL to the hardware map is in its OWN try-catch block.
  */
-public class Hardware22 {
+public class Hardware23 {
 
     public DcMotor rearLeft = null;
     public DcMotor rearRight = null;
     public DcMotor frontLeft = null;
     public DcMotor frontRight = null;
     public WebcamName logitechWebcam = null;
-    public DcMotor towerMotor = null;
-    public Servo dumpServo = null;
-    public Servo tseServo = null;
-    public DcMotor collectionMotor = null;
-    public DcMotor liftMotor = null;
+
+    public DcMotor linearSlide = null;
+    public Servo rightClaw = null;
+    public Servo leftClaw = null;
+
 
     private BNO055IMU imu;
 
@@ -74,8 +74,7 @@ public class Hardware22 {
     public TrajectoryGeneratorOld generator;
 
 
-    public Hardware22(HardwareMap hardwareMap) {
-        drive = new SampleMecanumDrive(hardwareMap);
+    public Hardware23(HardwareMap hardwareMap) {
         // Define and initialize motors
         // NEVER DO THIS
         try {
@@ -108,29 +107,18 @@ public class Hardware22 {
         }
 
         try {
-        towerMotor = hardwareMap.dcMotor.get("tower_motor");
-        towerMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
+        linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } catch (Exception ignored) {
         }
 
         try {
-        dumpServo = hardwareMap.servo.get("servo_dump");
+        rightClaw = hardwareMap.get(Servo.class, "right_claw");
         } catch (Exception ignored) {
         }
 
         try {
-        tseServo = hardwareMap.servo.get("tse_servo");
-        } catch (Exception ignored) {
-        }
-
-
-        try {
-        collectionMotor = hardwareMap.dcMotor.get("collection_motor");
-        } catch (Exception ignored) {
-        }
-
-        try {
-        liftMotor = hardwareMap.dcMotor.get("lift_motor");
+        leftClaw = hardwareMap.get(Servo.class, "left_claw");
         } catch (Exception ignored) {
         }
 

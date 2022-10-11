@@ -2,19 +2,21 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.Hardware22;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-class Auto extends LinearOpMode {
+@Autonomous
+public class Auto extends LinearOpMode {
     FtcDashboard ftcDashboard = FtcDashboard.getInstance();
 
     @Override
@@ -73,6 +75,8 @@ class Auto extends LinearOpMode {
 
         // Start of game delay, if we need it
         sleep(delay);
+
+        robot.drive.followTrajectorySequence(trajSequence);
     }
 
     private OpenCvCamera initCamera(OpenCvPipeline pipeline) {
