@@ -22,8 +22,8 @@ public class Auto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // This lets us write telemetry to both FTC Dashboard and driverhub
-        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
-
+//        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
+        telemetry.setAutoClear(true);
         Hardware22 robot = new Hardware22(hardwareMap);
 
         // Init the camera. Save pipeline, as we need it later
@@ -33,9 +33,12 @@ public class Auto extends LinearOpMode {
         initMotors(robot);
 //        int liftEncoderStart = robot.liftMotor.getCurrentPosition();
 
-        // We only need the delay here, everything else jsut gets passed to TrajectoryGenerator
+        // We only need the delay here, everything else just gets passed to TrajectoryGenerator
         AutoState autoState = getUserInput();
         long delay = autoState.delay;
+
+        // Ask the driver if they missed anything
+        confirmAutoGood();
 
         // Confirm auto settings
         telemetry.addLine("Init complete, ready to run");
@@ -49,9 +52,6 @@ public class Auto extends LinearOpMode {
         if (isStopRequested()) {
             return;
         }
-
-        // Ask the driver if they missed anything
-        confirmAutoGood();
 
         waitForStart();
         // If we need to keep track of time

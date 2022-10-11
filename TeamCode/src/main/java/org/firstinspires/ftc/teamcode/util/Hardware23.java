@@ -73,6 +73,7 @@ public class Hardware23 {
     public SampleMecanumDrive drive;
 
     public Hardware23(HardwareMap hardwareMap) {
+        drive = new SampleMecanumDrive(hardwareMap);
         // Define and initialize motors
         // NEVER DO THIS
         try {
@@ -117,11 +118,6 @@ public class Hardware23 {
 
         try {
             leftClaw = hardwareMap.get(Servo.class, "left_claw");
-        } catch (Exception ignored) {
-        }
-
-        try {
-            drive = new SampleMecanumDrive(hardwareMap);
         } catch (Exception ignored) {
         }
     }
