@@ -189,20 +189,20 @@ public class TeleopPPTest extends LinearOpMode {
         ControlConfig.update(gamepad1, gamepad2);
 
         /////////////////////////////LINEAR SLIDE//////////////////////////////
-        if (gamepad1.dpad_up && robot.linearSlide.getCurrentPosition() < 1555) {
+        if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.linearSlide.setPower(0.5);
-            if (robot.linearSlide.getCurrentPosition() > 1555) {
-                holdPosition = 1555;
+            if (robot.linearSlide.getCurrentPosition() > Constants.liftEncoderMax) {
+                holdPosition = Constants.liftEncoderMax;
             } else {
                 holdPosition = robot.linearSlide.getCurrentPosition();
             }
-        } else if (gamepad1.dpad_down && robot.linearSlide.getCurrentPosition() > 0) {
+        } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.linearSlide.setPower(-0.4);
             holdPosition = robot.linearSlide.getCurrentPosition();
         } else {
-            if (robot.linearSlide.getCurrentPosition() < 1555 && robot.linearSlide.getCurrentPosition() > 600) {
+            if (robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax && robot.linearSlide.getCurrentPosition() > 600) {
                 robot.linearSlide.setTargetPosition(holdPosition);
                 robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.linearSlide.setPower(0.05);
@@ -218,13 +218,13 @@ public class TeleopPPTest extends LinearOpMode {
 ////////////////////GRABBER////////////////////////////////////////////////////////
 
         // A button = open claw, b button = closed claw
-        if (gamepad1.a) {
-            robot.rightClaw.setPosition(0.95); // Right claw open
-            robot.leftClaw.setPosition(0.0); // Left claw open
+        if (ControlConfig.openClaw) {
+            robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
+            robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
         }
-        if (gamepad1.b) {
-            robot.rightClaw.setPosition(0.70); // Right claw closed
-            robot.leftClaw.setPosition(0.25); // Left claw closed
+        if (ControlConfig.closeClaw) {
+            robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
+            robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
         }
 
     }

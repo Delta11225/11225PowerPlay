@@ -70,7 +70,7 @@ public abstract class ControlConfig {
         lowerSlide = pad2.dpad_down;
         linSlideSlow = pad2.right_trigger > .1;
 
-        openClaw = pad2.a;
-        closeClaw = pad2.b;
+        openClaw = pad2.a || pad2.cross;
+        closeClaw = pad2.b || pad2.circle;
     }
 }

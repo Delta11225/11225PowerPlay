@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -80,10 +81,10 @@ public class TeleopFinal extends OpMode {
         robot.rearLeft.setPower(0);
         robot.rearRight.setPower(0);
 
-//        robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
-//        robot.frontRight.setDirection(DcMotor.Direction.FORWARD);
-//        robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
-//        robot.rearRight.setDirection(DcMotor.Direction.FORWARD);
+        robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
+        robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
+        robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
         robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -206,11 +207,11 @@ public class TeleopFinal extends OpMode {
 ////////////////////GRABBER////////////////////////////////////////////////////////
 
         // A button = open claw, b button = closed claw
+        gamepad2.toString();
         if (ControlConfig.openClaw) {
             robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
             robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
-        }
-        if (ControlConfig.closeClaw) {
+        } else if (gamepad2.b) {
             robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
             robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
         }
