@@ -37,7 +37,7 @@ public class LinearSlideTest extends LinearOpMode {
 
         while (opModeIsActive()) {
 
- /////////////////////////////LINEAR SLIDE//////////////////////////////
+            /////////////////////////////LINEAR SLIDE//////////////////////////////
             if (gamepad1.dpad_up && linearSlide.getCurrentPosition() < 1555) {
                 linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 linearSlide.setPower(0.5);
@@ -66,18 +66,18 @@ public class LinearSlideTest extends LinearOpMode {
 
 ////////////////////GRABBER////////////////////////////////////////////////////////
 
-                // A button = open claw, b button = closed claw
-                if (gamepad1.a){
-                    rightClaw.setPosition(0.95); // Right claw open
-                    leftClaw.setPosition(0.0); // Left claw open
-                }
-                if (gamepad1.b){
-                    rightClaw.setPosition(0.70); // Right claw closed
-                    leftClaw.setPosition(0.25); // Left claw closed
-                }
-
-
+            // A button = open claw, b button = closed claw
+            if (gamepad1.a) {
+                rightClaw.setPosition(0.95); // Right claw open
+                leftClaw.setPosition(0.0); // Left claw open
             }
+            if (gamepad1.b) {
+                rightClaw.setPosition(0.70); // Right claw closed
+                leftClaw.setPosition(0.25); // Left claw closed
+            }
+
+
         }
     }
+}
 

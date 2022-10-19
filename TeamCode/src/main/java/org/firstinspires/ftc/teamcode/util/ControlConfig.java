@@ -15,41 +15,44 @@ import com.qualcomm.robotcore.hardware.Gamepad;
  */
 public abstract class ControlConfig {
     // Movement
-    public static double forward;
-    public static double backward;
-    public static double right;
-    public static double left;
-    public static double clockwise;
+    public static double forward = 0;
+    public static double backward = 0;
+    public static double right = 0;
+    public static double left = 0;
+    public static double clockwise = 0;
 
-    public static boolean slow;
-    public static boolean fast;
+    public static boolean slow = false;
+    public static boolean fast = false;
 
     // Peripherals
-    public static boolean collectWheel;
-    public static boolean unCollectWheel;
+    public static boolean collectWheel =false;
+    public static boolean unCollectWheel =false;
 
-    public static boolean liftSlide;
-    public static boolean lowerSlide;
-    public static boolean runSlideToLowDump;
+    public static boolean liftSlide = false;
+    public static boolean lowerSlide = false;
+    public static boolean runSlideToLowDump = false;
 
-    public static boolean linearSlideOverride;
+    public static boolean linearSlideOverride = false;
 
-    public static boolean duckWheelBlue;
-    public static boolean duckWheelRed;
+    public static boolean duckWheelBlue = false;
+    public static boolean duckWheelRed = false;
 
-    public static boolean dumpBucket;
-    public static boolean collectBucket;
+    public static boolean dumpBucket = false;
+    public static boolean collectBucket = false;
 
 //    public static boolean toggleTseRodServo;
 //    public static boolean toggleTseArmServo;
-    public static boolean raiseTseArm;
-    public static boolean lowerTseArm;
-    public static boolean initTseArm;
-    public static boolean collectTseArm;
+    public static boolean raiseTseArm = false;
+    public static boolean lowerTseArm = false;
+    public static boolean initTseArm = false;
+    public static boolean collectTseArm = false;
 
-    public static boolean linSlideSlow;
+    public static boolean linSlideSlow = false;
 
-    public static boolean playMotivSound;
+    public static boolean playMotivSound = false;
+
+    public static boolean openClaw = false;
+    public static boolean closeClaw = false;
 
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls;
@@ -63,27 +66,11 @@ public abstract class ControlConfig {
         fast = pad1.left_bumper;
         slow = pad1.right_bumper;
 
-        // Update peripheral controls
-        collectWheel = pad1.left_trigger > .1;
-        unCollectWheel = pad1.right_trigger > .1;
-
-        lowerTseArm = pad1.a;
-        raiseTseArm = pad1.y;
-        initTseArm = pad1.x;
-        collectTseArm = pad1.b;
-
         liftSlide = pad2.dpad_up;
         lowerSlide = pad2.dpad_down;
         linSlideSlow = pad2.right_trigger > .1;
 
-        duckWheelBlue = pad2.right_bumper;
-        duckWheelRed = pad2.right_bumper;
-
-        dumpBucket = pad2.y;
-        collectBucket = pad2.a;
-
-        linearSlideOverride = pad2.left_bumper || pad2.right_stick_button; // For compatibility reasons
-
-        playMotivSound = pad1.left_stick_button || pad1.right_stick_button || pad2.left_stick_button || pad2.right_stick_button;
+        openClaw = pad2.a || pad2.cross;
+        closeClaw = pad2.b || pad2.circle;
     }
 }

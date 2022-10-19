@@ -58,8 +58,9 @@ public class Hardware23 {
     public DcMotor linearSlide = null;
     public Servo rightClaw = null;
     public Servo leftClaw = null;
-
-
+    // RoadRunner driver
+    public SampleMecanumDrive drive;
+    public TrajectoryGenerator generator;
     private BNO055IMU imu;
 
     // State used for updating telemetry
@@ -70,7 +71,6 @@ public class Hardware23 {
     private final ElapsedTime runtime = new ElapsedTime();
 
     // RoadRunner driver
-    public SampleMecanumDrive drive;
 
     public Hardware23(HardwareMap hardwareMap) {
         drive = new SampleMecanumDrive(hardwareMap);
@@ -106,7 +106,7 @@ public class Hardware23 {
         }
 
         try {
-            linearSlide = hardwareMap.dcMotor.get("linear_slide");
+            linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
             linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         } catch (Exception ignored) {
         }
@@ -118,6 +118,16 @@ public class Hardware23 {
 
         try {
             leftClaw = hardwareMap.get(Servo.class, "left_claw");
+        } catch (Exception ignored) {
+        }
+
+        try {
+            drive = new SampleMecanumDrive(hardwareMap);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            generator = new TrajectoryGenerator(drive);
         } catch (Exception ignored) {
         }
     }
