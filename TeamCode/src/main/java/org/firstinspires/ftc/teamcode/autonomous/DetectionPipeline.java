@@ -35,6 +35,7 @@ public class DetectionPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+        // TODO resize image so the center of the image is bigger
         // Do HSV stuff, crank S and V
         Imgproc.cvtColor(input, hsvMat, Imgproc.COLOR_RGB2HSV);
         Core.extractChannel(hsvMat, hMat, 0);

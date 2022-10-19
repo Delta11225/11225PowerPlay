@@ -180,7 +180,7 @@ public class TeleopFinal extends OpMode {
         /////////////////////////////LINEAR SLIDE//////////////////////////////
         if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.linearSlide.setPower(0.5);
+            robot.linearSlide.setPower(Constants.liftUpPower);
             if (robot.linearSlide.getCurrentPosition() > Constants.liftEncoderMax) {
                 holdPosition = Constants.liftEncoderMax;
             } else {
@@ -188,7 +188,7 @@ public class TeleopFinal extends OpMode {
             }
         } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.linearSlide.setPower(-0.4);
+            robot.linearSlide.setPower(-Constants.liftDownPower);
             holdPosition = robot.linearSlide.getCurrentPosition();
         } else {
             if (robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax && robot.linearSlide.getCurrentPosition() > 600) {

@@ -15,7 +15,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@Autonomous
+@Autonomous(preselectTeleOp = "TeleopFinal")
 public class Auto extends LinearOpMode {
     FtcDashboard ftcDashboard = FtcDashboard.getInstance();
 
