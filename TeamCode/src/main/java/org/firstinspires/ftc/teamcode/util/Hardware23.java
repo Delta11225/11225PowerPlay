@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.autonomous.TrajectoryGenerator;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
 /**
@@ -60,7 +61,6 @@ public class Hardware23 {
     public Servo leftClaw = null;
     // RoadRunner driver
     public SampleMecanumDrive drive;
-    public TrajectoryGenerator generator;
     private BNO055IMU imu;
 
     // State used for updating telemetry
@@ -123,11 +123,6 @@ public class Hardware23 {
 
         try {
             drive = new SampleMecanumDrive(hardwareMap);
-        } catch (Exception ignored) {
-        }
-
-        try {
-            generator = new TrajectoryGenerator(drive);
         } catch (Exception ignored) {
         }
     }
