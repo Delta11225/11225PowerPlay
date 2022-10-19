@@ -32,6 +32,7 @@ public class DetectionPipeline extends OpenCvPipeline {
 //            Mat vMat = new Mat(); // Channel 2
 
     Mat satMat = new Mat();
+    Mat ones = new Mat();
 
     @Override
     public Mat processFrame(Mat input) {
@@ -45,7 +46,7 @@ public class DetectionPipeline extends OpenCvPipeline {
 
         // Get mat of all ones of the same size as input to set saturation and value (brightness)
         // to max
-        Mat ones = new Mat(input.rows(), input.cols(), hMat.type(), new Scalar(255));
+        ones = new Mat(input.rows(), input.cols(), hMat.type(), new Scalar(255));
 
         // Put the mats in the proper order as merge() expects a list
         List<Mat> matList = Arrays.asList(
