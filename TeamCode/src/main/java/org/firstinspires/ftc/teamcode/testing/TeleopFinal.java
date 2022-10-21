@@ -187,8 +187,10 @@ public class TeleopFinal extends OpMode {
 
         /////////////////////////////LINEAR SLIDE//////////////////////////////
         if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
+            // If we give it any input, stop running to a certain set position
             runningToPos = false;
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
             robot.linearSlide.setPower(Constants.liftUpPower);
             if (robot.linearSlide.getCurrentPosition() > Constants.liftEncoderMax) {
                 holdPosition = Constants.liftEncoderMax;
@@ -198,10 +200,10 @@ public class TeleopFinal extends OpMode {
         } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
             runningToPos = false;
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
             robot.linearSlide.setPower(-Constants.liftDownPower);
             holdPosition = robot.linearSlide.getCurrentPosition();
-        } else {
-            runningToPos = false;
+        } else if (!runningToPos) {
             if (robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax && robot.linearSlide.getCurrentPosition() > 600) {
                 robot.linearSlide.setTargetPosition(holdPosition);
                 robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -230,20 +232,23 @@ public class TeleopFinal extends OpMode {
             hasRumbled = false;
         }
 
-        // TODO add a thing to run the linear slide to low dump position
+        // Initialization code. If we want to start running goToLow, set appropriate target pos,
+        // put linear slide in correct mode, and tell everyone we are running to a position.
         if (ControlConfig.goToLow && !runningToPos) {
             robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             runningToPos = true;
         }
 
+        // If we are running to a position and the slide is busy, set its power to .5. Otherwise,
+        // set its power to 0 and tell everyone we are done running to a position
         if (runningToPos) {
             if (robot.linearSlide.isBusy()) {
                 robot.linearSlide.setPower(0.5);
-            } else {
-                runningToPos = false;
-                robot.linearSlide.setPower(0);
-            }
+            } // else {
+//                runningToPos = false;
+//                robot.linearSlide.setPower(0);
+//            }
         }
 
 ////////////////////GRABBER////////////////////////////////////////////////////////
