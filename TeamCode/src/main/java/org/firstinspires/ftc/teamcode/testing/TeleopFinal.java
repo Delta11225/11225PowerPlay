@@ -92,6 +92,7 @@ public class TeleopFinal extends OpMode {
         robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        // FIXME Hardware23 takes forever to init for some reason
         telemetry.addData("Robot HWMap init time", getRuntime());
         telemetry.update();
     }
@@ -208,6 +209,21 @@ public class TeleopFinal extends OpMode {
             }
             telemetry.addData("encoder", robot.linearSlide.getCurrentPosition());
             telemetry.update();
+        }
+
+        // Handle rumblies for low junction drop pos
+        int currentPos = robot.linearSlide.getCurrentPosition();
+        // liftEncoderLow is the lowest dump pos, but we add some encoder counts to it to make a larger
+        // rumble zone as robot could just skip past it
+        if (currentPos > Constants.liftEncoderLow && currentPos < Constants.liftEncoderLow + 60) {
+            // There is probably a better way to do this, but basically, rumble if we haven't
+            // rumbled while we have been in the rumble range. Reset when we leave it
+            if (!hasRumbled) {
+                gamepad2.rumble(250);
+            }
+            hasRumbled = true;
+        } else {
+            hasRumbled = false;
         }
 
 ////////////////////GRABBER////////////////////////////////////////////////////////

@@ -46,6 +46,7 @@ public abstract class Constants {
     public final static double leftClawClosed = 0.25;
 
     public final static int liftEncoderMax = 2200;
+    public final static int liftEncoderLow = 1780;
 
     public final static double liftUpPower = 0.75;
     public final static double liftDownPower = 0.5;
