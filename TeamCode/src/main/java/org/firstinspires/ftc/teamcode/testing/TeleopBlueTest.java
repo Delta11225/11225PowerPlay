@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.testing;
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,8 +22,8 @@ import org.firstinspires.ftc.teamcode.util.Hardware22;
 
 import java.util.Locale;
 
-//@Disabled
 @TeleOp
+@Disabled
 public class TeleopBlueTest extends LinearOpMode {
     // FIXME in the future reduce number of global vars
     // TODO add button combination to override things
