@@ -240,6 +240,13 @@ public class TeleopFinal extends OpMode {
             runningToPos = true;
         }
 
+        // Same as above, but running to bottom
+        if (ControlConfig.goToBottom && !runningToPos) {
+            robot.linearSlide.setTargetPosition(0);
+            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            runningToPos = true;
+        }
+
         // If we are running to a position and the slide is busy, set its power to .5. Otherwise,
         // set its power to 0 and tell everyone we are done running to a position
         if (runningToPos) {
