@@ -60,7 +60,7 @@ public class TeleopFinal extends OpMode {
 
     @Override
     public void init() {
-
+        resetRuntime();
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -73,7 +73,10 @@ public class TeleopFinal extends OpMode {
         imu.initialize(parameters);
 
         composeTelemetry();
+        telemetry.addData("IMU init time", getRuntime());
+        telemetry.update();
 
+        resetRuntime();
         robot = new Hardware23(hardwareMap);
 
         robot.frontLeft.setPower(0);
@@ -88,6 +91,9 @@ public class TeleopFinal extends OpMode {
 
         robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        telemetry.addData("Robot HWMap init time", getRuntime());
+        telemetry.update();
     }
 
     @Override
