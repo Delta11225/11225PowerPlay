@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.ControlConfig;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
+import org.firstinspires.ftc.teamcode.util.PosRunningTo;
 
 import java.util.Locale;
 
@@ -57,7 +58,8 @@ public class TeleopFinal extends OpMode {
     int holdPosition;
     ElapsedTime elapsedTime = new ElapsedTime();
     private final ElapsedTime runtime = new ElapsedTime();
-    private boolean runningToPos = false;
+//    private boolean runningToPos = false;
+    private PosRunningTo posRunningTo = PosRunningTo.NONE;
 
     @Override
     public void init() {
@@ -188,7 +190,8 @@ public class TeleopFinal extends OpMode {
         /////////////////////////////LINEAR SLIDE//////////////////////////////
         if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
             // If we give it any input, stop running to a certain set position
-            runningToPos = false;
+//            runningToPos = false;
+            posRunningTo = PosRunningTo.NONE;
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             robot.linearSlide.setPower(Constants.liftUpPower);
@@ -198,12 +201,13 @@ public class TeleopFinal extends OpMode {
                 holdPosition = robot.linearSlide.getCurrentPosition();
             }
         } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
-            runningToPos = false;
+//            runningToPos = false;
+            posRunningTo = PosRunningTo.NONE;
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             robot.linearSlide.setPower(-Constants.liftDownPower);
             holdPosition = robot.linearSlide.getCurrentPosition();
-        } else if (!runningToPos) {
+        } else if (posRunningTo == PosRunningTo.NONE) {
             if (robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax && robot.linearSlide.getCurrentPosition() > 600) {
                 robot.linearSlide.setTargetPosition(holdPosition);
                 robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -234,24 +238,32 @@ public class TeleopFinal extends OpMode {
 
         // Initialization code. If we want to start running goToLow, set appropriate target pos,
         // put linear slide in correct mode, and tell everyone we are running to a position.
-        if (ControlConfig.goToLow && !runningToPos) {
+        if (ControlConfig.goToLow && posRunningTo != PosRunningTo.LOW) {
+            telemetry.addData("Go to pos", Constants.liftEncoderLow);
+            telemetry.update();
+
             robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            runningToPos = true;
+//            runningToPos = true;
+            posRunningTo = PosRunningTo.LOW;
         }
 
         // Same as above, but running to bottom
-        if (ControlConfig.goToBottom && !runningToPos) {
+        if (ControlConfig.goToBottom && posRunningTo != PosRunningTo.GROUD) {
+            telemetry.addData("Go to pos", 0);
+            telemetry.update();
+
             robot.linearSlide.setTargetPosition(0);
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            runningToPos = true;
+//            runningToPos = true;
+            posRunningTo = PosRunningTo.GROUD;
         }
 
         // If we are running to a position and the slide is busy, set its power to .5. Otherwise,
         // set its power to 0 and tell everyone we are done running to a position
-        if (runningToPos) {
+        if (posRunningTo != PosRunningTo.NONE) {
             if (robot.linearSlide.isBusy()) {
-                robot.linearSlide.setPower(0.5);
+                robot.linearSlide.setPower(Constants.liftPosRunPower);
             } // else {
 //                runningToPos = false;
 //                robot.linearSlide.setPower(0);
