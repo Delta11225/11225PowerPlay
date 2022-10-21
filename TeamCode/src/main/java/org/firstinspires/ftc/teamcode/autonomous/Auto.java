@@ -40,13 +40,16 @@ public class Auto extends LinearOpMode {
         // Ask the driver if they missed anything
         confirmAutoGood();
 
-        // Confirm auto settings
-        telemetry.addLine("Init complete, ready to run");
-        telemetry.addData("Color", autoState.color);
-        telemetry.addData("Start pos", autoState.position);
-        telemetry.addData("Delay", delay);
-        telemetry.addData("Camera detection", pipeline.getLastPos());
-        telemetry.update();
+        // Loop for user friendliness, constantly updates camera detection result
+        while (!isStopRequested() && !isStarted()) {
+            // Confirm auto settings
+            telemetry.addLine("Init complete, ready to run");
+            telemetry.addData("Color", autoState.color);
+            telemetry.addData("Start pos", autoState.position);
+            telemetry.addData("Delay", delay);
+            telemetry.addData("Camera detection", pipeline.getLastPos());
+            telemetry.update();
+        }
 
         // Just to be safe
         if (isStopRequested()) {
