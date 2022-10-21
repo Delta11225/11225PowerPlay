@@ -68,7 +68,7 @@ public class DetectionPipeline extends OpenCvPipeline {
         Point pointMid = new Point((int)(input.cols()* midPos[0]), (int)(input.rows()* midPos[1]));
 
         // Draw circle on specified point
-        Imgproc.circle(displayMat, pointMid,5, new Scalar( 255, 0, 0 ),1 );//draws circle
+        Imgproc.circle(displayMat, pointMid,7, new Scalar( 0, 0, 0 ),3 );//draws circle
 
         // Draw rectangle around point
         // Circle and rectangle ware just for the user, they help with alignment
