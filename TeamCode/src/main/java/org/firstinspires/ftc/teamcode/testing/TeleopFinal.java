@@ -57,6 +57,7 @@ public class TeleopFinal extends OpMode {
     int holdPosition;
     ElapsedTime elapsedTime = new ElapsedTime();
     private final ElapsedTime runtime = new ElapsedTime();
+    private boolean runningToPos = false;
 
     @Override
     public void init() {
@@ -186,6 +187,7 @@ public class TeleopFinal extends OpMode {
 
         /////////////////////////////LINEAR SLIDE//////////////////////////////
         if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
+            runningToPos = false;
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.linearSlide.setPower(Constants.liftUpPower);
             if (robot.linearSlide.getCurrentPosition() > Constants.liftEncoderMax) {
@@ -194,10 +196,12 @@ public class TeleopFinal extends OpMode {
                 holdPosition = robot.linearSlide.getCurrentPosition();
             }
         } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
+            runningToPos = false;
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.linearSlide.setPower(-Constants.liftDownPower);
             holdPosition = robot.linearSlide.getCurrentPosition();
         } else {
+            runningToPos = false;
             if (robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax && robot.linearSlide.getCurrentPosition() > 600) {
                 robot.linearSlide.setTargetPosition(holdPosition);
                 robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -224,6 +228,22 @@ public class TeleopFinal extends OpMode {
             hasRumbled = true;
         } else {
             hasRumbled = false;
+        }
+
+        // TODO add a thing to run the linear slide to low dump position
+        if (ControlConfig.goToLow && !runningToPos) {
+            robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
+            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            runningToPos = true;
+        }
+
+        if (runningToPos) {
+            if (robot.linearSlide.isBusy()) {
+                robot.linearSlide.setPower(0.5);
+            } else {
+                runningToPos = false;
+                robot.linearSlide.setPower(0);
+            }
         }
 
 ////////////////////GRABBER////////////////////////////////////////////////////////

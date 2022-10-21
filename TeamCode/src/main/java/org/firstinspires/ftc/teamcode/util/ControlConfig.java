@@ -54,6 +54,8 @@ public abstract class ControlConfig {
     public static boolean openClaw = false;
     public static boolean closeClaw = false;
 
+    public static boolean goToLow = false;
+
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls;
         forward = -pad1.left_stick_y;
@@ -72,5 +74,7 @@ public abstract class ControlConfig {
 
         openClaw = pad2.a || pad2.cross;
         closeClaw = pad2.b || pad2.circle;
+
+        goToLow = pad2.triangle || pad2.y;
     }
 }
