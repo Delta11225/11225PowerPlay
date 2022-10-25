@@ -176,6 +176,7 @@ public class TeleopFinal extends OpMode {
 
         telemetry.update();
 
+        // TODO rework this to use samplemecanumdrive
         robot.frontLeft.setPower(frontLeft * powerMultiplier);
         robot.frontRight.setPower(-frontRight * powerMultiplier);
         robot.rearLeft.setPower(rearLeft * powerMultiplier);
@@ -274,6 +275,7 @@ public class TeleopFinal extends OpMode {
 
         // A button = open claw, b button = closed claw
         gamepad2.toString();
+        // TODO make this not be able to dump if robot is moving (if motor powers are non-zero)
         if (ControlConfig.openClaw) {
             robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
             robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
