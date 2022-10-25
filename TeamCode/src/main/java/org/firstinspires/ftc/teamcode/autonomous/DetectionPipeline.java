@@ -34,6 +34,8 @@ public class DetectionPipeline extends OpenCvPipeline {
     Mat satMat = new Mat();
     Mat ones = new Mat();
 
+    // FIXME this still leaks memory for some reason
+    // FIXME are we instantiating some mat inside of processFrame?
     @Override
     public Mat processFrame(Mat input) {
         // TODO resize image so the center of the image is bigger
