@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.firstinspires.ftc.teamcode.util.PosRunningTo;
 
 import java.util.Locale;
+import java.util.stream.DoubleStream;
 
 //@Disabled
 @TeleOp
@@ -82,10 +83,11 @@ public class TeleopFinal extends OpMode {
         resetRuntime();
         robot = new Hardware23(hardwareMap);
 
-        robot.frontLeft.setPower(0);
-        robot.frontRight.setPower(0);
-        robot.rearLeft.setPower(0);
-        robot.rearRight.setPower(0);
+        robot.drive.setMotorPowers(0, 0, 0, 0);
+//        robot.frontLeft.setPower(0);
+//        robot.frontRight.setPower(0);
+//        robot.rearLeft.setPower(0);
+//        robot.rearRight.setPower(0);
 
         robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
@@ -176,11 +178,16 @@ public class TeleopFinal extends OpMode {
 
         telemetry.update();
 
-        // TODO rework this to use samplemecanumdrive
-        robot.frontLeft.setPower(frontLeft * powerMultiplier);
-        robot.frontRight.setPower(-frontRight * powerMultiplier);
-        robot.rearLeft.setPower(rearLeft * powerMultiplier);
-        robot.rearRight.setPower(-rearRight * powerMultiplier);
+        robot.drive.setMotorPowers(
+                frontLeft * powerMultiplier,
+                rearLeft * powerMultiplier,
+                -frontRight * powerMultiplier,
+                -rearRight * powerMultiplier
+        );
+//        robot.frontLeft.setPower(frontLeft * powerMultiplier);
+//        robot.frontRight.setPower(-frontRight * powerMultiplier);
+//        robot.rearLeft.setPower(rearLeft * powerMultiplier);
+//        robot.rearRight.setPower(-rearRight * powerMultiplier);
 
 
     }
@@ -275,11 +282,26 @@ public class TeleopFinal extends OpMode {
 
         // A button = open claw, b button = closed claw
         gamepad2.toString();
-        // TODO make this not be able to dump if robot is moving (if motor powers are non-zero)
-        if (ControlConfig.openClaw) {
+        // Get sum of wheel velocities, I just didn't want to loop
+        double wheelVelSum = robot.drive.getWheelVelocities().stream().mapToDouble(Double::doubleValue).sum();
+        telemetry.addData("Wheel vel sum", wheelVelSum);
+        telemetry.update();
+
+        // This complex conditional allows the claw to open if:
+        // 1. The control to open it is pressed AND:
+        // 2. It is NOT TRUE that:
+        //    a) the linear slide is above the lowest dropping position AND
+        //    b) the wheels are moving a lot
+        // Basically, we allow a drop if either the linear slide is below the lowest drop position
+        // or, if it is above the lowest drop position, only allow the drop if the wheels are not
+        // moving a lot
+        // It is a safety to prevent the claw from opening if driver has jerked the robot
+        // TODO tune this threshold, that's why the telemetry is there. I don't know for sure how velocities are reported
+        double movementThresh = 0.1;
+        if (ControlConfig.openClaw && !(robot.linearSlide.getCurrentPosition() > Constants.liftEncoderLow && wheelVelSum >= movementThresh)) {
             robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
             robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
-        } else if (gamepad2.b) {
+        } else if (ControlConfig.closeClaw) {
             robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
             robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
         }
