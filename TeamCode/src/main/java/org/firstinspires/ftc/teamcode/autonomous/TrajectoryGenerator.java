@@ -11,6 +11,11 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 import kotlin.NotImplementedError;
 
+// TODO add a utility method that automatically generates trajectories that go from a tile to another tile
+// TODO while avoiding junctions
+/*
+ * Ex: Navigate from cell A1 to cell B3
+ */
 public class TrajectoryGenerator {
     private final Hardware22 robot;
     private final SampleMecanumDrive drive;
