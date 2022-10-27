@@ -51,4 +51,6 @@ public abstract class Constants {
     public final static double liftUpPower = 0.75;
     public final static double liftDownPower = 0.5;
     public final static double liftPosRunPower = 1;
+
+    public final static int[] coneStackPos = new int[]{706, 495, 347, 181, 0};
 }

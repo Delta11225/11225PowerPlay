@@ -2,10 +2,13 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware22;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 
@@ -17,12 +20,12 @@ import kotlin.NotImplementedError;
  * Ex: Navigate from cell A1 to cell B3
  */
 public class TrajectoryGenerator {
-    private final Hardware22 robot;
+    private final Hardware23 robot;
     private final SampleMecanumDrive drive;
     private AutoState autoState;
     private ParkingPosition parkPos;
 
-    public TrajectoryGenerator(Hardware22 robot, AutoState autoState, ParkingPosition parkPos) {
+    public TrajectoryGenerator(Hardware23 robot, AutoState autoState, ParkingPosition parkPos) {
         this.robot = robot;
         this.drive = robot.drive;
         this.autoState = autoState;
@@ -44,9 +47,31 @@ public class TrajectoryGenerator {
         TrajectorySequenceBuilder gen = null;
         switch (autoState.position) {
             case FRONT:
-                Pose2d startPose = new Pose2d(-35, 70-(12.25/2.0), Math.toRadians(270));
+                Pose2d startPose = new Pose2d(-40, 70-(12.25/2.0), Math.toRadians(270));
                 drive.setPoseEstimate(startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
+                gen.addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                });
+                gen.addDisplacementMarker(() -> {
+                   robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
+                   robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                   robot.linearSlide.setPower(1);
+                });
+                gen.splineToLinearHeading(new Pose2d(-25, 53, Math.toRadians(300)), Math.toRadians(300))
+                        .addDisplacementMarker(() -> {
+                            robot.leftClaw.setPosition(Constants.leftClawOpen);
+                            robot.rightClaw.setPosition(Constants.rightClawOpen);
+                });
+                gen.splineToLinearHeading(new Pose2d(-35, 60, Math.toRadians(270)), Math.toRadians(270));
+                gen.addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(0);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                });
+//                break;
+
                 switch (parkPos) {
                     case ONE:
                         gen.strafeLeft(35-16)
@@ -57,11 +82,9 @@ public class TrajectoryGenerator {
                         break;
                     default:
                         gen.strafeRight(35-16)
+//                                .splineToSplineHeading(new Pose2d(-53, 32, Math.toRadians(300)), Math.toRadians(300))
                                 .splineToConstantHeading(new Vector2d(-59, 36), Math.toRadians(270));
                         break;
-//                    case HOW_ON_EARTH:
-                    // TODO maybe have it do a default so it'll park somewhere instead of crashing
-//                        throw new IllegalStateException("??????????????????????");
                 }
                 break;
             case BACK:
@@ -80,9 +103,6 @@ public class TrajectoryGenerator {
                         gen.strafeRight(35-16)
                                 .splineToConstantHeading(new Vector2d(12, 36), Math.toRadians(270));
                         break;
-//                    case HOW_ON_EARTH:
-                    // TODO maybe have it do a default so it'll park somewhere instead of crashing
-//                        throw new IllegalStateException("??????????????????????");
                 }
                 break;
         }
@@ -108,9 +128,6 @@ public class TrajectoryGenerator {
                         gen.strafeRight(35-16)
                                 .splineToConstantHeading(new Vector2d(-12, -36), Math.toRadians(90));
                         break;
-//                    case HOW_ON_EARTH:
-                    // TODO maybe have it do a default so it'll park somewhere instead of crashing
-//                        throw new IllegalStateException("??????????????????????");
                 }
                 break;
             case BACK:
@@ -129,9 +146,6 @@ public class TrajectoryGenerator {
                         gen.strafeRight(35-16)
                                 .splineToConstantHeading(new Vector2d(59, -36), Math.toRadians(90));
                         break;
-//                    case HOW_ON_EARTH:
-                    // TODO maybe have it do a default so it'll park somewhere instead of crashing
-//                        throw new IllegalStateException("??????????????????????");
                 }
                 break;
         }

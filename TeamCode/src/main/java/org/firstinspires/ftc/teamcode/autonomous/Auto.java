@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.Hardware22;
+import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -22,9 +23,9 @@ public class Auto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // This lets us write telemetry to both FTC Dashboard and driverhub
-//        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
-        telemetry.setAutoClear(true);
-        Hardware22 robot = new Hardware22(hardwareMap);
+        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
+//        telemetry.setAutoClear(true);
+        Hardware23 robot = new Hardware23(hardwareMap);
 
         // Init the camera. Save pipeline, as we need it later
         DetectionPipeline pipeline = new DetectionPipeline();
@@ -216,7 +217,7 @@ public class Auto extends LinearOpMode {
         while (!isStopRequested() && !gamepad2.x) {}
     }
 
-    private void initMotors(Hardware22 robot) {
+    private void initMotors(Hardware23 robot) {
         return;
     }
 }
