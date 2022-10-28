@@ -34,6 +34,7 @@ public class TrajectoryGenerator {
     // FIXME most of this (everything aside from parking) can to be called during init, but parking methods
     // must be called after init as we need to know the color of the signal sleeve. Unfortunately, we'll just have
     // to deal with that and break it up, as otherwise generating trajectories takes forever
+    // TODO it would be easier to just generate all of the possible trajectories and follow the appropriate one
     public TrajectorySequence generateTrajectories() {
         TrajectorySequenceBuilder gen = null;
         switch (autoState.color) {
