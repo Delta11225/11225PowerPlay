@@ -4,15 +4,13 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.util.Constants;
-import org.firstinspires.ftc.teamcode.util.Hardware22;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 
-import kotlin.NotImplementedError;
+import java.util.HashMap;
 
 // TODO add a utility method that automatically generates trajectories that go from a tile to another tile
 // TODO while avoiding junctions
@@ -22,33 +20,55 @@ import kotlin.NotImplementedError;
 public class TrajectoryGenerator {
     private final Hardware23 robot;
     private final SampleMecanumDrive drive;
-    private AutoState autoState;
-    private ParkingPosition parkPos;
 
-    public TrajectoryGenerator(Hardware23 robot, AutoState autoState, ParkingPosition parkPos) {
+    private HashMap<TrajectoryState, TrajectorySequence> trajectories;
+
+    public TrajectoryGenerator(Hardware23 robot) {
         this.robot = robot;
         this.drive = robot.drive;
-        this.autoState = autoState;
-        this.parkPos = parkPos;
+
+        this.trajectories = generateAllTrajectories();
+    }
+
+    public TrajectorySequence getAppropriateTrajectory(AutoState autoState, ParkingPosition parkPos) {
+        TrajectoryState trajState = new TrajectoryState(autoState.color, autoState.position, parkPos);
+        TrajectorySequence traj = trajectories.getOrDefault(trajState, null);
+        if (traj == null) {
+            throw new IllegalStateException("WTF? How? You somehow have provide an auto state that there" +
+                    "aren't trajectories for.");
+        }
+        return traj;
+    }
+
+    private HashMap<TrajectoryState, TrajectorySequence> generateAllTrajectories() {
+        HashMap<TrajectoryState, TrajectorySequence> trajMap = new HashMap<>();
+        for (Color color : new Color[]{Color.BLUE, Color.RED}) {
+            for (StartPosition startPos : new StartPosition[]{StartPosition.FRONT, StartPosition.FRONT})
+                for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
+                    TrajectoryState trajState = new TrajectoryState(color, startPos, parkPos);
+                    TrajectorySequence traj = genTrajectory(color, startPos, parkPos);
+                    trajMap.put(trajState, traj);
+            }
+        }
+        return trajMap;
     }
     // FIXME most of this (everything aside from parking) can to be called during init, but parking methods
     // must be called after init as we need to know the color of the signal sleeve. Unfortunately, we'll just have
     // to deal with that and break it up, as otherwise generating trajectories takes forever
     // TODO it would be easier to just generate all of the possible trajectories and follow the appropriate one
-    public TrajectorySequence generateTrajectories() {
-        TrajectorySequenceBuilder gen = null;
-        switch (autoState.color) {
+    public TrajectorySequence genTrajectory(Color color, StartPosition startPos, ParkingPosition parkPos) {
+        switch (color) {
             case RED:
-                return getRedTrajectories();
+                return genRedTrajectories(startPos, parkPos);
             case BLUE:
-                return getBlueTrajectories();
+                return genBlueTrajectories(startPos, parkPos);
         }
         return null;
     }
 
-    private TrajectorySequence getBlueTrajectories() {
+    private TrajectorySequence genBlueTrajectories(StartPosition startPos, ParkingPosition parkPos) {
         TrajectorySequenceBuilder gen = null;
-        switch (autoState.position) {
+        switch (startPos) {
             case FRONT:
                 Pose2d startPose = new Pose2d(-40, 70-(12.25/2.0), Math.toRadians(270));
                 drive.setPoseEstimate(startPose);
@@ -112,9 +132,9 @@ public class TrajectoryGenerator {
         return gen.build();
     }
 
-    private TrajectorySequence getRedTrajectories() {
+    private TrajectorySequence genRedTrajectories(StartPosition startPos, ParkingPosition parkPos) {
         TrajectorySequenceBuilder gen = null;
-        switch (autoState.position) {
+        switch (startPos) {
             case FRONT:
                 Pose2d startPose = new Pose2d(-35, -(70-(12.25/2.0)), Math.toRadians(90));
                 drive.setPoseEstimate(startPose);
@@ -153,5 +173,17 @@ public class TrajectoryGenerator {
                 break;
         }
         return gen.build();
+    }
+
+    public class TrajectoryState {
+        public final Color color;
+        public final StartPosition position;
+        public final ParkingPosition parkPos;
+
+        TrajectoryState(Color color, StartPosition position, ParkingPosition parkPos) {
+            this.color = color;
+            this.position = position;
+            this.parkPos = parkPos;
+        }
     }
 }

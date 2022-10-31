@@ -5,11 +5,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.Hardware22;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -27,6 +24,13 @@ public class Auto extends LinearOpMode {
 //        telemetry.setAutoClear(true);
         Hardware23 robot = new Hardware23(hardwareMap);
 
+        // Do this here, as it takes a while
+        telemetry.addLine("Building trajectories...");
+        telemetry.update();
+        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot);
+        telemetry.addData("Build! Time taken (s)", getRuntime());
+        telemetry.update();
+
         // Init the camera. Save pipeline, as we need it later
         DetectionPipeline pipeline = new DetectionPipeline();
         OpenCvCamera webcam = initCamera(pipeline);
@@ -40,6 +44,8 @@ public class Auto extends LinearOpMode {
 
         // Ask the driver if they missed anything
         confirmAutoGood();
+
+        resetRuntime();
 
         // Loop for user friendliness, constantly updates camera detection result
         while (!isStopRequested() && !isStarted()) {
@@ -67,11 +73,8 @@ public class Auto extends LinearOpMode {
         telemetry.addData("Park pos", parkPos);
         telemetry.update();
 
-        // Generate trajectories. We need to do this here as otherwise we don't know where it will
-        // park
         TrajectorySequence trajSequence;
-        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, autoState, parkPos);
-        trajSequence = trajGen.generateTrajectories();
+        trajSequence = trajGen.getAppropriateTrajectory(autoState, parkPos);
 
         // To prevent issues, stop the camera stream
         webcam.stopStreaming();
