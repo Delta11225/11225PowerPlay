@@ -71,14 +71,21 @@ public class Auto extends LinearOpMode {
         ParkingPosition parkPos = pipeline.getLastPos();
         telemetry.clearAll();
         telemetry.addData("Park pos", parkPos);
+        telemetry.addData("Time taken (s)", getRuntime());
         telemetry.update();
 
-        TrajectorySequence trajSequence;
-        trajSequence = trajGen.getAppropriateTrajectory(autoState, parkPos);
-
         // To prevent issues, stop the camera stream
+//        resetRuntime();
         webcam.stopStreaming();
         ftcDashboard.stopCameraStream();
+        telemetry.addData("Time taken (s)", getRuntime());
+        telemetry.update();
+
+//        resetRuntime();
+        TrajectorySequence trajSequence;
+        trajSequence = trajGen.getAppropriateTrajectory(autoState, parkPos);
+        telemetry.addData("Time taken (s)", getRuntime());
+        telemetry.update();
 
         // Start of game delay, if we need it
         sleep(delay);

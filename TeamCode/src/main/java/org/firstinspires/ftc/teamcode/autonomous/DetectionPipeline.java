@@ -34,6 +34,8 @@ public class DetectionPipeline extends OpenCvPipeline {
     Mat satMat = new Mat();
     Mat ones = new Mat();
 
+    List<Mat> matList;
+
     // FIXME this still leaks memory for some reason
     // FIXME are we instantiating some mat inside of processFrame?
     @Override
@@ -51,7 +53,7 @@ public class DetectionPipeline extends OpenCvPipeline {
         ones = new Mat(input.rows(), input.cols(), hMat.type(), new Scalar(255));
 
         // Put the mats in the proper order as merge() expects a list
-        List<Mat> matList = Arrays.asList(
+        matList = Arrays.asList(
                 hMat,
                 ones,
                 ones

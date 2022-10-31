@@ -22,6 +22,7 @@ public class TrajectoryGenerator {
     private final SampleMecanumDrive drive;
 
     private HashMap<TrajectoryState, TrajectorySequence> trajectories;
+    private HashMap<TrajectoryState, Pose2d> startPoses = new HashMap<>();
 
     public TrajectoryGenerator(Hardware23 robot) {
         this.robot = robot;
@@ -31,12 +32,23 @@ public class TrajectoryGenerator {
     }
 
     public TrajectorySequence getAppropriateTrajectory(AutoState autoState, ParkingPosition parkPos) {
-        TrajectoryState trajState = new TrajectoryState(autoState.color, autoState.position, parkPos);
-        TrajectorySequence traj = trajectories.getOrDefault(trajState, null);
-        if (traj == null) {
+        TrajectoryState tempTrajState = new TrajectoryState(autoState.color, autoState.position, parkPos);
+        TrajectoryState mapTrajState = new TrajectoryState();
+
+        for (TrajectoryState trajState : trajectories.keySet()) {
+            if (tempTrajState.hasSameValue(trajState)) {
+                mapTrajState = trajState;
+                break;
+            }
+        }
+
+        TrajectorySequence traj = trajectories.getOrDefault(mapTrajState, null);
+        Pose2d startPose = startPoses.getOrDefault(mapTrajState, null);
+        if (traj == null || startPose == null) {
             throw new IllegalStateException("WTF? How? You somehow have provide an auto state that there" +
                     "aren't trajectories for.");
         }
+        drive.setPoseEstimate(startPose);
         return traj;
     }
 
@@ -46,7 +58,7 @@ public class TrajectoryGenerator {
             for (StartPosition startPos : new StartPosition[]{StartPosition.FRONT, StartPosition.FRONT})
                 for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
                     TrajectoryState trajState = new TrajectoryState(color, startPos, parkPos);
-                    TrajectorySequence traj = genTrajectory(color, startPos, parkPos);
+                    TrajectorySequence traj = genTrajectory(trajState);
                     trajMap.put(trajState, traj);
             }
         }
@@ -56,22 +68,24 @@ public class TrajectoryGenerator {
     // must be called after init as we need to know the color of the signal sleeve. Unfortunately, we'll just have
     // to deal with that and break it up, as otherwise generating trajectories takes forever
     // TODO it would be easier to just generate all of the possible trajectories and follow the appropriate one
-    public TrajectorySequence genTrajectory(Color color, StartPosition startPos, ParkingPosition parkPos) {
-        switch (color) {
+    public TrajectorySequence genTrajectory(TrajectoryState state) {
+        switch (state.color) {
             case RED:
-                return genRedTrajectories(startPos, parkPos);
+                return genRedTrajectories(state);
             case BLUE:
-                return genBlueTrajectories(startPos, parkPos);
+                return genBlueTrajectories(state);
         }
         return null;
     }
 
-    private TrajectorySequence genBlueTrajectories(StartPosition startPos, ParkingPosition parkPos) {
+    private TrajectorySequence genBlueTrajectories(TrajectoryState state) {
         TrajectorySequenceBuilder gen = null;
+        StartPosition startPos = state.position;
+        ParkingPosition parkPos = state.parkPos;
         switch (startPos) {
             case FRONT:
                 Pose2d startPose = new Pose2d(-40, 70-(12.25/2.0), Math.toRadians(270));
-                drive.setPoseEstimate(startPose);
+                startPoses.put(state, startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
                 gen.addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);
@@ -112,7 +126,7 @@ public class TrajectoryGenerator {
                 break;
             case BACK:
                 startPose = new Pose2d(35, 70-(12.25/2.0), Math.toRadians(270));
-                drive.setPoseEstimate(startPose);
+                startPoses.put(state, startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
                 switch (parkPos) {
                     case ONE:
@@ -132,12 +146,14 @@ public class TrajectoryGenerator {
         return gen.build();
     }
 
-    private TrajectorySequence genRedTrajectories(StartPosition startPos, ParkingPosition parkPos) {
+    private TrajectorySequence genRedTrajectories(TrajectoryState state) {
         TrajectorySequenceBuilder gen = null;
+        StartPosition startPos = state.position;
+        ParkingPosition parkPos = state.parkPos;
         switch (startPos) {
             case FRONT:
                 Pose2d startPose = new Pose2d(-35, -(70-(12.25/2.0)), Math.toRadians(90));
-                drive.setPoseEstimate(startPose);
+                startPoses.put(state, startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
                 switch (parkPos) {
                     case ONE:
@@ -155,7 +171,7 @@ public class TrajectoryGenerator {
                 break;
             case BACK:
                 startPose = new Pose2d(35, -(70-(12.25/2.0)), Math.toRadians(90));
-                drive.setPoseEstimate(startPose);
+                startPoses.put(state, startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
                 switch (parkPos) {
                     case ONE:
@@ -175,15 +191,25 @@ public class TrajectoryGenerator {
         return gen.build();
     }
 
-    public class TrajectoryState {
+    private static class TrajectoryState {
         public final Color color;
         public final StartPosition position;
         public final ParkingPosition parkPos;
+
+        TrajectoryState() {
+           this.color = null;
+           this.position = null;
+           this.parkPos = null;
+        }
 
         TrajectoryState(Color color, StartPosition position, ParkingPosition parkPos) {
             this.color = color;
             this.position = position;
             this.parkPos = parkPos;
+        }
+
+        public boolean hasSameValue(TrajectoryState state) {
+            return this.color == state.color && this.position == state.position && this.parkPos == state.parkPos;
         }
     }
 }
