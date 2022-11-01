@@ -22,7 +22,6 @@ public class TrajectoryGenerator {
     private final SampleMecanumDrive drive;
 
     private HashMap<TrajectoryState, TrajectorySequence> trajectories;
-    private HashMap<TrajectoryState, Pose2d> startPoses = new HashMap<>();
 
     public TrajectoryGenerator(Hardware23 robot) {
         this.robot = robot;
@@ -43,12 +42,11 @@ public class TrajectoryGenerator {
         }
 
         TrajectorySequence traj = trajectories.getOrDefault(mapTrajState, null);
-        Pose2d startPose = startPoses.getOrDefault(mapTrajState, null);
-        if (traj == null || startPose == null) {
+        if (traj == null) {
             throw new IllegalStateException("WTF? How? You somehow have provide an auto state that there" +
                     "aren't trajectories for.");
         }
-        drive.setPoseEstimate(startPose);
+        drive.setPoseEstimate(traj.start());
         return traj;
     }
 
@@ -85,7 +83,6 @@ public class TrajectoryGenerator {
         switch (startPos) {
             case FRONT:
                 Pose2d startPose = new Pose2d(-40, 70-(12.25/2.0), Math.toRadians(270));
-                startPoses.put(state, startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
                 gen.addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);
@@ -126,7 +123,6 @@ public class TrajectoryGenerator {
                 break;
             case BACK:
                 startPose = new Pose2d(35, 70-(12.25/2.0), Math.toRadians(270));
-                startPoses.put(state, startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
                 switch (parkPos) {
                     case ONE:
@@ -153,7 +149,6 @@ public class TrajectoryGenerator {
         switch (startPos) {
             case FRONT:
                 Pose2d startPose = new Pose2d(-35, -(70-(12.25/2.0)), Math.toRadians(90));
-                startPoses.put(state, startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
                 switch (parkPos) {
                     case ONE:
@@ -171,7 +166,6 @@ public class TrajectoryGenerator {
                 break;
             case BACK:
                 startPose = new Pose2d(35, -(70-(12.25/2.0)), Math.toRadians(90));
-                startPoses.put(state, startPose);
                 gen = drive.trajectorySequenceBuilder(startPose);
                 switch (parkPos) {
                     case ONE:
