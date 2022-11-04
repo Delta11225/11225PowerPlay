@@ -51,4 +51,9 @@ public abstract class Constants {
     public final static double liftUpPower = 0.75;
     public final static double liftDownPower = 0.5;
     public final static double liftPosRunPower = 1;
+
+    public final static int[] liftEncoderConeStack = new int[]{706, 495, 347, 181, 0};
+
+    public final static int upEncoderStep = 10;
+    public final static int downEncoderStep = 10;
 }
