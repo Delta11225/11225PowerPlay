@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.testing;
+package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -60,6 +60,7 @@ public class TeleopFinal extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
 //    private boolean runningToPos = false;
     private PosRunningTo posRunningTo = PosRunningTo.NONE;
+    private int linearSlideTarget = 0;
 
     @Override
     public void init() {
@@ -93,7 +94,8 @@ public class TeleopFinal extends OpMode {
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
         robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.linearSlide.setTargetPosition(linearSlideTarget);
+        robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // FIXME Hardware23 takes forever to init for some reason
         telemetry.addData("Robot HWMap init time", getRuntime());
@@ -187,6 +189,44 @@ public class TeleopFinal extends OpMode {
     public void peripheralMove() {
         ControlConfig.update(gamepad1, gamepad2);
 
+        linearSlideMove();
+
+////////////////////GRABBER////////////////////////////////////////////////////////
+
+        // A button = open claw, b button = closed claw
+        gamepad2.toString();
+        if (ControlConfig.openClaw) {
+            robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
+            robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
+        } else if (gamepad2.b) {
+            robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
+            robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
+        }
+
+    }
+
+    private void linearSlideMove() {
+        if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
+            linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.liftEncoderMax);
+        } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
+            linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, 0);
+        }
+
+        if (ControlConfig.goToLow) {
+            linearSlideTarget = Constants.liftEncoderLow;
+        }
+
+        if (ControlConfig.goToBottom) {
+            linearSlideTarget = 0;
+        }
+
+        robot.linearSlide.setTargetPosition(linearSlideTarget);
+        robot.linearSlide.setPower(0.5);
+        telemetry.addData("Linear Slide set pos", linearSlideTarget);
+        telemetry.update();
+    }
+
+    private void linearSlideMoveOld() {
         /////////////////////////////LINEAR SLIDE//////////////////////////////
         if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
             // If we give it any input, stop running to a certain set position
@@ -269,19 +309,6 @@ public class TeleopFinal extends OpMode {
 //                robot.linearSlide.setPower(0);
 //            }
         }
-
-////////////////////GRABBER////////////////////////////////////////////////////////
-
-        // A button = open claw, b button = closed claw
-        gamepad2.toString();
-        if (ControlConfig.openClaw) {
-            robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
-            robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
-        } else if (gamepad2.b) {
-            robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
-            robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
-        }
-
     }
 
     /*-----------------------------------//
