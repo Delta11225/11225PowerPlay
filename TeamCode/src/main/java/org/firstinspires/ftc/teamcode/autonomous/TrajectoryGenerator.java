@@ -104,6 +104,39 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     robot.linearSlide.setPower(1);
                 });
+                gen
+                    .splineToLinearHeading(new Pose2d(-28, 53.8, Math.toRadians(300)), Math.toRadians(300))
+                    .splineToLinearHeading(new Pose2d(-27.7, 58.5, Math.toRadians(270)), Math.toRadians(270))
+                    .strafeTo(new Vector2d(-14.2, 58.5))
+                    .splineToConstantHeading(new Vector2d(-12.2, 58.5), Math.toRadians(270))
+                    .splineToConstantHeading(new Vector2d(-12.2, 14), Math.toRadians(270))
+                    .splineTo(new Vector2d(-14.2, 12), Math.toRadians(180))
+                    .addDisplacementMarker(() -> {
+                        robot.linearSlide.setTargetPosition(Constants.liftEncoderConeStack[0]);
+                        robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        robot.linearSlide.setPower(1);
+                    })
+                    .splineToConstantHeading(new Vector2d(-59, 12), Math.toRadians(180))
+                    .addDisplacementMarker(() -> {
+                        robot.rightClaw.setPosition(Constants.rightClawClosed);
+                        robot.leftClaw.setPosition(Constants.leftClawClosed);
+                        robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
+                        robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        robot.linearSlide.setPower(1);
+                    })
+                    .back(10)
+                    .splineToLinearHeading(new Pose2d(-52, 17.6, Math.toRadians(45)), Math.toRadians(45))
+                    .addDisplacementMarker(() -> {
+                        robot.rightClaw.setPosition(Constants.rightClawOpen);
+                        robot.leftClaw.setPosition(Constants.rightClawOpen);
+                    })
+                    .splineToLinearHeading(new Pose2d(-54.8, 12.5, Math.toRadians(90)), Math.toRadians(90))
+                    .addDisplacementMarker(() -> {
+                        robot.linearSlide.setTargetPosition(0);
+                        robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        robot.linearSlide.setPower(1);
+                    })
+                    .strafeTo(new Vector2d(-34.5, 12.5));
 //                break;
 
                 switch (parkPos) {
