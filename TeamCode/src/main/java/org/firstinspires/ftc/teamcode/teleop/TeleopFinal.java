@@ -206,9 +206,15 @@ public class TeleopFinal extends OpMode {
     }
 
     private void linearSlideMove() {
+        // FIXME after manual doesnt immediately work after clicking go to low or go to bottom
+
         if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
+            linearSlideTarget = robot.linearSlide.getTargetPosition();
+
             linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.liftEncoderMax);
         } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
+            linearSlideTarget = robot.linearSlide.getTargetPosition();
+
             linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, 0);
         }
 
