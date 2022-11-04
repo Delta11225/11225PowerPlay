@@ -23,7 +23,10 @@ public class MeepMeepTest {
 //                                .splineToConstantHeading(new Vector2d(-59, 36), Math.toRadians(270))
                                 .splineToLinearHeading(new Pose2d(-28, 53.8, Math.toRadians(300)), Math.toRadians(300))
                                 .splineToLinearHeading(new Pose2d(-27.7, 58.5, Math.toRadians(270)), Math.toRadians(270))
-                                .strafeTo(new Vector2d(-12.2, 58.5))
+                                .strafeTo(new Vector2d(-14.2, 58.5))
+                                .splineToConstantHeading(new Vector2d(-12.2, 58.5), Math.toRadians(270))
+                                .strafeTo(new Vector2d(-12.2, 10))
+                                .splineToLinearHeading(new Pose2d(-14.2, 10, Math.toRadians(180)), Math.toRadians(180))
 
 //
 //                                  // Middle parking (2)
