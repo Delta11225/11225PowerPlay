@@ -56,8 +56,8 @@ public abstract class ControlConfig {
 
     public static boolean goToGround = false;
     public static boolean goToLow = false;
-    private static boolean goToMedium = false;
-    private static boolean goToHigh = false;
+    public static boolean goToMedium = false;
+    public static boolean goToHigh = false;
 
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls;
