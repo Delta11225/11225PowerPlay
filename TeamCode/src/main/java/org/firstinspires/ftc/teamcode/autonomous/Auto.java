@@ -135,9 +135,10 @@ public class Auto extends LinearOpMode {
 
     private Color getColor() {
         // Need two things for normal or dualshock controllers
-        telemetry.addLine("Color?");
-        telemetry.addLine("Blue = X or Square");
-        telemetry.addLine("Red = B or Circle");
+        telemetry.clear();
+        telemetry.addData("Color?","");
+        telemetry.addData("Blue", "X or Square");
+        telemetry.addData("Red", "B or Circle");
         telemetry.update();
 
         Color color = null;
