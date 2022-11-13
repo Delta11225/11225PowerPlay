@@ -32,7 +32,7 @@ public abstract class ControlConfig {
     public static boolean lowerSlide = false;
     public static boolean runSlideToLowDump = false;
 
-    public static boolean linearSlideOverride = false;
+    public static boolean overrideModifier = false;
 
     public static boolean duckWheelBlue = false;
     public static boolean duckWheelRed = false;
@@ -54,8 +54,10 @@ public abstract class ControlConfig {
     public static boolean openClaw = false;
     public static boolean closeClaw = false;
 
+    public static boolean goToGround = false;
     public static boolean goToLow = false;
-    public static boolean goToBottom = false;
+    public static boolean goToMedium = false;
+    public static boolean goToHigh = false;
 
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls;
@@ -73,10 +75,16 @@ public abstract class ControlConfig {
         lowerSlide = pad2.dpad_down;
         linSlideSlow = pad2.right_trigger > .1;
 
-        openClaw = pad2.a || pad2.cross;
-        closeClaw = pad2.b || pad2.circle;
+//        openClaw = pad2.a || pad2.cross;
+//        closeClaw = pad2.b || pad2.circle;
+        openClaw = pad2.right_bumper;
+        closeClaw = pad2.left_bumper;
 
-        goToLow = pad2.triangle || pad2.y;
-        goToBottom = pad2.square || pad2.x;
+        goToGround = pad2.cross || pad2.a;
+        goToLow = pad2.square || pad2.x;
+        goToMedium = pad2.triangle || pad2.y;
+        goToHigh = pad2.circle || pad2.b;
+
+        overrideModifier = pad2.left_stick_button;
     }
 }
