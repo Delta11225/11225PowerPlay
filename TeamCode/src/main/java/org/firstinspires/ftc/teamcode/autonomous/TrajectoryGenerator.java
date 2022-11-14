@@ -134,7 +134,7 @@ public class TrajectoryGenerator {
                     })
                     .back(12)
                         // FIXME The 17 here should probbaaly be a 16
-                    .splineToLinearHeading(new Pose2d(-50.5, 17, Math.toRadians(45)), Math.toRadians(45))
+                    .splineToLinearHeading(new Pose2d(-50.5, 16, Math.toRadians(45)), Math.toRadians(45))
                     .addDisplacementMarker(() -> {
                         robot.rightClaw.setPosition(Constants.rightClawOpen);
                         robot.leftClaw.setPosition(Constants.leftClawOpen);
