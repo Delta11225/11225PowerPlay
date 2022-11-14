@@ -87,7 +87,7 @@ public class TrajectoryGenerator {
             case FRONT:
                 Pose2d startPose = new Pose2d(-40, 70-(12.25/2.0), Math.toRadians(270));
                 gen = drive.trajectorySequenceBuilder(startPose);
-                gen.setTurnConstraint(30, 2);
+                gen.setTurnConstraint(60, 5);
                 gen.addDisplacementMarker(() -> {
                             robot.rightClaw.setPosition(Constants.rightClawClosed);
                     robot.leftClaw.setPosition(Constants.leftClawClosed);
@@ -118,22 +118,22 @@ public class TrajectoryGenerator {
                         robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         robot.linearSlide.setPower(1);
                     })
-                    .splineToConstantHeading(new Vector2d(-63, 9), Math.toRadians(180))
-                    .waitSeconds(0.5)
+                    .splineToConstantHeading(new Vector2d(-60, 9), Math.toRadians(180))
+                    .waitSeconds(0.25)
                     .addDisplacementMarker(() -> {
                         robot.rightClaw.setPosition(Constants.rightClawClosed);
                         robot.leftClaw.setPosition(Constants.leftClawClosed);
                     })
                     // Do not ever do this. This is a hack.
                     .forward(0.001)
-                    .waitSeconds(0.75)
+                    .waitSeconds(0.25)
                     .addDisplacementMarker(() -> {
                         robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
                         robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         robot.linearSlide.setPower(1);
                     })
-                    .back(10)
-                    .splineToLinearHeading(new Pose2d(-52, 17.6, Math.toRadians(45)), Math.toRadians(45))
+                    .back(12)
+                    .splineToLinearHeading(new Pose2d(-50.5, 16, Math.toRadians(45)), Math.toRadians(45))
                     .addDisplacementMarker(() -> {
                         robot.rightClaw.setPosition(Constants.rightClawOpen);
                         robot.leftClaw.setPosition(Constants.leftClawOpen);
