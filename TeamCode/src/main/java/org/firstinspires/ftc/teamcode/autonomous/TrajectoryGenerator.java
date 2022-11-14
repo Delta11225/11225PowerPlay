@@ -110,19 +110,22 @@ public class TrajectoryGenerator {
                     })
                     .strafeTo(new Vector2d(-14.2, 58.5))
                     .splineToConstantHeading(new Vector2d(-12.2, 58.5), Math.toRadians(270))
-                    .splineToConstantHeading(new Vector2d(-12.2, 12), Math.toRadians(270))
-                    .splineTo(new Vector2d(-14.2, 10), Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-12.2, 9), Math.toRadians(270))
+                    .turn(Math.toRadians(-90))
+//                    .splineTo(new Vector2d(-14.2, 10), Math.toRadians(180))
                     .addDisplacementMarker(() -> {
                         robot.linearSlide.setTargetPosition(Constants.liftEncoderConeStack[0]);
                         robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         robot.linearSlide.setPower(1);
                     })
-                    .splineToConstantHeading(new Vector2d(-63, 10), Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-63, 9), Math.toRadians(180))
                     .waitSeconds(0.5)
                     .addDisplacementMarker(() -> {
                         robot.rightClaw.setPosition(Constants.rightClawClosed);
                         robot.leftClaw.setPosition(Constants.leftClawClosed);
                     })
+                    // Do not ever do this. This is a hack.
+                    .forward(0.001)
                     .waitSeconds(0.75)
                     .addDisplacementMarker(() -> {
                         robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
