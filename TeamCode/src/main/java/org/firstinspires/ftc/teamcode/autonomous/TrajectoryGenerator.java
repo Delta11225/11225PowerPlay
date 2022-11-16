@@ -59,6 +59,7 @@ public class TrajectoryGenerator {
     }
 
     private HashMap<TrajectoryState, TrajectorySequence> generateAllTrajectories() {
+        // TODO repeated trajectories will need to be cached to save time
         HashMap<TrajectoryState, TrajectorySequence> trajMap = new HashMap<>();
         for (Color color : new Color[]{Color.BLUE, Color.RED}) {
             for (StartPosition startPos : new StartPosition[]{StartPosition.FRONT, StartPosition.BACK})
