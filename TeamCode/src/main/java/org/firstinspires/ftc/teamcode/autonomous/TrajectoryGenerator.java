@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -25,12 +26,14 @@ import androidx.annotation.NonNull;
 public class TrajectoryGenerator {
     private final Hardware23 robot;
     private final SampleMecanumDrive drive;
+    private final Telemetry telemetry;
 
     private HashMap<TrajectoryState, TrajectorySequence> trajectories;
 
-    public TrajectoryGenerator(Hardware23 robot) {
+    public TrajectoryGenerator(Hardware23 robot, Telemetry telemetry) {
         this.robot = robot;
         this.drive = robot.drive;
+        this.telemetry = telemetry;
 
         this.trajectories = generateAllTrajectories();
     }
@@ -60,11 +63,13 @@ public class TrajectoryGenerator {
         for (Color color : new Color[]{Color.BLUE, Color.RED}) {
             for (StartPosition startPos : new StartPosition[]{StartPosition.FRONT, StartPosition.BACK})
                 for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
-                    Log.d("[DEBUG - USER]", String.format("Generating traj - %s %s %s", color, startPos, parkPos));
+                    Log.d("TrajectoryGenerator", String.format("Generating traj - %s %s %s", color, startPos, parkPos));
+                    telemetry.addLine(String.format("Generating traj - %s %s %s", color, startPos, parkPos));
+                    telemetry.update();
                     TrajectoryState trajState = new TrajectoryState(color, startPos, parkPos);
                     TrajectorySequence traj = genTrajectory(trajState);
                     trajMap.put(trajState, traj);
-                    Log.d("[DEBUG - USER]", "Traj gen finished");
+//                    Log.d("TrajectoryGenerator", "Traj gen finished");
             }
         }
         return trajMap;
@@ -90,7 +95,7 @@ public class TrajectoryGenerator {
                 gen = drive.trajectorySequenceBuilder(startPose);
                 gen.setTurnConstraint(60, 5);
                 gen.addDisplacementMarker(() -> {
-                            robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
                     robot.leftClaw.setPosition(Constants.leftClawClosed);
                 })
                 .addDisplacementMarker(() -> {
@@ -134,7 +139,7 @@ public class TrajectoryGenerator {
                         robot.linearSlide.setPower(1);
                     })
                     .back(12)
-                        // FIXME The 17 here should probbaaly be a 16
+                        // FIXME The 17 here should probably be a 16
                     .splineToLinearHeading(new Pose2d(-50.5, 16, Math.toRadians(45)), Math.toRadians(45))
                     .addDisplacementMarker(() -> {
                         robot.rightClaw.setPosition(Constants.rightClawOpen);

@@ -27,7 +27,7 @@ public class Auto extends LinearOpMode {
         // Do this here, as it takes a while
         telemetry.addLine("Building trajectories...");
         telemetry.update();
-        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot);
+        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, telemetry);
         telemetry.addData("Build! Time taken (s)", getRuntime());
         telemetry.update();
 
