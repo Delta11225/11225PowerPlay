@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import android.util.Log;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
@@ -56,11 +58,13 @@ public class TrajectoryGenerator {
     private HashMap<TrajectoryState, TrajectorySequence> generateAllTrajectories() {
         HashMap<TrajectoryState, TrajectorySequence> trajMap = new HashMap<>();
         for (Color color : new Color[]{Color.BLUE, Color.RED}) {
-            for (StartPosition startPos : new StartPosition[]{StartPosition.FRONT, StartPosition.FRONT})
+            for (StartPosition startPos : new StartPosition[]{StartPosition.FRONT, StartPosition.BACK})
                 for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
+                    Log.d("[DEBUG - USER]", String.format("Generating traj - %s %s %s", color, startPos, parkPos));
                     TrajectoryState trajState = new TrajectoryState(color, startPos, parkPos);
                     TrajectorySequence traj = genTrajectory(trajState);
                     trajMap.put(trajState, traj);
+                    Log.d("[DEBUG - USER]", "Traj gen finished");
             }
         }
         return trajMap;
