@@ -7,17 +7,9 @@ package org.firstinspires.ftc.teamcode.util;
  * appropriate value.
  */
 public abstract class Constants {
-    public final static double dumpPosition = 0.0;
-    public final static double collectPosition = 0.73;
-    public final static double holdPosition = 0.35;
-
-    public final static double tseArmInitPosition = 0.47;
-    public final static double tseArmCollectPosition = 0.83;
-//    public final static double tseArmActivePosition = 0.46;
-//
-//    public final static double tseArmCollectPosition = 0.40;
-//    public final static double tseArmDeployPosition = 0.2;
-//    public final static double tseArmReleasePosition = 0.3;
+    // Set this to true before competition. When true, stops ignoring null motors in the hardware
+    // file.
+    public final static boolean COMPETITION_MODE = false;
 
     public final static double fastMultiplier = 0.8;
     public final static double normalMultiplier = 0.4;
