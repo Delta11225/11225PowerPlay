@@ -61,14 +61,14 @@ public abstract class Constants {
     }
 //    public final static int liftEncoderLow = 1780;
 
-    public final static int[] liftEncoderConeStack = new int[]{706, 495, 347, 181, 0};
+    private final static int[] liftEncoderConeStack = new int[]{706, 495, 347, 181, 0};
     public static int[] getLiftEncoderConeStack() {
         return new int[] {
-                706 + linearSlideZeroOffset,
-                495 + linearSlideZeroOffset,
-                347 + linearSlideZeroOffset,
-                181 + linearSlideZeroOffset,
-                0 + linearSlideZeroOffset
+                liftEncoderConeStack[0] + linearSlideZeroOffset,
+                liftEncoderConeStack[1] + linearSlideZeroOffset,
+                liftEncoderConeStack[2] + linearSlideZeroOffset,
+                liftEncoderConeStack[3] + linearSlideZeroOffset,
+                liftEncoderConeStack[4] + linearSlideZeroOffset
         };
     }
 }

@@ -103,8 +103,7 @@ public class TrajectoryGenerator {
                         .strafeTo(new Vector2d(-12.5, 65))
                         .splineToConstantHeading(new Vector2d(-10, 57.1), Math.toRadians(270))
                         .addDisplacementMarker(() -> {
-                            // Should be high encoder
-                            robot.linearSlide.setTargetPosition(0);
+                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
                         })
@@ -116,11 +115,14 @@ public class TrajectoryGenerator {
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
                         })
+
+                        // Back up
                         .splineToLinearHeading(new Pose2d(-13, 30, Math.toRadians(270)), Math.toRadians(270))
 
+                        // Go to turn
                         .splineToLinearHeading(new Pose2d(-16, 12, Math.toRadians(180)), Math.toRadians(180))
                         .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.liftEncoderConeStack[0]);
+                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderConeStack()[0]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
                         })
@@ -134,23 +136,28 @@ public class TrajectoryGenerator {
                         .forward(0.001)
                         .waitSeconds(0.25)
                         .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
+                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
                         })
-                        .back(12)
-                        // FIXME The 17 here should probably be a 16
-                        .splineToLinearHeading(new Pose2d(-50.5, 16, Math.toRadians(45)), Math.toRadians(45))
+                        .back(20)
+                        .addDisplacementMarker(() -> {
+                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
+                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                            robot.linearSlide.setPower(1);
+                        })
+                        .splineToLinearHeading(new Pose2d(-28.5, 8.5, Math.toRadians(300)), Math.toRadians(300))
                         .addDisplacementMarker(() -> {
                             robot.rightClaw.setPosition(Constants.rightClawOpen);
                             robot.leftClaw.setPosition(Constants.leftClawOpen);
                         })
-                        .splineToLinearHeading(new Pose2d(-56, 12.5, Math.toRadians(90)), Math.toRadians(90))
+                        .back(10)
                         .addDisplacementMarker(() -> {
                             robot.linearSlide.setTargetPosition(0);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
-                        });
+                        })
+                        .forward(0.001);
 
                 return gen;
             case BACK:
@@ -192,23 +199,13 @@ public class TrajectoryGenerator {
             case FRONT:
                 switch (trajState.parkPos) {
                     case ONE:
-                        gen.strafeTo(new Vector2d(-14, 12.5))
-                                .splineToConstantHeading(new Vector2d(-12.2, 14), Math.toRadians(90))
-                                .splineTo(new Vector2d(-12.2, 34), Math.toRadians(90));
-//                        gen.strafeLeft(35-16)
-//                                .splineToConstantHeading(new Vector2d(-12, 36), Math.toRadians(270));
+                        gen.splineToLinearHeading(new Pose2d(-13, 13, Math.toRadians(270)), Math.toRadians(0));
                         break;
                     case TWO:
-                        gen.strafeTo(new Vector2d(-36, 12.5))
-                                .splineToConstantHeading(new Vector2d(-34.5, 14), Math.toRadians(90))
-                                .splineTo(new Vector2d(-34.5, 34), Math.toRadians(90));
-//                        gen.forward(70-(12.25/2.0) - 36);
+                        gen.splineToLinearHeading(new Pose2d(-36, 13, Math.toRadians(270)), Math.toRadians(90));
                         break;
                     default:
-                        gen.forward(20);
-//                        gen.strafeRight(35-16)
-//                                .splineToSplineHeading(new Pose2d(-53, 32, Math.toRadians(300)), Math.toRadians(300))
-//                                .splineToConstantHeading(new Vector2d(-59, 36), Math.toRadians(270));
+                        gen.splineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)), Math.toRadians(180));
                         break;
                 }
                 return gen;
@@ -293,7 +290,7 @@ public class TrajectoryGenerator {
                             robot.leftClaw.setPosition(Constants.leftClawClosed);
                         })
                         .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
+                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
                         });
@@ -314,7 +311,7 @@ public class TrajectoryGenerator {
                         .turn(Math.toRadians(-90))
 //                    .splineTo(new Vector2d(-14.2, 10), Math.toRadians(180))
                         .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.liftEncoderConeStack[0]);
+                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderConeStack()[0]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
                         })
@@ -328,7 +325,7 @@ public class TrajectoryGenerator {
                         .forward(0.001)
                         .waitSeconds(0.25)
                         .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
+                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
                         })
