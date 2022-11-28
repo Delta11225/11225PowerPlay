@@ -391,6 +391,7 @@ public class TeleopFinal extends OpMode {
 
         // Initialization code. If we want to start running goToLow, set appropriate target pos,
         // put linear slide in correct mode, and tell everyone we are running to a position.
+        // TODO add med and high junctions
         if (ControlConfig.goToLow && linearSlideMode != LinearSlideMode.LOW) {
             telemetry.addData("Go to pos", Constants.getLiftEncoderJunctions()[0]);
             telemetry.update();
