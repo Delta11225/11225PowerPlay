@@ -27,7 +27,7 @@ public class ColorSensorTest extends OpMode {
         if (sensorColor.blue() > sensorColor.red()) {
             telemetry.addLine("Blue");
         }
-        if (sensorDistance.getDistance(DistanceUnit.CM) < 3) {
+        if (sensorDistance.getDistance(DistanceUnit.CM) <3) {
             telemetry.addLine("Ready to grab");
         }
 
