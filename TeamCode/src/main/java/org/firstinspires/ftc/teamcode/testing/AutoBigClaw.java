@@ -33,7 +33,7 @@ public class AutoBigClaw extends OpMode {
         sensorColor = hardwareMap.get(ColorSensor.class, "colordistance_sensor");
         sensorDistance = hardwareMap.get(DistanceSensor.class,"colordistance_sensor");
 
-        telemetry.addData("status", "Initialized");
+        telemetry.addData("status:", "Initialized");
         telemetry.update();
 
     }
