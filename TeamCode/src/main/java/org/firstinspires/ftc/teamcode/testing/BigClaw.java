@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class BigClaw extends LinearOpMode {
 
     DcMotor linearSlide;
@@ -18,7 +18,7 @@ public class BigClaw extends LinearOpMode {
     int holdPosition;
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         rightClaw = hardwareMap.get(Servo.class, "right_claw");
         leftClaw = hardwareMap.get(Servo.class, "left_claw");
@@ -33,12 +33,12 @@ public class BigClaw extends LinearOpMode {
             telemetry.update();
             // A button = open claw, b button = closed claw
             if (gamepad1.a) {
-                rightClaw.setPosition(0.44); // Right claw open
+//                rightClaw.setPosition(0.44); // Right claw open
                 leftClaw.setPosition(0.7); // Left claw open
             }
             if (gamepad1.b) {
-                rightClaw.setPosition(0.57); // Right claw closed
-                leftClaw.setPosition(0.57); // Left claw closed
+//                rightClaw.setPosition(0.6); // Right claw closed
+                leftClaw.setPosition(0.53); // Left claw closed
             }
 
 

@@ -245,18 +245,12 @@ public class TeleopFinal extends OpMode {
 
         if (ControlConfig.goToMedium) {
             linearSlideMode = LinearSlideMode.MEDIUM;
-            telemetry.addLine("Can't do this yet, moron. Add the linear slide first.");
-            telemetry.update();
-            linearSlideTarget = Constants.getLiftEncoderJunctions()[0];
-//            linearSlideTarget = Constants.getLiftEncoderJunctions()[1];
+            linearSlideTarget = Constants.getLiftEncoderJunctions()[1];
         }
 
         if (ControlConfig.goToHigh) {
             linearSlideMode = LinearSlideMode.HIGH;
-            telemetry.addLine("Can't do this yet, moron. Add the linear slide first.");
-            telemetry.update();
-            linearSlideTarget = Constants.getLiftEncoderJunctions()[0];
-//            linearSlideTarget = Constants.getLiftEncoderJunctions()[2];
+            linearSlideTarget = Constants.getLiftEncoderJunctions()[2];
         }
 
         // Handle overrides
