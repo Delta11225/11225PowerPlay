@@ -212,7 +212,6 @@ public class TeleopFinal extends OpMode {
     }
 
     private void linearSlideMoveWithOverride() {
-        // FIXME linear slide moves extremely slowly after running to ground for some reason
         DcMotor linearSlide = robot.linearSlide;
 //        int linearSlideOffetPos = linearSlide.getCurrentPosition() + Constants.linearSlideZeroOffset;
         Log.d("LinearSlideMovement", String.valueOf(Constants.linearSlideZeroOffset));
