@@ -179,6 +179,8 @@ public class TeleopFinal extends OpMode {
 //            telemetry.addLine("normal");
         }
 
+        // TODO cap speed if linear slide is too high
+
         telemetry.addData("Power:", powerMultiplier);
 
         telemetry.update();
