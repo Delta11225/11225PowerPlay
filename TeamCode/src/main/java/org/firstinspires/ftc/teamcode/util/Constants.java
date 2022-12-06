@@ -7,6 +7,10 @@ package org.firstinspires.ftc.teamcode.util;
  * appropriate value.
  */
 public abstract class Constants {
+    // Set this to true before competition. When true, stops ignoring null motors in the hardware
+    // file.
+    public final static boolean COMPETITION_MODE = false;
+
     public final static double fastMultiplier = 0.8;
     public final static double normalMultiplier = 0.4;
     public final static double slowMultiplier = 0.3;
@@ -46,14 +50,14 @@ public abstract class Constants {
     }
 //    public final static int liftEncoderLow = 1780;
 
-    public final static int[] liftEncoderConeStack = new int[]{706, 495, 347, 181, 0};
+    private final static int[] liftEncoderConeStack = new int[]{706, 495, 347, 181, 0};
     public static int[] getLiftEncoderConeStack() {
         return new int[] {
-                706 + linearSlideZeroOffset,
-                495 + linearSlideZeroOffset,
-                347 + linearSlideZeroOffset,
-                181 + linearSlideZeroOffset,
-                0 + linearSlideZeroOffset
+                liftEncoderConeStack[0] + linearSlideZeroOffset,
+                liftEncoderConeStack[1] + linearSlideZeroOffset,
+                liftEncoderConeStack[2] + linearSlideZeroOffset,
+                liftEncoderConeStack[3] + linearSlideZeroOffset,
+                liftEncoderConeStack[4] + linearSlideZeroOffset
         };
     }
 }

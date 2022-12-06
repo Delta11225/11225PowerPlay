@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-class AutoState {
+public class AutoState {
    public final Color color;
    public final StartPosition position;
    public final long delay;
