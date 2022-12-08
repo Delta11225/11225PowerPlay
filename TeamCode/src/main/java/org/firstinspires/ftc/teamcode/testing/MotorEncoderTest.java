@@ -14,7 +14,7 @@ public class MotorEncoderTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         DcMotor front_left = hardwareMap.get(DcMotor.class, "front_left");
         DcMotor front_right = hardwareMap.get(DcMotor.class, "front_right");
