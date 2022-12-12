@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class LinearSlideEncoderMaxTest extends OpMode {
     Hardware23 robot = null;
     private int linearSlideTarget = 0;

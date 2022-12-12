@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class LinearSlideTest extends LinearOpMode {
 
     DcMotor linearSlide;
