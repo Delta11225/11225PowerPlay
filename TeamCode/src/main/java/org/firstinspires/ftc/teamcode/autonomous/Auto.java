@@ -20,7 +20,7 @@ public class Auto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // This lets us write telemetry to both FTC Dashboard and driverhub
-        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
+//        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
 //        telemetry.setAutoClear(true);
         Hardware23 robot = new Hardware23(hardwareMap);
 

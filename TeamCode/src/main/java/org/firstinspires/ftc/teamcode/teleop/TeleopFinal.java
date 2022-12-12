@@ -213,6 +213,7 @@ public class TeleopFinal extends OpMode {
 
     }
 
+    // TODO add comments
     private void linearSlideMoveWithOverride() {
         DcMotor linearSlide = robot.linearSlide;
 //        int linearSlideOffetPos = linearSlide.getCurrentPosition() + Constants.linearSlideZeroOffset;
