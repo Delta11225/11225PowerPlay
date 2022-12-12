@@ -31,11 +31,11 @@ public abstract class Constants {
 
     public final static int autoLiftEncoderStart = 40;
 
-    public final static double rightClawOpen = 0.90;
-    public final static double rightClawClosed = 0.7;
+    public final static double rightClawOpen = 0.44;
+    public final static double rightClawClosed = 0.6;
 
-    public final static double leftClawOpen = 0.05;
-    public final static double leftClawClosed = 0.25;
+    public final static double leftClawOpen = 0.7;
+    public final static double leftClawClosed = 0.53;
 
     public final static double liftUpPower = 0.75;
     public final static double liftDownPower = 0.5;
