@@ -19,6 +19,7 @@ import java.util.HashMap;
 // TODO add a utility method that automatically generates trajectories that go from a tile to another tile
 // TODO while avoiding junctions
 // TODO IMPORTANT comment this file
+// FIXME SUPER DUPER ULTRA MEGA IMPORTANT: This class is broken somehow, review
 /*
  * Ex: Navigate from cell A1 to cell B3
  */
