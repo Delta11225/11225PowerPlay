@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 import java.util.HashMap;
 
-// TODO IMPORTANT comment this file
 // FIXME SUPER DUPER ULTRA MEGA IMPORTANT: This class is broken somehow, review
 public class TrajectoryGenerator {
     // Various useful variables
