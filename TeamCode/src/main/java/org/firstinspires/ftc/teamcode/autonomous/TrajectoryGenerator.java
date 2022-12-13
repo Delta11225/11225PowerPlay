@@ -16,32 +16,42 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 import java.util.HashMap;
 
-// TODO add a utility method that automatically generates trajectories that go from a tile to another tile
-// TODO while avoiding junctions
 // TODO IMPORTANT comment this file
-// FIXME SUPER DUPER ULTRA MEGA IMPORTANT: This class is broken somehow, review
-/*
- * Ex: Navigate from cell A1 to cell B3
- */
 public class TrajectoryGenerator {
+    // Various useful variables
     private final Hardware23 robot;
     private final SampleMecanumDrive drive;
     private final Telemetry telemetry;
 
+    // Stores mapping between Auto State (color, start pos, park pos) and traj sequence to run.
     private HashMap<TrajectoryState, TrajectorySequence> trajectories;
 
+    /**
+     * @param robot The hardware file corresponding to the robot we are using
+     * @param telemetry The telemetry object to direct telem calls to
+     */
     public TrajectoryGenerator(Hardware23 robot, Telemetry telemetry) {
         this.robot = robot;
         this.drive = robot.drive;
         this.telemetry = telemetry;
 
+        // Self explanatory. Populates trajectories variable
         this.trajectories = generateAllTrajectories();
     }
 
+    /**
+     * @param autoState The state that auto is in (color, start pos)
+     * @param parkPos The required parking position
+     * @return The appropriate trajectory sequence for this auto state
+     */
     public TrajectorySequence getAppropriateTrajectory(AutoState autoState, ParkingPosition parkPos) {
+        // A TrajectoryState (combines AutoState and ParkingPosition) that corresponds to the parameters
         TrajectoryState tempTrajState = new TrajectoryState(autoState.color, autoState.position, parkPos);
+        // Used later for fetching appropriate value from hashmap
         TrajectoryState mapTrajState = new TrajectoryState();
 
+        // Since hashmaps are not by value but by reference, we need to manually loop through the hashmap to find
+        // the key with the same VALUE as the trajectory state we have, and save it
         for (TrajectoryState trajState : trajectories.keySet()) {
             if (tempTrajState.hasSameValue(trajState)) {
                 mapTrajState = trajState;
@@ -49,8 +59,15 @@ public class TrajectoryGenerator {
             }
         }
 
+        // Get the right trajectories with the traj state object we found earlier. If we don't find it, provide null instead of
+        // throwing an error
         TrajectorySequence traj = trajectories.getOrDefault(mapTrajState, null);
+        
+        // If traj is null, it means it wasn't in our hashmap, and something has gone wrong. Let the user know.
         if (traj == null) {
+            // Throw and error and report the error to the log (debug reasons)
+            Log.e("TrajectoryGenerator", "WTF? How? You somehow have provide an auto state that there" +
+                    "aren't trajectories for.")
             throw new IllegalStateException("WTF? How? You somehow have provide an auto state that there" +
                     "aren't trajectories for.");
         }
