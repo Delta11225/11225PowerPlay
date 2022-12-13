@@ -27,8 +27,6 @@ import java.util.Locale;
 @TeleOp
 public class TeleopFinal extends OpMode {
     // FIXME in the future reduce number of global vars
-    // TODO add button combination to override things
-    // TODO like maybe right joystick button and a, b, x, or y
 
     Hardware23 robot;
 
@@ -102,7 +100,6 @@ public class TeleopFinal extends OpMode {
         robot.linearSlide.setTargetPosition(linearSlideTarget);
         robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        // FIXME Hardware23 takes forever to init for some reason
         telemetry.addData("Robot HWMap init time", getRuntime());
         telemetry.update();
     }
@@ -113,6 +110,7 @@ public class TeleopFinal extends OpMode {
         currentAngle = 0;
 
         elapsedTime.reset();
+        resetRuntime();
     }
 
     @Override
@@ -130,6 +128,7 @@ public class TeleopFinal extends OpMode {
         }
     }
 
+    // TODO this needs better comments, but in the meantime, its *magic*
     public void move() {
 
         ControlConfig.update(gamepad1, gamepad2);
@@ -179,8 +178,6 @@ public class TeleopFinal extends OpMode {
 //            telemetry.addLine("normal");
         }
 
-        // TODO cap speed if linear slide is too high
-
         telemetry.addData("Power:", powerMultiplier);
 
         telemetry.update();
@@ -202,6 +199,7 @@ public class TeleopFinal extends OpMode {
 ////////////////////GRABBER////////////////////////////////////////////////////////
 
         // A button = open claw, b button = closed claw
+        // Prevents weirdness with gamepad2 locking up
         gamepad2.toString();
         if (ControlConfig.openClaw) {
             robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
@@ -213,29 +211,49 @@ public class TeleopFinal extends OpMode {
 
     }
 
-    // TODO add comments
+    // TODO cap speed if linear slide is too high
     private void linearSlideMoveWithOverride() {
         DcMotor linearSlide = robot.linearSlide;
 //        int linearSlideOffetPos = linearSlide.getCurrentPosition() + Constants.linearSlideZeroOffset;
+        // Log linear slide offset for debug reasons
         Log.d("LinearSlideMovement", String.valueOf(Constants.linearSlideZeroOffset));
+
+        // Complex if statement, but if we want to lift the lide and the linear slide is below the max
+        // AND we are not overriding, lift the slide
         if (ControlConfig.liftSlide && linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax() && !ControlConfig.overrideModifier) {
+            // If we are not in manual mode (basically running to ground or high or something)
+            // reset the linear slide target (where the slide wants to go) to the current position
             if (linearSlideMode != LinearSlideMode.MANUAL) {
                 linearSlideTarget = linearSlide.getCurrentPosition();
             }
 
+            // Reset linear slide mode to manual, for obvious reasons
             linearSlideMode = LinearSlideMode.MANUAL;
+            // Set the target to the MINIMUM of either the current target plus some number or the
+            // linear slide max to prevent linear slide from going too high
             linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.getLiftEncoderMax());
+
+        // Same logic as above, just for going down. Make sure to use zeroOffset and not 0 since
+        // we don't know where 0 is and zeroOffset should be the minimum for the slide
         } else if (ControlConfig.lowerSlide && linearSlide.getCurrentPosition() > Constants.linearSlideZeroOffset && !ControlConfig.overrideModifier) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
                 linearSlideTarget = linearSlide.getCurrentPosition();
             }
 
             linearSlideMode = LinearSlideMode.MANUAL;
+
+            // Same as the min above, just now with max and zeroOffset. Prevents slide from going down
+            // too far.
             linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, Constants.linearSlideZeroOffset);
+
+        // If we are not overriding and in manual mode, set target to current position. Prevents
+        // slide from moving after button is released.
         } else if (linearSlideMode == LinearSlideMode.MANUAL && !ControlConfig.overrideModifier) {
             linearSlideTarget = linearSlide.getCurrentPosition();
         }
 
+        // All these are the same. If we pushed the button to go to a certain location, set the
+        // target there and change the mode
         if (ControlConfig.goToGround) {
             linearSlideMode = LinearSlideMode.GROUD;
             linearSlideTarget = Constants.linearSlideZeroOffset;
@@ -256,31 +274,42 @@ public class TeleopFinal extends OpMode {
             linearSlideTarget = Constants.getLiftEncoderJunctions()[2];
         }
 
-        // Handle overrides
+        // Handle overrides since we ignore them above. Some of the logic is reused and I will only
+        // comment new logic
+
+        // If we override and are lifting the slide
         if (ControlConfig.overrideModifier && ControlConfig.liftSlide) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
                 linearSlideTarget = linearSlide.getCurrentPosition();
             }
 
             linearSlideTarget = linearSlideTarget + Constants.upEncoderStep;
+
+            // Reset the zeroOffset to the current position, as that is supposedly the new 0.
             Constants.linearSlideZeroOffset = linearSlide.getCurrentPosition();
         }
 
+        // Same as above.
         if (ControlConfig.overrideModifier && ControlConfig.lowerSlide) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
                 linearSlideTarget = linearSlide.getCurrentPosition();
             }
 
             linearSlideTarget = linearSlideTarget - Constants.upEncoderStep;
+
             Constants.linearSlideZeroOffset = linearSlide.getCurrentPosition();
         }
 
+        // The linear slide is in run to position mode to prevent it from falling down when it is high
+        // up. Here we set the target pos to whatever we have calculated it to be.
         robot.linearSlide.setTargetPosition(linearSlideTarget);
+        // We shouldn't need to do this, but just in case
         robot.linearSlide.setPower(0.5);
         telemetry.addData("Linear Slide set pos", linearSlideTarget);
         telemetry.update();
     }
 
+    @Deprecated
     private void linearSlideMove() {
         DcMotor linearSlide = robot.linearSlide;
         // Use this modified variable for any bounds checking. For target setting it will be offset
@@ -331,10 +360,12 @@ public class TeleopFinal extends OpMode {
         telemetry.update();
     }
 
+    @Deprecated
     private int calcWithOffset(int rawLinearSlideTarget) {
         return rawLinearSlideTarget + Constants.linearSlideZeroOffset;
     }
 
+    @Deprecated
     private void linearSlideMoveOld() {
         /////////////////////////////LINEAR SLIDE//////////////////////////////
         if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax()) {
@@ -387,7 +418,6 @@ public class TeleopFinal extends OpMode {
 
         // Initialization code. If we want to start running goToLow, set appropriate target pos,
         // put linear slide in correct mode, and tell everyone we are running to a position.
-        // TODO add med and high junctions
         if (ControlConfig.goToLow && linearSlideMode != LinearSlideMode.LOW) {
             telemetry.addData("Go to pos", Constants.getLiftEncoderJunctions()[0]);
             telemetry.update();
@@ -496,27 +526,4 @@ public class TeleopFinal extends OpMode {
     String formatDegrees(double degrees) {
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
-
-//    class LiftThread implements Runnable {
-//        @Override
-//        public void run() {
-//            while (opModeIsActive()) {
-//                if (ControlConfig.runSlideToLowDump) {
-//                    robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-////                        telemetry.addLine("Got here");
-//                    telemetry.update();
-//                    robot.liftMotor.setTargetPosition((int) (liftEncoderStart + 1100));
-//                    robot.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//                    robot.liftMotor.setPower(1.0);
-//                    slideReturning = true;
-////                        telemetry.addLine(String.valueOf(slideReturning));
-//                    telemetry.update();
-//                }
-//
-//                while (opModeIsActive() && robot.liftMotor.isBusy()) {}
-//                slideReturning = false;
-//            }
-//        }
-//    }
 }
