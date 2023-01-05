@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.util.Hardware22;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 @TeleOp
-@Disabled
+//@Disabled
 public class LinearSlideEncoderMaxTest extends OpMode {
     Hardware23 robot = null;
 
