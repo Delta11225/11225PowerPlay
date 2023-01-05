@@ -26,9 +26,9 @@ public class LinearSlideEncoderMaxTest extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.dpad_up) {
-            robot.linearSlide.setPower(0.1);
+            robot.linearSlide.setPower(0.3);
         } else if (gamepad1.dpad_down) {
-            robot.linearSlide.setPower(-0.1);
+            robot.linearSlide.setPower(-0.3);
         } else {
             robot.linearSlide.setPower(0);
         }

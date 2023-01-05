@@ -28,7 +28,7 @@ public class MeepMeepTest {
               .addDisplacementMarker(() -> {
 
               })
-              .splineToLinearHeading(new Pose2d(-5.6, 31, Math.toRadians(300)), Math.toRadians(300))
+              .splineToLinearHeading(new Pose2d(-3.6, 30, Math.toRadians(300)), Math.toRadians(300))
               .addDisplacementMarker(() -> {
 
               })
