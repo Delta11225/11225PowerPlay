@@ -1,11 +1,12 @@
-package org.firstinspires.ftc.teamcode.testing;
+package org.firstinspires.ftc.teamcode.teleop;
+
+import android.util.Log;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -18,10 +19,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.ControlConfig;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
-import org.firstinspires.ftc.teamcode.util.PosRunningTo;
+import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
 
 import java.util.Locale;
-import java.util.stream.DoubleStream;
 
 //@Disabled
 @TeleOp
@@ -60,11 +60,16 @@ public class TeleopFinal extends OpMode {
     ElapsedTime elapsedTime = new ElapsedTime();
     private final ElapsedTime runtime = new ElapsedTime();
 //    private boolean runningToPos = false;
-    private PosRunningTo posRunningTo = PosRunningTo.NONE;
+    private LinearSlideMode linearSlideMode = LinearSlideMode.MANUAL;
+    private int linearSlideTarget = 0;
 
     @Override
     public void init() {
         resetRuntime();
+
+//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        Constants.linearSlideZeroOffset = 0;
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -83,11 +88,10 @@ public class TeleopFinal extends OpMode {
         resetRuntime();
         robot = new Hardware23(hardwareMap);
 
-        robot.drive.setMotorPowers(0, 0, 0, 0);
-//        robot.frontLeft.setPower(0);
-//        robot.frontRight.setPower(0);
-//        robot.rearLeft.setPower(0);
-//        robot.rearRight.setPower(0);
+        robot.frontLeft.setPower(0);
+        robot.frontRight.setPower(0);
+        robot.rearLeft.setPower(0);
+        robot.rearRight.setPower(0);
 
         robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
@@ -95,7 +99,8 @@ public class TeleopFinal extends OpMode {
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
         robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.linearSlide.setTargetPosition(linearSlideTarget);
+        robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // FIXME Hardware23 takes forever to init for some reason
         telemetry.addData("Robot HWMap init time", getRuntime());
@@ -178,16 +183,10 @@ public class TeleopFinal extends OpMode {
 
         telemetry.update();
 
-        robot.drive.setMotorPowers(
-                frontLeft * powerMultiplier,
-                rearLeft * powerMultiplier,
-                -frontRight * powerMultiplier,
-                -rearRight * powerMultiplier
-        );
-//        robot.frontLeft.setPower(frontLeft * powerMultiplier);
-//        robot.frontRight.setPower(-frontRight * powerMultiplier);
-//        robot.rearLeft.setPower(rearLeft * powerMultiplier);
-//        robot.rearRight.setPower(-rearRight * powerMultiplier);
+        robot.frontLeft.setPower(frontLeft * powerMultiplier);
+        robot.frontRight.setPower(-frontRight * powerMultiplier);
+        robot.rearLeft.setPower(rearLeft * powerMultiplier);
+        robot.rearRight.setPower(-rearRight * powerMultiplier);
 
 
     }
@@ -195,28 +194,174 @@ public class TeleopFinal extends OpMode {
     public void peripheralMove() {
         ControlConfig.update(gamepad1, gamepad2);
 
+        linearSlideMoveWithOverride();
+//        linearSlideMove();
+
+////////////////////GRABBER////////////////////////////////////////////////////////
+
+        // A button = open claw, b button = closed claw
+        gamepad2.toString();
+        if (ControlConfig.openClaw) {
+            robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
+            robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
+        } else if (ControlConfig.closeClaw) {
+            robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
+            robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
+        }
+
+    }
+
+    private void linearSlideMoveWithOverride() {
+        // FIXME linear slide moves extremely slowly after running to ground for some reason
+        DcMotor linearSlide = robot.linearSlide;
+//        int linearSlideOffetPos = linearSlide.getCurrentPosition() + Constants.linearSlideZeroOffset;
+        Log.d("LinearSlideMovement", String.valueOf(Constants.linearSlideZeroOffset));
+        if (ControlConfig.liftSlide && linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax() && !ControlConfig.overrideModifier) {
+            if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideTarget = linearSlide.getCurrentPosition();
+            }
+
+            linearSlideMode = LinearSlideMode.MANUAL;
+            linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.getLiftEncoderMax());
+        } else if (ControlConfig.lowerSlide && linearSlide.getCurrentPosition() > Constants.linearSlideZeroOffset && !ControlConfig.overrideModifier) {
+            if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideTarget = linearSlide.getCurrentPosition();
+            }
+
+            linearSlideMode = LinearSlideMode.MANUAL;
+            linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, Constants.linearSlideZeroOffset);
+        } else if (linearSlideMode == LinearSlideMode.MANUAL && !ControlConfig.overrideModifier) {
+            linearSlideTarget = linearSlide.getCurrentPosition();
+        }
+
+        if (ControlConfig.goToGround) {
+            linearSlideMode = LinearSlideMode.GROUD;
+            linearSlideTarget = Constants.linearSlideZeroOffset;
+        }
+
+        if (ControlConfig.goToLow) {
+            linearSlideMode = LinearSlideMode.LOW;
+            linearSlideTarget = Constants.getLiftEncoderJunctions()[0];
+        }
+
+        if (ControlConfig.goToMedium) {
+            linearSlideMode = LinearSlideMode.MEDIUM;
+            telemetry.addLine("Can't do this yet, moron. Add the linear slide first.");
+            telemetry.update();
+            linearSlideTarget = Constants.getLiftEncoderJunctions()[0];
+//            linearSlideTarget = Constants.getLiftEncoderJunctions()[1];
+        }
+
+        if (ControlConfig.goToHigh) {
+            linearSlideMode = LinearSlideMode.HIGH;
+            telemetry.addLine("Can't do this yet, moron. Add the linear slide first.");
+            telemetry.update();
+            linearSlideTarget = Constants.getLiftEncoderJunctions()[0];
+//            linearSlideTarget = Constants.getLiftEncoderJunctions()[2];
+        }
+
+        // Handle overrides
+        if (ControlConfig.overrideModifier && ControlConfig.liftSlide) {
+            if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideTarget = linearSlide.getCurrentPosition();
+            }
+
+            linearSlideTarget = linearSlideTarget + Constants.upEncoderStep;
+            Constants.linearSlideZeroOffset = linearSlide.getCurrentPosition();
+        }
+
+        if (ControlConfig.overrideModifier && ControlConfig.lowerSlide) {
+            if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideTarget = linearSlide.getCurrentPosition();
+            }
+
+            linearSlideTarget = linearSlideTarget - Constants.upEncoderStep;
+            Constants.linearSlideZeroOffset = linearSlide.getCurrentPosition();
+        }
+
+        robot.linearSlide.setTargetPosition(linearSlideTarget);
+        robot.linearSlide.setPower(0.5);
+        telemetry.addData("Linear Slide set pos", linearSlideTarget);
+        telemetry.update();
+    }
+
+    private void linearSlideMove() {
+        DcMotor linearSlide = robot.linearSlide;
+        // Use this modified variable for any bounds checking. For target setting it will be offset
+        // at the end of the method, so just use linearSlide.getCurrentPosition() for that
+        int linearSlideComparisonPos = linearSlide.getCurrentPosition() - Constants.linearSlideZeroOffset;
+
+        if (ControlConfig.liftSlide && ((linearSlideComparisonPos < Constants.getLiftEncoderMax()) || ControlConfig.overrideModifier)) {
+            if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideTarget = linearSlide.getCurrentPosition();
+            }
+
+            linearSlideMode = LinearSlideMode.MANUAL;
+            if (ControlConfig.overrideModifier) {
+                linearSlideTarget = linearSlideTarget + Constants.upEncoderStep;
+                Constants.linearSlideZeroOffset = robot.linearSlide.getCurrentPosition();
+            } else {
+                linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.getLiftEncoderMax());
+            }
+        } else if (ControlConfig.lowerSlide && ((linearSlideComparisonPos > 0) || ControlConfig.overrideModifier)) {
+            if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideTarget = linearSlide.getCurrentPosition();
+            }
+
+            linearSlideMode = LinearSlideMode.MANUAL;
+            if (ControlConfig.overrideModifier) {
+                linearSlideTarget = linearSlideTarget - Constants.downEncoderStep;
+                Constants.linearSlideZeroOffset = robot.linearSlide.getCurrentPosition();
+            } else {
+                linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, 0);
+            }
+        } else if (linearSlideMode == LinearSlideMode.MANUAL) {
+            linearSlideTarget = linearSlide.getCurrentPosition();
+        }
+
+        if (ControlConfig.goToLow) {
+            linearSlideMode = LinearSlideMode.LOW;
+            linearSlideTarget = Constants.getLiftEncoderJunctions()[0];
+        }
+
+        if (ControlConfig.goToGround) {
+            linearSlideMode = LinearSlideMode.GROUD;
+            linearSlideTarget = Constants.linearSlideZeroOffset;
+        }
+
+        robot.linearSlide.setTargetPosition(calcWithOffset(linearSlideTarget));
+        robot.linearSlide.setPower(0.5);
+        telemetry.addData("Linear Slide set pos", linearSlideTarget);
+        telemetry.update();
+    }
+
+    private int calcWithOffset(int rawLinearSlideTarget) {
+        return rawLinearSlideTarget + Constants.linearSlideZeroOffset;
+    }
+
+    private void linearSlideMoveOld() {
         /////////////////////////////LINEAR SLIDE//////////////////////////////
-        if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax) {
+        if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax()) {
             // If we give it any input, stop running to a certain set position
 //            runningToPos = false;
-            posRunningTo = PosRunningTo.NONE;
+            linearSlideMode = LinearSlideMode.MANUAL;
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             robot.linearSlide.setPower(Constants.liftUpPower);
-            if (robot.linearSlide.getCurrentPosition() > Constants.liftEncoderMax) {
-                holdPosition = Constants.liftEncoderMax;
+            if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderMax()) {
+                holdPosition = Constants.getLiftEncoderMax();
             } else {
                 holdPosition = robot.linearSlide.getCurrentPosition();
             }
         } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
 //            runningToPos = false;
-            posRunningTo = PosRunningTo.NONE;
+            linearSlideMode = LinearSlideMode.MANUAL;
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             robot.linearSlide.setPower(-Constants.liftDownPower);
             holdPosition = robot.linearSlide.getCurrentPosition();
-        } else if (posRunningTo == PosRunningTo.NONE) {
-            if (robot.linearSlide.getCurrentPosition() < Constants.liftEncoderMax && robot.linearSlide.getCurrentPosition() > 600) {
+        } else if (linearSlideMode == LinearSlideMode.MANUAL) {
+            if (robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax() && robot.linearSlide.getCurrentPosition() > 600) {
                 robot.linearSlide.setTargetPosition(holdPosition);
                 robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.linearSlide.setPower(0.05);
@@ -233,7 +378,7 @@ public class TeleopFinal extends OpMode {
         int currentPos = robot.linearSlide.getCurrentPosition();
         // liftEncoderLow is the lowest dump pos, but we add some encoder counts to it to make a larger
         // rumble zone as robot could just skip past it
-        if (currentPos > Constants.liftEncoderLow && currentPos < Constants.liftEncoderLow + 60) {
+        if (currentPos > Constants.getLiftEncoderJunctions()[0] && currentPos < Constants.getLiftEncoderJunctions()[0] + 60) {
             // There is probably a better way to do this, but basically, rumble if we haven't
             // rumbled while we have been in the rumble range. Reset when we leave it
             if (!hasRumbled) {
@@ -246,30 +391,30 @@ public class TeleopFinal extends OpMode {
 
         // Initialization code. If we want to start running goToLow, set appropriate target pos,
         // put linear slide in correct mode, and tell everyone we are running to a position.
-        if (ControlConfig.goToLow && posRunningTo != PosRunningTo.LOW) {
-            telemetry.addData("Go to pos", Constants.liftEncoderLow);
+        if (ControlConfig.goToLow && linearSlideMode != LinearSlideMode.LOW) {
+            telemetry.addData("Go to pos", Constants.getLiftEncoderJunctions()[0]);
             telemetry.update();
 
-            robot.linearSlide.setTargetPosition(Constants.liftEncoderLow);
+            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //            runningToPos = true;
-            posRunningTo = PosRunningTo.LOW;
+            linearSlideMode = LinearSlideMode.LOW;
         }
 
         // Same as above, but running to bottom
-        if (ControlConfig.goToBottom && posRunningTo != PosRunningTo.GROUD) {
+        if (ControlConfig.goToGround && linearSlideMode != LinearSlideMode.GROUD) {
             telemetry.addData("Go to pos", 0);
             telemetry.update();
 
             robot.linearSlide.setTargetPosition(0);
             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //            runningToPos = true;
-            posRunningTo = PosRunningTo.GROUD;
+            linearSlideMode = LinearSlideMode.GROUD;
         }
 
         // If we are running to a position and the slide is busy, set its power to .5. Otherwise,
         // set its power to 0 and tell everyone we are done running to a position
-        if (posRunningTo != PosRunningTo.NONE) {
+        if (linearSlideMode != LinearSlideMode.MANUAL) {
             if (robot.linearSlide.isBusy()) {
                 robot.linearSlide.setPower(Constants.liftPosRunPower);
             } // else {
@@ -277,35 +422,6 @@ public class TeleopFinal extends OpMode {
 //                robot.linearSlide.setPower(0);
 //            }
         }
-
-////////////////////GRABBER////////////////////////////////////////////////////////
-
-        // A button = open claw, b button = closed claw
-        gamepad2.toString();
-        // Get sum of wheel velocities, I just didn't want to loop
-        double wheelVelSum = robot.drive.getWheelVelocities().stream().mapToDouble(Double::doubleValue).sum();
-        telemetry.addData("Wheel vel sum", wheelVelSum);
-        telemetry.update();
-
-        // This complex conditional allows the claw to open if:
-        // 1. The control to open it is pressed AND:
-        // 2. It is NOT TRUE that:
-        //    a) the linear slide is above the lowest dropping position AND
-        //    b) the wheels are moving a lot
-        // Basically, we allow a drop if either the linear slide is below the lowest drop position
-        // or, if it is above the lowest drop position, only allow the drop if the wheels are not
-        // moving a lot
-        // It is a safety to prevent the claw from opening if driver has jerked the robot
-        // TODO tune this threshold, that's why the telemetry is there. I don't know for sure how velocities are reported
-        double movementThresh = 0.1;
-        if (ControlConfig.openClaw && !(robot.linearSlide.getCurrentPosition() > Constants.liftEncoderLow && wheelVelSum >= movementThresh)) {
-            robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
-            robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
-        } else if (ControlConfig.closeClaw) {
-            robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
-            robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
-        }
-
     }
 
     /*-----------------------------------//
