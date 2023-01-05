@@ -81,7 +81,7 @@ public class Hardware23 {
         // NEVER DO THIS
         try {
             rearLeft = hardwareMap.dcMotor.get("rear_left");
-            rearLeft.setDirection(DcMotor.Direction.REVERSE);
+//            rearLeft.setDirection(DcMotor.Direction.REVERSE);
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 rearLeft = new NullDcMotor();
@@ -92,7 +92,7 @@ public class Hardware23 {
 
         try {
             frontLeft = hardwareMap.dcMotor.get("front_left");
-            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+//            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 frontLeft = new NullDcMotor();
@@ -103,7 +103,7 @@ public class Hardware23 {
 
         try {
             frontRight = hardwareMap.dcMotor.get("front_right");
-            frontRight.setDirection(DcMotor.Direction.FORWARD);
+//            frontRight.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 frontRight = new NullDcMotor();
@@ -114,7 +114,7 @@ public class Hardware23 {
 
         try {
             rearRight = hardwareMap.dcMotor.get("rear_right");
-            rearRight.setDirection(DcMotor.Direction.FORWARD);
+//            rearRight.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 rearRight = new NullDcMotor();
