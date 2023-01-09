@@ -16,17 +16,6 @@ public abstract class Constants {
     public final static double slowMultiplier = 0.3;
     public final static double superSlowMultiplier = 0.2;
 
-//    public final static double towerWheelSpeedEndgame = .6009;
-//    public final static double towerWheelSpeedAuto = .420;
-//    public final static double duckAccelIncrement = 0.05;
-
-//    public final static double tseStep = 0.0005;
-
-//    public final static int lowEncoder = 1120;
-//    public final static int midEncoder = 2270;
-//    public final static int highEncoder = 3470;
-
-//    public final static double lowestDump = 1100;
     public final static int motivationQuantity = 4;
 
     public final static int autoLiftEncoderStart = 40;

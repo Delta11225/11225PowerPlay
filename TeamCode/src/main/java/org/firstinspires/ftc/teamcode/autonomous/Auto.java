@@ -92,6 +92,7 @@ public class Auto extends LinearOpMode {
         sleep(delay);
 
         robot.drive.followTrajectorySequence(trajSequence);
+        // Set 0 override to linear slide position
     }
 
     private OpenCvCamera initCamera(OpenCvPipeline pipeline) {

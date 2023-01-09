@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.testing;
+package org.firstinspires.ftc.teamcode.testing.autotraj;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -55,7 +55,8 @@ public class AutoTestBlueFront extends LinearOpMode {
                  robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                  robot.linearSlide.setPower(1);
               })
-              .splineToConstantHeading(new Vector2d(-56, 11), Math.toRadians(180))
+               // Approach cone stack
+              .splineToConstantHeading(new Vector2d(-55.5, 11), Math.toRadians(180))
               .waitSeconds(0.25)
 
               .addDisplacementMarker(() -> {
