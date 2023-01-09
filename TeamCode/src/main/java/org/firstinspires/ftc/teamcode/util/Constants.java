@@ -60,4 +60,6 @@ public abstract class Constants {
                 liftEncoderConeStack[4] + linearSlideZeroOffset
         };
     }
+
+    public static final double maxTiltDegrees = 20;
 }
