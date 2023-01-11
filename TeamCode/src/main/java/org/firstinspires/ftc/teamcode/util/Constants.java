@@ -31,7 +31,7 @@ public abstract class Constants {
     public final static double liftPosRunPower = 1;
 
     public final static int upEncoderStep = 10;
-    public final static int downEncoderStep = 10;
+    public final static int downEncoderStep = 20;
 
     public static int linearSlideZeroOffset = 0;
 
