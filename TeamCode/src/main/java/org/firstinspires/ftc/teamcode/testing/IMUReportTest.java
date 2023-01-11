@@ -149,9 +149,14 @@ public class IMUReportTest extends OpMode {
         // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
         // website at the bottom of the answer for the rotation matrix used.
         // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
+        //        Vector3D normalVec = new Vector3D(
+//                -sin(x) * cos(z) - cos(x) * sin(y) * sin(z),
+//                sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
+//                cos(x) * cos(y)
+//        );
         Vector3D normalVec = new Vector3D(
-                -sin(x) * cos(z) - cos(x) * sin(y) * sin(z),
-                sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
+                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
+                sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
                 cos(x) * cos(y)
         );
         // Just in case. Above should be normal, but just in case.
