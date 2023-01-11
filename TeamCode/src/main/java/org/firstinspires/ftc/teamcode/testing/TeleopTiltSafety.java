@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -140,18 +141,26 @@ public class TeleopTiltSafety extends OpMode {
 
         Vector3D robotNormalVec = getRobotNormalVector();
         if (isOverMaxTilt(robotNormalVec)) {
+            Log.d("Tilt", "CORRECTION");
             double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(robotNormalVec.getZ());
             Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
 
             // Correct based on how far off the axis we are
-            responseVec.normalize();
-            responseVec.scalarMultiply(calcCorrectionFactor(angleDiff));
+            responseVec = responseVec.normalize();
+            responseVec = responseVec.scalarMultiply(calcCorrectionFactor(angleDiff));
+
+            Log.d("Tilt", String.format("Angle diff %f", (angleDiff)));
+            Log.d("Tilt", String.format("Correction factor %f", calcCorrectionFactor(angleDiff)));
 
             double responseX = responseVec.getX();
-            double responseY = responseVec.getX();
+            double responseY = responseVec.getY();
             telemetry.addData("Response vec x", responseX);
             telemetry.addData("Response vec y", responseY);
             telemetry.update();
+
+            Log.d("Tilt", String.format("Response vec x %f", responseX));
+            Log.d("Tilt", String.format("Response vec y %f", responseY));
+
             Pose2d responsePose = new Pose2d(responseX, responseY, 0);
             // TODO NOTE: I have no idea how this method works. We will need to test it.
             robot.drive.setWeightedDrivePower(responsePose);
@@ -215,9 +224,9 @@ public class TeleopTiltSafety extends OpMode {
 
     }
 
-    // Uses a logistic growth sigmoid function to calculate correction
+    // Uses a logarithmic growth sigmoid function to calculate correction
     private double calcCorrectionFactor(double angleDiff) {
-        return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * angleDiff + 1);
+        return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * Math.abs(angleDiff) + 1);
     }
 
     private Vector3D getRobotNormalVector() {
@@ -229,7 +238,7 @@ public class TeleopTiltSafety extends OpMode {
         int[] axisIndicies = orientation.axesOrder.indices();
 
         // All these calcuations work only in radians, so gotta do this
-        orientation.toAngleUnit(AngleUnit.RADIANS);
+        orientation = orientation.toAngleUnit(AngleUnit.RADIANS);
 
         double[] angles = new double[]{orientation.firstAngle, orientation.secondAngle, orientation.thirdAngle};
 
@@ -243,20 +252,35 @@ public class TeleopTiltSafety extends OpMode {
         telemetry.addData("Angle 2 (y)", y);
         telemetry.addData("Angle 3 (z)", z);
 
+        Log.d("Tilt", String.format("Angle 1 (x) %f", x));
+        Log.d("Tilt", String.format("Angle 2 (y) %f", y));
+        Log.d("Tilt", String.format("Angle 3 (z) %f", z));
+
         // All this math just gets the robot's normal vector. In technical terms, it rotates a unit
         // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
         // website at the bottom of the answer for the rotation matrix used.
         // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
         Vector3D normalVec = new Vector3D(
-                -sin(x) * cos(z) - cos(z) * sin(y) * sin(z),
+                -sin(x) * cos(z) - cos(x) * sin(y) * sin(z),
                 sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
-                cos(x) * sin(y)
+                cos(x) * cos(y)
         );
         // Just in case. Above should be normal, but just in case.
-        normalVec.normalize();
+        // Also, can't normalize vectors of length 0 so gotta do this
+        try {
+            normalVec = normalVec.normalize();
+        } catch (MathArithmeticException e) {
+
+        }
         telemetry.addData("Component x", normalVec.getX());
         telemetry.addData("Component y", normalVec.getY());
         telemetry.addData("Component z", normalVec.getZ());
+
+        Log.d("Tilt", String.format("Component x %f", normalVec.getX()));
+        Log.d("Tilt", String.format("Component y %f", normalVec.getY()));
+        Log.d("Tilt", String.format("Component z %f", normalVec.getZ()));
+
+        telemetry.update();
 
         return normalVec;
     }
@@ -265,9 +289,9 @@ public class TeleopTiltSafety extends OpMode {
         // To compute the angle to the Z axis (tilt angle) we need the dot product with this vector
         // and the Z axis, but fortunately the dot product simplifies down to this since two of
         // the components of the z unit vector are zero (0, 0, 1)
-        double angleToZ = normalVec.getZ();
+        double angleToZ = Math.acos(normalVec.getZ());
 
-        return Math.toDegrees(angleToZ) >= Constants.maxTiltDegrees;
+        return Math.abs(Math.toDegrees(angleToZ)) >= Constants.maxTiltDegrees;
     }
 
     private Vector2D getNormalAxisProjection(Vector3D normalVec) {
