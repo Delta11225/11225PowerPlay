@@ -57,7 +57,7 @@ public class TeleopTiltSafety extends OpMode {
     int holdPosition;
     ElapsedTime elapsedTime = new ElapsedTime();
     private final ElapsedTime runtime = new ElapsedTime();
-//    private boolean runningToPos = false;
+    //    private boolean runningToPos = false;
     private LinearSlideMode linearSlideMode = LinearSlideMode.MANUAL;
     private int linearSlideTarget = 0;
 
@@ -133,7 +133,7 @@ public class TeleopTiltSafety extends OpMode {
 
         if (isOverMaxTilt())
 
-        ControlConfig.update(gamepad1, gamepad2);
+            ControlConfig.update(gamepad1, gamepad2);
         double theta = Math.toRadians(currentAngle);
 
 //        telemetry.addData("CurrentAngle", currentAngle);
@@ -249,8 +249,8 @@ public class TeleopTiltSafety extends OpMode {
             // linear slide max to prevent linear slide from going too high
             linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.getLiftEncoderMax());
 
-        // Same logic as above, just for going down. Make sure to use zeroOffset and not 0 since
-        // we don't know where 0 is and zeroOffset should be the minimum for the slide
+            // Same logic as above, just for going down. Make sure to use zeroOffset and not 0 since
+            // we don't know where 0 is and zeroOffset should be the minimum for the slide
         } else if (ControlConfig.lowerSlide && linearSlide.getCurrentPosition() > Constants.linearSlideZeroOffset && !ControlConfig.overrideModifier) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
                 linearSlideTarget = linearSlide.getCurrentPosition();
@@ -262,8 +262,8 @@ public class TeleopTiltSafety extends OpMode {
             // too far.
             linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, Constants.linearSlideZeroOffset);
 
-        // If we are not overriding and in manual mode, set target to current position. Prevents
-        // slide from moving after button is released.
+            // If we are not overriding and in manual mode, set target to current position. Prevents
+            // slide from moving after button is released.
         } else if (linearSlideMode == LinearSlideMode.MANUAL && !ControlConfig.overrideModifier) {
             linearSlideTarget = linearSlide.getCurrentPosition();
         }
