@@ -12,13 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DetectionPipeline extends OpenCvPipeline {
-    private static final float[] midPos = {1f/2f, 1f/2f};
+    private static final float[] detectionPoint = {1f/2f, 1f/2f};
 
     private static float rectHeight = 1f/8f;
     private static float rectWidth =  1f/8f;
 
     private int channelIndexLast = -1;
-    private Double[] rawVals = new Double[] {0d, 0d, 0d};
+    private double[] rawColorVals = new double[] {-1d, -1d, -1d};
     private ParkingPosition posLast = ParkingPosition.HOW_ON_EARTH;
 
     Mat displayMat = new Mat();
@@ -64,12 +64,12 @@ public class DetectionPipeline extends OpenCvPipeline {
 
         // Convert back to RGB for display reasons
         Imgproc.cvtColor(satMat, displayMat, Imgproc.COLOR_HSV2RGB);
-        Core.extractChannel(displayMat, rMat, 0);
-        Core.extractChannel(displayMat, gMat, 1);
-        Core.extractChannel(displayMat, bMat, 2);
+//        Core.extractChannel(displayMat, rMat, 0);
+//        Core.extractChannel(displayMat, gMat, 1);
+//        Core.extractChannel(displayMat, bMat, 2);
 
         // Create middle point
-        Point pointMid = new Point((int)(input.cols()* midPos[0]), (int)(input.rows()* midPos[1]));
+        Point pointMid = new Point((int)(input.cols()* detectionPoint[0]), (int)(input.rows()* detectionPoint[1]));
 
         // Draw circle on specified point
         Imgproc.circle(displayMat, pointMid,7, new Scalar( 0, 0, 0 ),3 );//draws circle
@@ -79,28 +79,31 @@ public class DetectionPipeline extends OpenCvPipeline {
         Imgproc.rectangle(
                 displayMat,
                 new Point(
-                        input.cols()*(midPos[0]- rectWidth /2),
-                        input.rows()*(midPos[1]- rectHeight /2)),
+                        input.cols()*(detectionPoint[0]- rectWidth /2),
+                        input.rows()*(detectionPoint[1]- rectHeight /2)),
                 new Point(
-                        input.cols()*(midPos[0]+ rectWidth /2),
-                        input.rows()*(midPos[1]+ rectHeight /2)),
+                        input.cols()*(detectionPoint[0]+ rectWidth /2),
+                        input.rows()*(detectionPoint[1]+ rectHeight /2)),
                 new Scalar(0, 255, 0), 3);
 
         // Get proper channel index
         // There are probably easier ways to do this with hue distance or something, but
         // I am too lazy to even try to implement those
-        Double[] vals = new Double[] {
-                rMat.get((int)(input.rows()* midPos[1]), (int)(input.cols()* midPos[0]))[0],
-                gMat.get((int)(input.rows()* midPos[1]), (int)(input.cols()* midPos[0]))[0],
-                bMat.get((int)(input.rows()* midPos[1]), (int)(input.cols()* midPos[0]))[0]
-        };
+        double[] vals = displayMat.get((int)(input.rows()* detectionPoint[1]), (int)(input.cols()* detectionPoint[0]));
+//        Double[] vals = new Double[] {
+//                rMat.get((int)(input.rows()* detectionPoint[1]), (int)(input.cols()* detectionPoint[0]))[0],
+//                gMat.get((int)(input.rows()* detectionPoint[1]), (int)(input.cols()* detectionPoint[0]))[0],
+//                bMat.get((int)(input.rows()* detectionPoint[1]), (int)(input.cols()* detectionPoint[0]))[0]
+//        };
 
         int maxAt = 0;
 
+        // Loop through colors and find index with maximum value
         for (int i = 0; i < vals.length; i++) {
             maxAt = vals[i] > vals[maxAt] ? i : maxAt;
         }
 
+        // Store for later
         channelIndexLast = maxAt;
 
         // A mapping between channel index (r,g,b) and position (1,2,3). Change it if signal sleeve
@@ -110,10 +113,12 @@ public class DetectionPipeline extends OpenCvPipeline {
         posMappings.put(1, ParkingPosition.ONE);
         posMappings.put(2, ParkingPosition.TWO);
 
+        // Set last parking position according to mapping
         posLast = posMappings.getOrDefault(maxAt, ParkingPosition.HOW_ON_EARTH);
 
         // Set these for debugging
-        rawVals = vals;
+        rawColorVals = vals;
+
         return displayMat;
         // return input;
     }
@@ -122,8 +127,8 @@ public class DetectionPipeline extends OpenCvPipeline {
         return channelIndexLast;
     }
 
-    public Double[] getRawVals() {
-        return rawVals;
+    public double[] getRawColorVals() {
+        return rawColorVals;
     }
 
     public ParkingPosition getLastPos() {

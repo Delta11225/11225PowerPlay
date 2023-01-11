@@ -13,6 +13,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+// TODO add comments and more logging
 @Autonomous(preselectTeleOp = "TeleopFinal")
 public class Auto extends LinearOpMode {
     FtcDashboard ftcDashboard = FtcDashboard.getInstance();
@@ -91,6 +92,7 @@ public class Auto extends LinearOpMode {
         sleep(delay);
 
         robot.drive.followTrajectorySequence(trajSequence);
+        // Set 0 override to linear slide position
     }
 
     private OpenCvCamera initCamera(OpenCvPipeline pipeline) {
