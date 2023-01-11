@@ -217,7 +217,7 @@ public class TeleopTiltSafety extends OpMode {
 
     // Uses a logistic growth sigmoid function to calculate correction
     private double calcCorrectionFactor(double angleDiff) {
-        return Constants.tiltCorrectionLogisticScale * Math.log10(angleDiff + 1);
+        return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * angleDiff + 1);
     }
 
     private Vector3D getRobotNormalVector() {

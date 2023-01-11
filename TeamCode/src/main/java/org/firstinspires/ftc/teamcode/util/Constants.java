@@ -64,6 +64,7 @@ public abstract class Constants {
     public static final double maxTiltDegrees = 20;
 
     // Deals with the logistic function that controls how aggresively we correct tilt. In a logistic
-    // growth function C log x, logisticScale is the C.
-    public static final double tiltCorrectionLogisticScale = 5;
+    // growth function C log Ax, logisticScale is the C and valueScale is the A.
+    public static final double tiltCorrectionLogisticScale = .5;
+    public static final double tiltCorrectionValueScale = 10;
 }
