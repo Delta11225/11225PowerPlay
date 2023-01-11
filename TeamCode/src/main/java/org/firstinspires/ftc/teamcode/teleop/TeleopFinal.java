@@ -162,7 +162,9 @@ public class TeleopFinal extends OpMode {
         if (ControlConfig.slow && ControlConfig.fast) {
             powerMultiplier = Constants.superSlowMultiplier;
 //            telemetry.addLine("super fast");
-        } else if (ControlConfig.fast) {
+        // Prevent robot from moving fast when linear slide is up. Avoids dangerous tilt issues when
+        // robot suddenly stops.
+        } else if (ControlConfig.fast && robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderJunctions()[0] + 10) {
             powerMultiplier = Constants.fastMultiplier;
 //            telemetry.addLine("fast");
         } else if (ControlConfig.slow) {
@@ -230,7 +232,6 @@ public class TeleopFinal extends OpMode {
         composeTelemetry();
     }
 
-    // TODO cap movement speed if linear slide is too high
     private void linearSlideMoveWithOverride() {
         // TODO can we somehow track motor power and stop linear slide if it is drawing too much current?
         DcMotor linearSlide = robot.linearSlide;
