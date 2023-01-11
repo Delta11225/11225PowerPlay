@@ -140,13 +140,19 @@ public class TeleopTiltSafety extends OpMode {
 
         Vector3D robotNormalVec = getRobotNormalVector();
         if (isOverMaxTilt(robotNormalVec)) {
+            double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(robotNormalVec.getZ());
             Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
+
+            // Correct based on how far off the axis we are
+            responseVec.normalize();
+            responseVec.scalarMultiply(calcCorrectionFactor(angleDiff));
+
             double responseX = responseVec.getX();
             double responseY = responseVec.getX();
             telemetry.addData("Response vec x", responseX);
             telemetry.addData("Response vec y", responseY);
             telemetry.update();
-            Pose2d responsePose = new Pose2d(responseX, responseY, Math.atan2(responseX, responseY));
+            Pose2d responsePose = new Pose2d(responseX, responseY, 0);
             // TODO NOTE: I have no idea how this method works. We will need to test it.
             robot.drive.setWeightedDrivePower(responsePose);
             return;
@@ -207,6 +213,11 @@ public class TeleopTiltSafety extends OpMode {
         robot.rearRight.setPower(-rearRight * powerMultiplier);
 
 
+    }
+
+    // Uses a logistic growth sigmoid function to calculate correction
+    private double calcCorrectionFactor(double angleDiff) {
+        return Constants.tiltCorrectionLogisticScale * Math.log10(angleDiff + 1);
     }
 
     private Vector3D getRobotNormalVector() {
