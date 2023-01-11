@@ -7,12 +7,14 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -60,6 +62,7 @@ public class TeleopFinal extends OpMode {
 //    private boolean runningToPos = false;
     private LinearSlideMode linearSlideMode = LinearSlideMode.MANUAL;
     private int linearSlideTarget = 0;
+    private boolean areInittingIMU = false;
 
     @Override
     public void init() {
@@ -68,18 +71,8 @@ public class TeleopFinal extends OpMode {
 //        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         Constants.linearSlideZeroOffset = 0;
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-
-        composeTelemetry();
+        initIMU();
+        areInittingIMU = false;
         telemetry.addData("IMU init time", getRuntime());
         telemetry.update();
 
@@ -209,14 +202,40 @@ public class TeleopFinal extends OpMode {
             robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
         }
 
+        // TODO work on this please
+//        if (ControlConfig.resetIMU && !areInittingIMU) {
+//            telemetry.addLine("Reinitting IMU");
+//            telemetry.update();
+//            initIMU();
+//            areInittingIMU = false;
+//            gamepad2.rumble(500);
+//        }
     }
 
-    // TODO cap speed if linear slide is too high
+    private void initIMU() {
+        areInittingIMU = true;
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+        composeTelemetry();
+    }
+
+    // TODO cap movement speed if linear slide is too high
     private void linearSlideMoveWithOverride() {
         DcMotor linearSlide = robot.linearSlide;
+
+        telemetry.update();
 //        int linearSlideOffetPos = linearSlide.getCurrentPosition() + Constants.linearSlideZeroOffset;
         // Log linear slide offset for debug reasons
-        Log.d("LinearSlideMovement", String.valueOf(Constants.linearSlideZeroOffset));
+//        Log.d("LinearSlideMovement", String.valueOf(Constants.linearSlideZeroOffset));
 
         // Complex if statement, but if we want to lift the lide and the linear slide is below the max
         // AND we are not overriding, lift the slide
@@ -306,6 +325,7 @@ public class TeleopFinal extends OpMode {
         // We shouldn't need to do this, but just in case
         robot.linearSlide.setPower(0.5);
         telemetry.addData("Linear Slide set pos", linearSlideTarget);
+        Log.d("LinearSlide", String.valueOf(linearSlideTarget));
         telemetry.update();
     }
 

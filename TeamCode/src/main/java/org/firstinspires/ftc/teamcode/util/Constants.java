@@ -26,8 +26,8 @@ public abstract class Constants {
     public final static double rightClawOpen = 0.68;
     public final static double rightClawClosed = 0.53;
 
-    public final static double liftUpPower = 0.75;
-    public final static double liftDownPower = 0.5;
+    public final static double liftUpPower = 1;
+    public final static double liftDownPower = 1;
     public final static double liftPosRunPower = 1;
 
     public final static int upEncoderStep = 10;
