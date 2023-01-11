@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.testing;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 import android.util.Log;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -9,6 +13,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -130,10 +136,21 @@ public class TeleopTiltSafety extends OpMode {
 
     // TODO this needs better comments, but in the meantime, its *magic*
     public void move() {
+        ControlConfig.update(gamepad1, gamepad2);
 
-        if (isOverMaxTilt())
-
-            ControlConfig.update(gamepad1, gamepad2);
+        Vector3D robotNormalVec = getRobotNormalVector();
+        if (isOverMaxTilt(robotNormalVec)) {
+            Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
+            double responseX = responseVec.getX();
+            double responseY = responseVec.getX();
+            telemetry.addData("Response vec x", responseX);
+            telemetry.addData("Response vec y", responseY);
+            telemetry.update();
+            Pose2d responsePose = new Pose2d(responseX, responseY, Math.atan2(responseX, responseY));
+            // TODO NOTE: I have no idea how this method works. We will need to test it.
+            robot.drive.setWeightedDrivePower(responsePose);
+            return;
+        }
         double theta = Math.toRadians(currentAngle);
 
 //        telemetry.addData("CurrentAngle", currentAngle);
@@ -143,8 +160,8 @@ public class TeleopTiltSafety extends OpMode {
         right = ControlConfig.right;
         clockwise = ControlConfig.clockwise;
 
-        temp = (forward * Math.cos(theta) - right * Math.sin(theta));
-        side = (forward * Math.sin(theta) + right * Math.cos(theta));
+        temp = (forward * cos(theta) - right * sin(theta));
+        side = (forward * sin(theta) + right * cos(theta));
 
         forward = temp;
         right = side;
@@ -192,18 +209,60 @@ public class TeleopTiltSafety extends OpMode {
 
     }
 
-    private boolean isOverMaxTilt() {
-        Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        double x_angle = orientation.firstAngle;
-        double y_angle = orientation.secondAngle;
+    private Vector3D getRobotNormalVector() {
+        Orientation orientation = imu.getAngularOrientation();
 
-        return x_angle > Constants.maxTiltDegrees || y_angle > Constants.maxTiltDegrees;
+        // AxesOrder.indices() returns an array of integers corresponding to what order the axes are
+        // in. For example, if the AxesOrder is ZYX, indices() is [2, 1, 0], since the X-axis (pos 1
+        // of the indices array] is the third reported angle (index 2).
+        int[] axisIndicies = orientation.axesOrder.indices();
+
+        // All these calcuations work only in radians, so gotta do this
+        orientation.toAngleUnit(AngleUnit.RADIANS);
+
+        double[] angles = new double[]{orientation.firstAngle, orientation.secondAngle, orientation.thirdAngle};
+
+        // All this code basically just figures out how the IMU is reporting angles and saves that
+        // in a way we can acually deal with
+        double x = angles[axisIndicies[0]];
+        double y = angles[axisIndicies[1]];
+        double z = angles[axisIndicies[2]];
+
+        telemetry.addData("Angle 1 (x)", x);
+        telemetry.addData("Angle 2 (y)", y);
+        telemetry.addData("Angle 3 (z)", z);
+
+        // All this math just gets the robot's normal vector. In technical terms, it rotates a unit
+        // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
+        // website at the bottom of the answer for the rotation matrix used.
+        // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
+        Vector3D normalVec = new Vector3D(
+                -sin(x) * cos(z) - cos(z) * sin(y) * sin(z),
+                sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
+                cos(x) * sin(y)
+        );
+        // Just in case. Above should be normal, but just in case.
+        normalVec.normalize();
+        telemetry.addData("Component x", normalVec.getX());
+        telemetry.addData("Component y", normalVec.getY());
+        telemetry.addData("Component z", normalVec.getZ());
+
+        return normalVec;
     }
 
-    private double getTiltAngle() {
-        Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        return 0;
+    private boolean isOverMaxTilt(Vector3D normalVec) {
+        // To compute the angle to the Z axis (tilt angle) we need the dot product with this vector
+        // and the Z axis, but fortunately the dot product simplifies down to this since two of
+        // the components of the z unit vector are zero (0, 0, 1)
+        double angleToZ = normalVec.getZ();
 
+        return Math.toDegrees(angleToZ) >= Constants.maxTiltDegrees;
+    }
+
+    private Vector2D getNormalAxisProjection(Vector3D normalVec) {
+        // Generates the ideal robot response to the given normal vector. Does not normalize intentionally
+        // as we don't want to respond with full force no matter what
+        return new Vector2D(normalVec.getX(), normalVec.getY());
     }
 
     public void peripheralMove() {
