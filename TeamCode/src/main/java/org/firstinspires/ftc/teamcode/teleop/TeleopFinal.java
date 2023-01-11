@@ -162,10 +162,15 @@ public class TeleopFinal extends OpMode {
         if (ControlConfig.slow && ControlConfig.fast) {
             powerMultiplier = Constants.superSlowMultiplier;
 //            telemetry.addLine("super fast");
-        // Prevent robot from moving fast when linear slide is up. Avoids dangerous tilt issues when
-        // robot suddenly stops.
-        } else if (ControlConfig.fast && robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderJunctions()[0] + 10) {
-            powerMultiplier = Constants.fastMultiplier;
+
+        } else if (ControlConfig.fast) {
+            // Prevent robot from moving fast when linear slide is up. Avoids dangerous tilt issues when
+            // robot suddenly stops.
+            if (robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderJunctions()[0] + 10) {
+                powerMultiplier = Constants.fastMultiplier;
+            } else {
+                powerMultiplier = Constants.normalMultiplier;
+            }
 //            telemetry.addLine("fast");
         } else if (ControlConfig.slow) {
             powerMultiplier = Constants.slowMultiplier;
