@@ -184,6 +184,7 @@ public class TeleopFinal extends OpMode {
     }
 
     public void peripheralMove() {
+        // TODO can we somehow track motor power and stop linear slide if it is drawing too much current?
         ControlConfig.update(gamepad1, gamepad2);
 
         linearSlideMoveWithOverride();
@@ -323,7 +324,7 @@ public class TeleopFinal extends OpMode {
         // up. Here we set the target pos to whatever we have calculated it to be.
         robot.linearSlide.setTargetPosition(linearSlideTarget);
         // We shouldn't need to do this, but just in case
-        robot.linearSlide.setPower(0.5);
+        robot.linearSlide.setPower(Constants.liftPosRunPower);
         telemetry.addData("Linear Slide set pos", linearSlideTarget);
         Log.d("LinearSlide", String.valueOf(linearSlideTarget));
         telemetry.update();
@@ -375,7 +376,7 @@ public class TeleopFinal extends OpMode {
         }
 
         robot.linearSlide.setTargetPosition(calcWithOffset(linearSlideTarget));
-        robot.linearSlide.setPower(0.5);
+        robot.linearSlide.setPower(Constants.liftPosRunPower);
         telemetry.addData("Linear Slide set pos", linearSlideTarget);
         telemetry.update();
     }
