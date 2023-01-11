@@ -25,6 +25,8 @@ import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
 
 import java.util.Locale;
 
+import androidx.core.math.MathUtils;
+
 //@Disabled
 @TeleOp
 public class TeleopFinal extends OpMode {
@@ -184,7 +186,6 @@ public class TeleopFinal extends OpMode {
     }
 
     public void peripheralMove() {
-        // TODO can we somehow track motor power and stop linear slide if it is drawing too much current?
         ControlConfig.update(gamepad1, gamepad2);
 
         linearSlideMoveWithOverride();
@@ -231,6 +232,7 @@ public class TeleopFinal extends OpMode {
 
     // TODO cap movement speed if linear slide is too high
     private void linearSlideMoveWithOverride() {
+        // TODO can we somehow track motor power and stop linear slide if it is drawing too much current?
         DcMotor linearSlide = robot.linearSlide;
 
         telemetry.update();

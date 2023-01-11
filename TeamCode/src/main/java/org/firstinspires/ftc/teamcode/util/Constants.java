@@ -36,6 +36,7 @@ public abstract class Constants {
     public static int linearSlideZeroOffset = 0;
 
     private final static int liftEncoderMax = 4530;
+
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;
     }
