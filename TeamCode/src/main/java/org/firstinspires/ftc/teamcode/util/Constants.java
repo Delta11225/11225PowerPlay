@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 /**
  * This is a class that holds all necessary constants for the robot. Put "magic numbers" here.
  * This class cannot be instantiated. Do not inherit from it.
@@ -36,6 +38,9 @@ public abstract class Constants {
     public static int linearSlideZeroOffset = 0;
 
     private final static int liftEncoderMax = 4530;
+
+    // Set at end of auto for teleop to sue
+    public static Pose2d currentPose;
 
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;

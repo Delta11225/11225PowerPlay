@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -93,6 +94,8 @@ public class Auto extends LinearOpMode {
 
         robot.drive.followTrajectorySequence(trajSequence);
         // Set 0 override to linear slide position
+
+        Constants.currentPose = robot.drive.getPoseEstimate();
     }
 
     private OpenCvCamera initCamera(OpenCvPipeline pipeline) {
