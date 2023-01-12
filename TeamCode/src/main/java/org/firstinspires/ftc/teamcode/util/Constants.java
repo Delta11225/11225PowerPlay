@@ -67,5 +67,5 @@ public abstract class Constants {
     // Deals with the logarithmic function that controls how aggresively we correct tilt. In a logistic
     // growth function C log Ax, logisticScale is the C and valueScale is the A.
     public static final double tiltCorrectionLogisticScale = .5;
-    public static final double tiltCorrectionValueScale = 10;
+    public static final double tiltCorrectionValueScale = 2;
 }

@@ -155,8 +155,8 @@ public class IMUReportTest extends OpMode {
 //                cos(x) * cos(y)
 //        );
         Vector3D normalVec = new Vector3D(
-                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
                 sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
+                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
                 cos(x) * cos(y)
         );
         // Just in case. Above should be normal, but just in case.

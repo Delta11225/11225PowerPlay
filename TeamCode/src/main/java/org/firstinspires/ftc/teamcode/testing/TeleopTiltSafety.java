@@ -141,16 +141,16 @@ public class TeleopTiltSafety extends OpMode {
 
         Vector3D robotNormalVec = getRobotNormalVector();
         if (isOverMaxTilt(robotNormalVec)) {
-            Log.d("Tilt", "CORRECTION");
-            double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(robotNormalVec.getZ());
+            Log.d("TiltCorr", "CORRECTION");
+            double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(calcTiltAngle(robotNormalVec));
             Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
 
             // Correct based on how far off the axis we are
             responseVec = responseVec.normalize();
             responseVec = responseVec.scalarMultiply(calcCorrectionFactor(angleDiff));
 
-            Log.d("Tilt", String.format("Angle diff %f", (angleDiff)));
-            Log.d("Tilt", String.format("Correction factor %f", calcCorrectionFactor(angleDiff)));
+            Log.d("TiltCorr", String.format("Angle diff %f", (angleDiff)));
+            Log.d("TiltCorr", String.format("Correction factor %f", calcCorrectionFactor(angleDiff)));
 
             double responseX = responseVec.getX();
             double responseY = responseVec.getY();
@@ -158,12 +158,11 @@ public class TeleopTiltSafety extends OpMode {
             telemetry.addData("Response vec y", responseY);
             telemetry.update();
 
-            Log.d("Tilt", String.format("Response vec x %f", responseX));
-            Log.d("Tilt", String.format("Response vec y %f", responseY));
+            Log.d("TiltCorr", String.format("Response vec x %f", responseX));
+            Log.d("TiltCorr", String.format("Response vec y %f", responseY));
 
             Pose2d responsePose = new Pose2d(responseX, responseY, 0);
-            // TODO NOTE: I have no idea how this method works. We will need to test it.
-            robot.drive.setWeightedDrivePower(responsePose);
+            setMotorPower(responseVec);
             return;
         }
         double theta = Math.toRadians(currentAngle);
@@ -224,6 +223,20 @@ public class TeleopTiltSafety extends OpMode {
 
     }
 
+    private void setMotorPower(Vector2D responseVec) {
+        double x = responseVec.getX();
+        double y = responseVec.getY();
+        double frontLeftPower = y - x;
+        double rearLeftPower = y - x;
+        double rearRightPower = -y - x;
+        double frontRightPower = x + y;
+        robot.drive.setMotorPowers(frontLeftPower, rearLeftPower, rearRightPower, frontRightPower);
+    }
+
+    private double calcTiltAngle(Vector3D robotNormalVec) {
+        return Math.acos(robotNormalVec.getZ());
+    }
+
     // Uses a logarithmic growth sigmoid function to calculate correction
     private double calcCorrectionFactor(double angleDiff) {
         return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * Math.abs(angleDiff) + 1);
@@ -260,16 +273,14 @@ public class TeleopTiltSafety extends OpMode {
         // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
         // website at the bottom of the answer for the rotation matrix used.
         // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
-        // IMPORTANT: I took the algorithm and matricies from there, but it seems the final matrix is
-        // wrong, so I multiplied it myself in WolframAlpha.
-//        Vector3D normalVec = new Vector3D(
+        //        Vector3D normalVec = new Vector3D(
 //                -sin(x) * cos(z) - cos(x) * sin(y) * sin(z),
 //                sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
 //                cos(x) * cos(y)
 //        );
         Vector3D normalVec = new Vector3D(
-                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
                 sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
+                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
                 cos(x) * cos(y)
         );
         // Just in case. Above should be normal, but just in case.
@@ -296,7 +307,7 @@ public class TeleopTiltSafety extends OpMode {
         // To compute the angle to the Z axis (tilt angle) we need the dot product with this vector
         // and the Z axis, but fortunately the dot product simplifies down to this since two of
         // the components of the z unit vector are zero (0, 0, 1)
-        double angleToZ = Math.acos(normalVec.getZ());
+        double angleToZ = calcTiltAngle(normalVec);
 
         return Math.abs(Math.toDegrees(angleToZ)) >= Constants.maxTiltDegrees;
     }

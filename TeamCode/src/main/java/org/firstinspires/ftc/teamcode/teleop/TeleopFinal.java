@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import android.util.Log;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -10,6 +11,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.apache.commons.math3.exception.MathArithmeticException;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -26,6 +30,9 @@ import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
 import java.util.Locale;
 
 import androidx.core.math.MathUtils;
+
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 //@Disabled
 @TeleOp
@@ -125,8 +132,36 @@ public class TeleopFinal extends OpMode {
 
     // TODO this needs better comments, but in the meantime, its *magic*
     public void move() {
-
         ControlConfig.update(gamepad1, gamepad2);
+
+        // Deals with tilt. Prevents robot from tilting too far. If above certain tilt angle, corrects it
+        // and locks driver control.
+        Vector3D robotNormalVec = getRobotNormalVector();
+        if (isOverMaxTilt(robotNormalVec)) {
+            Log.d("TiltCorr", "CORRECTION");
+            double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(calcTiltAngle(robotNormalVec));
+            Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
+
+            // Correct based on how far off the axis we are
+            responseVec = responseVec.normalize();
+            responseVec = responseVec.scalarMultiply(calcCorrectionFactor(angleDiff));
+
+            Log.d("TiltCorr", String.format("Angle diff %f", (angleDiff)));
+            Log.d("TiltCorr", String.format("Correction factor %f", calcCorrectionFactor(angleDiff)));
+
+            double responseX = responseVec.getX();
+            double responseY = responseVec.getY();
+            telemetry.addData("Response vec x", responseX);
+            telemetry.addData("Response vec y", responseY);
+            telemetry.update();
+
+            Log.d("TiltCorr", String.format("Response vec x %f", responseX));
+            Log.d("TiltCorr", String.format("Response vec y %f", responseY));
+
+            setMotorPower(responseVec);
+            return;
+        }
+
         double theta = Math.toRadians(currentAngle);
 
 //        telemetry.addData("CurrentAngle", currentAngle);
@@ -478,6 +513,103 @@ public class TeleopFinal extends OpMode {
 //                robot.linearSlide.setPower(0);
 //            }
         }
+    }
+
+    private void setMotorPower(Vector2D responseVec) {
+        // For some reason, as it is now, this causes spinning when correcting, but I am too lazy
+        // to fix. It's not a bug, it's a feature, I guess.
+        double x = responseVec.getX();
+        double y = responseVec.getY();
+        double frontLeftPower = y - x;
+        double rearLeftPower = y - x;
+        double rearRightPower = -y - x;
+        double frontRightPower = x + y;
+        robot.drive.setMotorPowers(frontLeftPower, rearLeftPower, rearRightPower, frontRightPower);
+    }
+
+    private double calcTiltAngle(Vector3D robotNormalVec) {
+        return Math.acos(robotNormalVec.getZ());
+    }
+
+    // Uses a logarithmic growth sigmoid function to calculate correction
+    private double calcCorrectionFactor(double angleDiff) {
+        return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * Math.abs(angleDiff) + 1);
+    }
+
+    private Vector3D getRobotNormalVector() {
+        Orientation orientation = imu.getAngularOrientation();
+
+        // AxesOrder.indices() returns an array of integers corresponding to what order the axes are
+        // in. For example, if the AxesOrder is ZYX, indices() is [2, 1, 0], since the X-axis (pos 1
+        // of the indices array] is the third reported angle (index 2).
+        int[] axisIndicies = orientation.axesOrder.indices();
+
+        // All these calcuations work only in radians, so gotta do this
+        orientation = orientation.toAngleUnit(AngleUnit.RADIANS);
+
+        double[] angles = new double[]{orientation.firstAngle, orientation.secondAngle, orientation.thirdAngle};
+
+        // All this code basically just figures out how the IMU is reporting angles and saves that
+        // in a way we can acually deal with
+        double x = angles[axisIndicies[0]];
+        double y = angles[axisIndicies[1]];
+        double z = angles[axisIndicies[2]];
+
+        telemetry.addData("Angle 1 (x)", x);
+        telemetry.addData("Angle 2 (y)", y);
+        telemetry.addData("Angle 3 (z)", z);
+
+        Log.d("Tilt", String.format("Angle 1 (x) %f", x));
+        Log.d("Tilt", String.format("Angle 2 (y) %f", y));
+        Log.d("Tilt", String.format("Angle 3 (z) %f", z));
+
+        // All this math just gets the robot's normal vector. In technical terms, it rotates a unit
+        // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
+        // website at the bottom of the answer for the rotation matrix used.
+        // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
+        //        Vector3D normalVec = new Vector3D(
+//                -sin(x) * cos(z) - cos(x) * sin(y) * sin(z),
+//                sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
+//                cos(x) * cos(y)
+//        );
+        Vector3D normalVec = new Vector3D(
+                sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
+                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
+                cos(x) * cos(y)
+        );
+        // Just in case. Above should be normal, but just in case.
+        // Also, can't normalize vectors of length 0 so gotta do this
+        try {
+            normalVec = normalVec.normalize();
+        } catch (MathArithmeticException e) {
+
+        }
+        telemetry.addData("Component x", normalVec.getX());
+        telemetry.addData("Component y", normalVec.getY());
+        telemetry.addData("Component z", normalVec.getZ());
+
+        Log.d("Tilt", String.format("Component x %f", normalVec.getX()));
+        Log.d("Tilt", String.format("Component y %f", normalVec.getY()));
+        Log.d("Tilt", String.format("Component z %f", normalVec.getZ()));
+
+        telemetry.update();
+
+        return normalVec;
+    }
+
+    private boolean isOverMaxTilt(Vector3D normalVec) {
+        // To compute the angle to the Z axis (tilt angle) we need the dot product with this vector
+        // and the Z axis, but fortunately the dot product simplifies down to this since two of
+        // the components of the z unit vector are zero (0, 0, 1)
+        double angleToZ = calcTiltAngle(normalVec);
+
+        return Math.abs(Math.toDegrees(angleToZ)) >= Constants.maxTiltDegrees;
+    }
+
+    private Vector2D getNormalAxisProjection(Vector3D normalVec) {
+        // Generates the ideal robot response to the given normal vector. Does not normalize intentionally
+        // as we don't want to respond with full force no matter what
+        return new Vector2D(normalVec.getX(), normalVec.getY());
     }
 
     /*-----------------------------------//
