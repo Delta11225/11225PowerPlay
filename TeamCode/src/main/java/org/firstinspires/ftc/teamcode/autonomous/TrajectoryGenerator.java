@@ -386,7 +386,7 @@ public class TrajectoryGenerator {
             case FRONT:
                 switch (trajState.parkPos) {
                     case ONE:
-                        gen.strafeTo(new Vector2d(6, 8))
+                        gen.strafeTo(new Vector2d(-6, 12))
                                 .waitSeconds(1);
                         break;
                     case TWO:
@@ -401,8 +401,8 @@ public class TrajectoryGenerator {
             case BACK:
                 switch (trajState.parkPos) {
                     case ONE:
-                        gen.strafeLeft(35 - 16)
-                                .splineToConstantHeading(new Vector2d(59, 36), Math.toRadians(270));
+                        gen.strafeTo(new Vector2d(6, 8))
+                                .waitSeconds(1);
                         break;
                     case TWO:
                         gen.waitSeconds(2);
