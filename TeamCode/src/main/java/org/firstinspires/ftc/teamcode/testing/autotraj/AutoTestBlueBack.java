@@ -31,7 +31,7 @@ public class AutoTestBlueBack extends LinearOpMode {
                 })
                 .splineToLinearHeading(new Pose2d(2, 32, Math.toRadians(240)), Math.toRadians(240))
 
-                .splineToLinearHeading(new Pose2d(1.5, 29.5, Math.toRadians(240)), Math.toRadians(240))
+                .splineToLinearHeading(new Pose2d(1, 30, Math.toRadians(240)), Math.toRadians(240))
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -73,17 +73,17 @@ public class AutoTestBlueBack extends LinearOpMode {
                  robot.linearSlide.setPower(1);
               })
               .back(5)
-
-             .splineToLinearHeading(new Pose2d(30, 8, Math.toRadians(0)), Math.toRadians(0))
+//backing up from cone stack
+             .splineToLinearHeading(new Pose2d(27.5, 5.5, Math.toRadians(0)), Math.toRadians(0))
              .addDisplacementMarker(() -> {
                  robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
                  robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                  robot.linearSlide.setPower(1);
               })
 
-             .splineToLinearHeading(new Pose2d(30.5, 5.5, Math.toRadians(240)), Math.toRadians(240))
+             .splineToLinearHeading(new Pose2d(29.5, 4.5, Math.toRadians(240)), Math.toRadians(240))
 
-              .splineToLinearHeading(new Pose2d(28, 3, Math.toRadians(240)), Math.toRadians(240))
+              .splineToLinearHeading(new Pose2d(27, 2, Math.toRadians(240)), Math.toRadians(240))
               .addDisplacementMarker(() -> {
                 robot.rightClaw.setPosition(Constants.rightClawOpen);
                  robot.leftClaw.setPosition(Constants.leftClawOpen);
@@ -97,6 +97,17 @@ public class AutoTestBlueBack extends LinearOpMode {
                  robot.linearSlide.setPower(1);
               })
               .splineToLinearHeading(new Pose2d(35, 8, Math.toRadians(270)), Math.toRadians(270))
+
+                // Parking for position 3
+                //.strafeTo(new Vector2d(6, 8))
+                //.waitSeconds(1)
+
+                // Parking for position 2
+                //.waitSeconds(1)
+
+                // Parking for position 1
+               .strafeTo(new Vector2d(62, 8))
+                .waitSeconds(1)
 
 
               .build();

@@ -104,7 +104,7 @@ public class AutoTestBlueFront extends LinearOpMode {
 
                 // Parking for position 2
 
-                // No movement needed
+               // .waitSeconds(1)
 
                 // Parking for position 3
                 .strafeTo(new Vector2d(-60, 12))
