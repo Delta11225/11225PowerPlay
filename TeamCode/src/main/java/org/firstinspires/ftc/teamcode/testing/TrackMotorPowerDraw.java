@@ -61,14 +61,14 @@ public class TrackMotorPowerDraw extends LinearOpMode {
             } else {
                 linearSlide.setPower(0);
             }
-            telemetry.addData("Motor current draw", getMotorCurrentDraw(3));
-            Log.d("Power", String.valueOf(getMotorCurrentDraw(3)));
+            telemetry.addData("Motor current draw", getExpansionHubMotorCurrentDraw(3));
+            Log.d("Power", String.valueOf(getExpansionHubMotorCurrentDraw(3)));
             telemetry.update();
         }
     }
 
     // FIXME this is not working RN
-    public synchronized double getMotorCurrentDraw(int port) {
+    public synchronized double getExpansionHubMotorCurrentDraw(int port) {
         LynxGetADCCommand.Channel channel;
 
         if (port == 0) {
