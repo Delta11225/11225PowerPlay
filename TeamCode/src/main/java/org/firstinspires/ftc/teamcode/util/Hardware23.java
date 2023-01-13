@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -39,6 +40,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.nulldevices.NullColorSensor;
 import org.firstinspires.ftc.teamcode.util.nulldevices.NullDcMotor;
 import org.firstinspires.ftc.teamcode.util.nulldevices.NullDrive;
 import org.firstinspires.ftc.teamcode.util.nulldevices.NullServo;
@@ -62,6 +64,8 @@ public class Hardware23 {
     public DcMotor linearSlide = null;
     public Servo rightClaw = null;
     public Servo leftClaw = null;
+
+    public NormalizedColorSensor colorSensor = null;
     // RoadRunner driver
     public SampleMecanumDrive drive;
     private BNO055IMU imu;
@@ -165,16 +169,16 @@ public class Hardware23 {
         }
 
         try {
+            colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color_sensor");
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                colorSensor = new NullColorSensor();
+            }
+        }
+
+        try {
             drive = new SampleMecanumDrive(hardwareMap);
         } catch (Exception ignored) {
         }
     }
 }
-
-
-
-
-
-
-
-
