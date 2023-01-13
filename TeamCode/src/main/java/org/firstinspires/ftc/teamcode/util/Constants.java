@@ -50,7 +50,7 @@ public abstract class Constants {
         return new int[] {
                 1780 + linearSlideZeroOffset,
                 3010 + linearSlideZeroOffset,
-                4120 + linearSlideZeroOffset,
+                3980 + linearSlideZeroOffset,
                 liftEncoderMax + linearSlideZeroOffset
         };
     }
