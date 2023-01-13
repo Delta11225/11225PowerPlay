@@ -392,10 +392,10 @@ public class TrajectoryGenerator {
                     case TWO:
                         gen.waitSeconds(2);
                         break;
-                    default:
+                    case THREE:
                         gen.strafeTo(new Vector2d(-60, 12))
                                 .waitSeconds(1);
-                    break;
+                        break;
                 }
                 return gen;
             case BACK:
@@ -407,10 +407,10 @@ public class TrajectoryGenerator {
                     case TWO:
                         gen.waitSeconds(2);
                         break;
-                    default:
+                    case THREE:
                         gen.strafeTo(new Vector2d(62, 8))
                                 .waitSeconds(1);
-                    break;
+                        break;
                 }
                 return gen;
         }
