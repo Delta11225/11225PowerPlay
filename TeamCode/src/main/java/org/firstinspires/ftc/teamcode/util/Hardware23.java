@@ -38,8 +38,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.autonomous.TrajectoryGenerator;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.nulldevices.NullDcMotor;
+import org.firstinspires.ftc.teamcode.util.nulldevices.NullDrive;
+import org.firstinspires.ftc.teamcode.util.nulldevices.NullServo;
+import org.firstinspires.ftc.teamcode.util.nulldevices.NullWebcamName;
 
 /**
  * PLEASE follow these instructions when adding new hardware:
@@ -78,47 +81,87 @@ public class Hardware23 {
         // NEVER DO THIS
         try {
             rearLeft = hardwareMap.dcMotor.get("rear_left");
-            rearLeft.setDirection(DcMotor.Direction.REVERSE);
-        } catch (Exception ignored) {
+//            rearLeft.setDirection(DcMotor.Direction.REVERSE);
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                rearLeft = new NullDcMotor();
+            } else {
+                throw e;
+            }
         }
 
         try {
             frontLeft = hardwareMap.dcMotor.get("front_left");
-            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
-        } catch (Exception ignored) {
+//            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                frontLeft = new NullDcMotor();
+            } else {
+                throw e;
+            }
         }
 
         try {
             frontRight = hardwareMap.dcMotor.get("front_right");
-            frontRight.setDirection(DcMotor.Direction.FORWARD);
-        } catch (Exception ignored) {
+//            frontRight.setDirection(DcMotor.Direction.FORWARD);
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                frontRight = new NullDcMotor();
+            } else {
+                throw e;
+            }
         }
 
         try {
             rearRight = hardwareMap.dcMotor.get("rear_right");
-            rearRight.setDirection(DcMotor.Direction.FORWARD);
-        } catch (Exception ignored) {
+//            rearRight.setDirection(DcMotor.Direction.FORWARD);
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                rearRight = new NullDcMotor();
+            } else {
+                throw e;
+            }
         }
 
         try {
             logitechWebcam = hardwareMap.get(WebcamName.class, "Webcam 1");
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                logitechWebcam = new NullWebcamName();
+            } else {
+                throw e;
+            }
         }
 
         try {
             linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
             linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                linearSlide = new NullDcMotor();
+            } else {
+                throw e;
+            }
         }
 
         try {
             rightClaw = hardwareMap.get(Servo.class, "right_claw");
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                rightClaw = new NullServo();
+            } else {
+                throw e;
+            }
         }
 
         try {
             leftClaw = hardwareMap.get(Servo.class, "left_claw");
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                leftClaw = new NullServo();
+            } else {
+                throw e;
+            }
         }
 
         try {

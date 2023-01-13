@@ -21,16 +21,15 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
-import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +53,7 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(4, 0, 1);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 2, .6);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 2, 0.6);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -71,7 +70,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
-    private Boolean[] encoderReverseMask = new Boolean[]{false, false, false, false};
 
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
@@ -82,7 +80,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
 
-        LynxModuleUtil.  ensureMinimumFirmwareVersion(hardwareMap);
+        LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
@@ -123,11 +121,13 @@ public class SampleMecanumDrive extends MecanumDrive {
         rightFront = hardwareMap.get(DcMotorEx.class, "front_right");
         rightRear = hardwareMap.get(DcMotorEx.class, "rear_right");
 
+
         // TODO if the robot is not right change these
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftRear.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightRear.setDirection(DcMotor.Direction.FORWARD);
+
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -276,11 +276,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     @Override
     public List<Double> getWheelPositions() {
         List<Double> wheelPositions = new ArrayList<>();
-        int counter = 0;
         for (DcMotorEx motor : motors) {
-            double pos = encoderTicksToInches(motor.getCurrentPosition());
-            wheelPositions.add(encoderReverseMask[counter] ? pos * -1 : pos);
-            counter++;
+            wheelPositions.add(encoderTicksToInches(motor.getCurrentPosition()));
         }
         return wheelPositions;
     }
@@ -288,21 +285,18 @@ public class SampleMecanumDrive extends MecanumDrive {
     @Override
     public List<Double> getWheelVelocities() {
         List<Double> wheelVelocities = new ArrayList<>();
-        int counter = 0;
         for (DcMotorEx motor : motors) {
-            double pos = encoderTicksToInches(motor.getVelocity());
-            wheelVelocities.add(encoderReverseMask[counter] ? pos * -1 : pos);
-            counter++;
+            wheelVelocities.add(encoderTicksToInches(motor.getVelocity()));
         }
         return wheelVelocities;
     }
 
     @Override
-    public void setMotorPowers(double lf, double lr, double rf, double rr) {
-        leftFront.setPower(lf);
-        leftRear.setPower(lr);
-        rightFront.setPower(rf);
-        rightRear.setPower(rr);
+    public void setMotorPowers(double v, double v1, double v2, double v3) {
+        leftFront.setPower(v);
+        leftRear.setPower(v1);
+        rightRear.setPower(v2);
+        rightFront.setPower(v3);
     }
 
     @Override

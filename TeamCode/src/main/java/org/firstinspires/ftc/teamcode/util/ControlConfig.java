@@ -59,6 +59,8 @@ public abstract class ControlConfig {
     public static boolean goToMedium = false;
     public static boolean goToHigh = false;
 
+    public static boolean resetIMU = false;
+
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls;
         forward = -pad1.left_stick_y;
@@ -86,5 +88,7 @@ public abstract class ControlConfig {
         goToHigh = pad2.circle || pad2.b;
 
         overrideModifier = pad2.left_stick_button;
+
+        resetIMU = pad1.left_stick_button && pad1.right_stick_button;
     }
 }

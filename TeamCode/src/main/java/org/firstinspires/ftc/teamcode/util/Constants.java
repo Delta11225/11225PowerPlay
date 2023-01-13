@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 /**
  * This is a class that holds all necessary constants for the robot. Put "magic numbers" here.
  * This class cannot be instantiated. Do not inherit from it.
@@ -7,54 +9,39 @@ package org.firstinspires.ftc.teamcode.util;
  * appropriate value.
  */
 public abstract class Constants {
-    public final static double dumpPosition = 0.0;
-    public final static double collectPosition = 0.73;
-    public final static double holdPosition = 0.35;
-
-    public final static double tseArmInitPosition = 0.47;
-    public final static double tseArmCollectPosition = 0.83;
-//    public final static double tseArmActivePosition = 0.46;
-//
-//    public final static double tseArmCollectPosition = 0.40;
-//    public final static double tseArmDeployPosition = 0.2;
-//    public final static double tseArmReleasePosition = 0.3;
+    // Set this to true before competition. When true, stops ignoring null motors in the hardware
+    // file.
+    public final static boolean COMPETITION_MODE = false;
 
     public final static double fastMultiplier = 0.8;
     public final static double normalMultiplier = 0.4;
     public final static double slowMultiplier = 0.3;
     public final static double superSlowMultiplier = 0.2;
 
-//    public final static double towerWheelSpeedEndgame = .6009;
-//    public final static double towerWheelSpeedAuto = .420;
-//    public final static double duckAccelIncrement = 0.05;
-
-//    public final static double tseStep = 0.0005;
-
-//    public final static int lowEncoder = 1120;
-//    public final static int midEncoder = 2270;
-//    public final static int highEncoder = 3470;
-
-//    public final static double lowestDump = 1100;
     public final static int motivationQuantity = 4;
 
     public final static int autoLiftEncoderStart = 40;
 
-    public final static double rightClawOpen = 0.44;
-    public final static double rightClawClosed = 0.6;
+    public final static double leftClawOpen = 0.42;
+    public final static double leftClawClosed = 0.6;
+    //right claw is plugged into port 0, left into 1
+    public final static double rightClawOpen = 0.68;
+    public final static double rightClawClosed = 0.53;
 
-    public final static double leftClawOpen = 0.7;
-    public final static double leftClawClosed = 0.53;
-
-    public final static double liftUpPower = 0.75;
-    public final static double liftDownPower = 0.5;
+    public final static double liftUpPower = 1;
+    public final static double liftDownPower = 1;
     public final static double liftPosRunPower = 1;
 
     public final static int upEncoderStep = 10;
-    public final static int downEncoderStep = 10;
+    public final static int downEncoderStep = 20;
 
     public static int linearSlideZeroOffset = 0;
 
-    private final static int liftEncoderMax = 2200;
+    private final static int liftEncoderMax = 4530;
+
+    // Set at end of auto for teleop to sue
+    public static Pose2d currentPose = new Pose2d();
+
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;
     }
@@ -62,21 +49,28 @@ public abstract class Constants {
     public static int[] getLiftEncoderJunctions() {
         return new int[] {
                 1780 + linearSlideZeroOffset,
-                -1 + linearSlideZeroOffset,
-                -1 + linearSlideZeroOffset,
-                -1 + linearSlideZeroOffset
+                3010 + linearSlideZeroOffset,
+                4120 + linearSlideZeroOffset,
+                liftEncoderMax + linearSlideZeroOffset
         };
     }
 //    public final static int liftEncoderLow = 1780;
 
-    public final static int[] liftEncoderConeStack = new int[]{706, 495, 347, 181, 0};
+    private final static int[] liftEncoderConeStack = new int[]{709, 534, 369, 181, 0};
     public static int[] getLiftEncoderConeStack() {
         return new int[] {
-                706 + linearSlideZeroOffset,
-                495 + linearSlideZeroOffset,
-                347 + linearSlideZeroOffset,
-                181 + linearSlideZeroOffset,
-                0 + linearSlideZeroOffset
+                liftEncoderConeStack[0] + linearSlideZeroOffset,
+                liftEncoderConeStack[1] + linearSlideZeroOffset,
+                liftEncoderConeStack[2] + linearSlideZeroOffset,
+                liftEncoderConeStack[3] + linearSlideZeroOffset,
+                liftEncoderConeStack[4] + linearSlideZeroOffset
         };
     }
+
+    public static final double maxTiltDegrees = 10;
+
+    // Deals with the logarithmic function that controls how aggresively we correct tilt. In a logistic
+    // growth function C log Ax, logisticScale is the C and valueScale is the A.
+    public static final double tiltCorrectionLogisticScale = .5;
+    public static final double tiltCorrectionValueScale = 2;
 }

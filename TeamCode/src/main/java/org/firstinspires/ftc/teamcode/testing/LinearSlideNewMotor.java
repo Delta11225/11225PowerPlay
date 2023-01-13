@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.testing;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -10,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 @Disabled
-public class LinearSlideTest extends LinearOpMode {
+public class LinearSlideNewMotor extends LinearOpMode {
 
     DcMotor linearSlide;
     Servo rightClaw;
@@ -19,7 +17,6 @@ public class LinearSlideTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
 
@@ -46,28 +43,16 @@ public class LinearSlideTest extends LinearOpMode {
             if (gamepad1.dpad_up && linearSlide.getCurrentPosition() < 1555) {
                 linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 linearSlide.setPower(0.5);
-                if (linearSlide.getCurrentPosition() > 1555) {
-                    holdPosition = 1555;
-                } else {
-                    holdPosition = linearSlide.getCurrentPosition();
-                }
             } else if (gamepad1.dpad_down && linearSlide.getCurrentPosition() > 0) {
                 linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 linearSlide.setPower(-0.4);
-                holdPosition = linearSlide.getCurrentPosition();
             } else {
-                if (linearSlide.getCurrentPosition() < 1555 && linearSlide.getCurrentPosition() > 600) {
-                    linearSlide.setTargetPosition(holdPosition);
-                    linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    linearSlide.setPower(0.05);
-                    //linearSlide.setPower(0);
-                } else {
-                    linearSlide.setPower(0);
-                    linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                linearSlide.setPower(0);
+                linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 telemetry.addData("encoder", linearSlide.getCurrentPosition());
                 telemetry.update();
-            }
+
 
 ////////////////////GRABBER////////////////////////////////////////////////////////
 
@@ -85,4 +70,3 @@ public class LinearSlideTest extends LinearOpMode {
         }
     }
 }
-

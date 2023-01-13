@@ -5,16 +5,16 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.util.Hardware22;
+import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+// TODO add comments and more logging
 @Autonomous(preselectTeleOp = "TeleopFinal")
 public class Auto extends LinearOpMode {
     FtcDashboard ftcDashboard = FtcDashboard.getInstance();
@@ -23,8 +23,15 @@ public class Auto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // This lets us write telemetry to both FTC Dashboard and driverhub
 //        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
-        telemetry.setAutoClear(true);
-        Hardware22 robot = new Hardware22(hardwareMap);
+//        telemetry.setAutoClear(true);
+        Hardware23 robot = new Hardware23(hardwareMap);
+
+        // Do this here, as it takes a while
+        telemetry.addLine("Building trajectories...");
+        telemetry.update();
+        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, telemetry);
+        telemetry.addData("Build! Time taken (s)", getRuntime());
+        telemetry.update();
 
         // Init the camera. Save pipeline, as we need it later
         DetectionPipeline pipeline = new DetectionPipeline();
@@ -39,6 +46,8 @@ public class Auto extends LinearOpMode {
 
         // Ask the driver if they missed anything
         confirmAutoGood();
+
+        resetRuntime();
 
         // Loop for user friendliness, constantly updates camera detection result
         while (!isStopRequested() && !isStarted()) {
@@ -64,22 +73,29 @@ public class Auto extends LinearOpMode {
         ParkingPosition parkPos = pipeline.getLastPos();
         telemetry.clearAll();
         telemetry.addData("Park pos", parkPos);
+        telemetry.addData("Time taken (s)", getRuntime());
         telemetry.update();
 
-        // Generate trajectories. We need to do this here as otherwise we don't know where it will
-        // park
-        TrajectorySequence trajSequence;
-        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, autoState, parkPos);
-        trajSequence = trajGen.generateTrajectories();
-
         // To prevent issues, stop the camera stream
+//        resetRuntime();
         webcam.stopStreaming();
         ftcDashboard.stopCameraStream();
+        telemetry.addData("Time taken (s)", getRuntime());
+        telemetry.update();
+
+//        resetRuntime();
+        TrajectorySequence trajSequence;
+        trajSequence = trajGen.getAppropriateTrajectory(autoState, parkPos);
+        telemetry.addData("Time taken (s)", getRuntime());
+        telemetry.update();
 
         // Start of game delay, if we need it
         sleep(delay);
 
         robot.drive.followTrajectorySequence(trajSequence);
+        // Set 0 override to linear slide position
+
+        Constants.currentPose = robot.drive.getPoseEstimate();
     }
 
     private OpenCvCamera initCamera(OpenCvPipeline pipeline) {
@@ -124,9 +140,10 @@ public class Auto extends LinearOpMode {
 
     private Color getColor() {
         // Need two things for normal or dualshock controllers
-        telemetry.addLine("Color?");
-        telemetry.addLine("Blue = X or Square");
-        telemetry.addLine("Red = B or Circle");
+        telemetry.clear();
+        telemetry.addData("Color?","");
+        telemetry.addData("Blue", "X or Square");
+        telemetry.addData("Red", "B or Circle");
         telemetry.update();
 
         Color color = null;
@@ -216,7 +233,7 @@ public class Auto extends LinearOpMode {
         while (!isStopRequested() && !gamepad2.x) {}
     }
 
-    private void initMotors(Hardware22 robot) {
+    private void initMotors(Hardware23 robot) {
         return;
     }
 }

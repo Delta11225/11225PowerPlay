@@ -31,7 +31,7 @@ public class WebcamTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        telemetry = new TelemWrapper(telemetry, FtcDashboard.getInstance().getTelemetry());
+//        telemetry = new TelemWrapper(telemetry, FtcDashboard.getInstance().getTelemetry());
         // servoTest = hardwareMap.get(Servo.class, "servoTest");
         // servoTest.setPosition(0);
 
