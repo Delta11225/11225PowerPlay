@@ -40,7 +40,7 @@ public abstract class Constants {
     private final static int liftEncoderMax = 4530;
 
     // Set at end of auto for teleop to sue
-    public static Pose2d currentPose;
+    public static Pose2d currentPose = new Pose2d();
 
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;

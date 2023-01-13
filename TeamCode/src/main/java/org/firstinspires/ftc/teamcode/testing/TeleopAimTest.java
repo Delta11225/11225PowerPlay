@@ -25,6 +25,8 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -63,7 +65,6 @@ public class TeleopAimTest extends OpMode {
     boolean hasRumbled = false;
     boolean didRumble1 = false;
 
-    double offset = 0;
     int holdPosition;
     ElapsedTime elapsedTime = new ElapsedTime();
     private final ElapsedTime runtime = new ElapsedTime();
@@ -115,7 +116,8 @@ public class TeleopAimTest extends OpMode {
 
         // Apparently we don't need it
         robot.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.drive.getLocalizer().setPoseEstimate(Constants.currentPose);
+//        robot.drive.getLocalizer().setPoseEstimate(Constants.currentPose);
+        robot.drive.getLocalizer().setPoseEstimate(new Pose2d(0, 0, Math.toRadians(270)));
 
         // Set input bounds for the heading controller
         // Automatically handles overflow
@@ -186,6 +188,7 @@ public class TeleopAimTest extends OpMode {
                 Pose2d poseEstimate = robot.drive.getLocalizer().getPoseEstimate();
 
                 updateTargetPoint(poseEstimate);
+                Log.d("Targeting", "Target point: " + targetPosition.getX() + " " + targetPosition.getY());
 
                 telemetry.addData("mode", currentMode);
 
@@ -234,9 +237,8 @@ public class TeleopAimTest extends OpMode {
         if (junctionsToCheck.size() == 0) {
             junctionsToCheck = closest;
         } else {
-            junctionsToCheck = junctionsToCheck.stream()
-                    .sorted((v1, v2) -> (int) ((v1.angleBetween(v2) * 10)))
-                    .collect(Collectors.toList());
+            Vector2d robotVec = new Vector2d(robotPos.getX(), robotPos.getY());
+            junctionsToCheck.sort((v1, v2) -> (int) (Math.abs(robotVec.angleBetween(v1) - robotVec.angleBetween(v2)) * 10));
         }
 
         targetPosition = junctionsToCheck.get(0);
@@ -716,12 +718,12 @@ public class TeleopAimTest extends OpMode {
     }
 
     private void generateJunctions() {
-        double fieldWidth = 70;
-        double offset = fieldWidth / 6;
+        double fieldWidth = 70 * 2;
+        double offset = fieldWidth / 6.0;
 
         // Generate the junction positions. The 2.5 is because I am worried about floating point errors.
         for (double i = -offset * 2; i < offset * 2.5; i += offset) {
-            for (double j = -offset * 2; i < offset * 2.5; i += offset) {
+            for (double j = -offset * 2; j < offset * 2.5; j += offset) {
                 junctionPositions.add(new Vector2d(i, j));
             }
         }
@@ -750,14 +752,19 @@ public class TeleopAimTest extends OpMode {
     }
 
     private List<Vector2d> getClosestJunctions(Pose2d robotPos) {
+        double fieldWidth = 70 * 2;
+        double offset = fieldWidth / 6.0;
+
         // The maximum possible distance between two adjacent junctions. Used to ignore anything farther away.
         double maxJunctionDist = vectorPointDistance(new Vector2d(0, 0), new Vector2d(offset * 1.1, offset * 1.1));
 
         // TODO untested. Make sure sorts in correct order.
+        // FIXME i guess stream and collect doesn't actually preserve sort order?
         List<Vector2d> sorted_closest = junctionPositions.stream()
-                .filter(v1 -> (vectorPointDistance(v1, robotPos) < maxJunctionDist))
-                .sorted((v1, v2) -> (int) ((vectorPointDistance(v1, v2) * 10)))
+                .filter(v1 -> (vectorPointDistance(v1, robotPos) <= maxJunctionDist))
                 .collect(Collectors.toList());
+
+        sorted_closest.sort((v1, v2) -> (int) (Math.abs(vectorPointDistance(v1, robotPos) - vectorPointDistance(v2, robotPos) * 10)));
 
         return sorted_closest;
     }
