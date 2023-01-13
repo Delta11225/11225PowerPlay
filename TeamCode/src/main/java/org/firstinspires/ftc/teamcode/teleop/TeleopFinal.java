@@ -2,13 +2,11 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import android.util.Log;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
@@ -18,7 +16,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -28,8 +25,6 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
 
 import java.util.Locale;
-
-import androidx.core.math.MathUtils;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -72,6 +67,8 @@ public class TeleopFinal extends OpMode {
     private LinearSlideMode linearSlideMode = LinearSlideMode.MANUAL;
     private int linearSlideTarget = 0;
     private boolean areInittingIMU = false;
+
+    private boolean isClawClosed = false;
 
     @Override
     public void init() {
@@ -138,7 +135,7 @@ public class TeleopFinal extends OpMode {
         // and locks driver control.
         Vector3D robotNormalVec = getRobotNormalVector();
         if (isOverMaxTilt(robotNormalVec)) {
-            Log.d("TiltCorr", "CORRECTION");
+//            Log.d("TiltCorr", "CORRECTION");
             double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(calcTiltAngle(robotNormalVec));
             Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
 
@@ -239,9 +236,11 @@ public class TeleopFinal extends OpMode {
         // Prevents weirdness with gamepad2 locking up
         gamepad2.toString();
         if (ControlConfig.openClaw) {
+            isClawClosed = false;
             robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
             robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
         } else if (ControlConfig.closeClaw) {
+            isClawClosed = true;
             robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
             robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
         }
@@ -317,7 +316,7 @@ public class TeleopFinal extends OpMode {
 
         // All these are the same. If we pushed the button to go to a certain location, set the
         // target there and change the mode
-        if (ControlConfig.goToGround) {
+        if (ControlConfig.goToGround && (!isClawClosed || robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderJunctions()[0])) {
             linearSlideMode = LinearSlideMode.GROUD;
             linearSlideTarget = Constants.linearSlideZeroOffset;
         }
@@ -555,13 +554,13 @@ public class TeleopFinal extends OpMode {
         double y = angles[axisIndicies[1]];
         double z = angles[axisIndicies[2]];
 
-        telemetry.addData("Angle 1 (x)", x);
-        telemetry.addData("Angle 2 (y)", y);
-        telemetry.addData("Angle 3 (z)", z);
+//        telemetry.addData("Angle 1 (x)", x);
+//        telemetry.addData("Angle 2 (y)", y);
+//        telemetry.addData("Angle 3 (z)", z);
 
-        Log.d("Tilt", String.format("Angle 1 (x) %f", x));
-        Log.d("Tilt", String.format("Angle 2 (y) %f", y));
-        Log.d("Tilt", String.format("Angle 3 (z) %f", z));
+//        Log.d("Tilt", String.format("Angle 1 (x) %f", x));
+//        Log.d("Tilt", String.format("Angle 2 (y) %f", y));
+//        Log.d("Tilt", String.format("Angle 3 (z) %f", z));
 
         // All this math just gets the robot's normal vector. In technical terms, it rotates a unit
         // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
@@ -584,13 +583,13 @@ public class TeleopFinal extends OpMode {
         } catch (MathArithmeticException e) {
 
         }
-        telemetry.addData("Component x", normalVec.getX());
-        telemetry.addData("Component y", normalVec.getY());
-        telemetry.addData("Component z", normalVec.getZ());
+//        telemetry.addData("Component x", normalVec.getX());
+//        telemetry.addData("Component y", normalVec.getY());
+//        telemetry.addData("Component z", normalVec.getZ());
 
-        Log.d("Tilt", String.format("Component x %f", normalVec.getX()));
-        Log.d("Tilt", String.format("Component y %f", normalVec.getY()));
-        Log.d("Tilt", String.format("Component z %f", normalVec.getZ()));
+//        Log.d("Tilt", String.format("Component x %f", normalVec.getX()));
+//        Log.d("Tilt", String.format("Component y %f", normalVec.getY()));
+//        Log.d("Tilt", String.format("Component z %f", normalVec.getZ()));
 
         telemetry.update();
 
