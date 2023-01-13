@@ -31,7 +31,7 @@ public class AutoTestBlueFront extends LinearOpMode {
                 })
                 .splineToLinearHeading(new Pose2d(-2, 32, Math.toRadians(300)), Math.toRadians(300))
 
-                .splineToLinearHeading(new Pose2d(-0.5, 29.5, Math.toRadians(300)), Math.toRadians(300))
+                .splineToLinearHeading(new Pose2d(-1, 30, Math.toRadians(300)), Math.toRadians(300))
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -82,7 +82,7 @@ public class AutoTestBlueFront extends LinearOpMode {
 
              .splineToLinearHeading(new Pose2d(-28.5, 8.5, Math.toRadians(300)), Math.toRadians(300))
 
-              .splineToLinearHeading(new Pose2d(-25, 6.5, Math.toRadians(300)), Math.toRadians(300))
+              .splineToLinearHeading(new Pose2d(-25.5, 6, Math.toRadians(300)), Math.toRadians(300))
               .addDisplacementMarker(() -> {
                 robot.rightClaw.setPosition(Constants.rightClawOpen);
                  robot.leftClaw.setPosition(Constants.leftClawOpen);
@@ -99,14 +99,16 @@ public class AutoTestBlueFront extends LinearOpMode {
               .splineToLinearHeading(new Pose2d(-35, 11, Math.toRadians(270)), Math.toRadians(270))
 
                // Parking for position 1
-                .strafeTo(new Vector2d(-6, 12))
-                .waitSeconds(1)
+                //.strafeTo(new Vector2d(-6, 12))
+                //.waitSeconds(1)
 
                 // Parking for position 2
 
                 // No movement needed
 
                 // Parking for position 3
+                .strafeTo(new Vector2d(-60, 12))
+                .waitSeconds(1)
 
 
 
