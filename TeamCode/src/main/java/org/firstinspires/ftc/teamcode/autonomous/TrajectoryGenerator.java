@@ -86,6 +86,7 @@ public class TrajectoryGenerator {
      * Loops through all possible auto states and parking methods and generates appropriate trajectories.
      * @return A hashmap with the TrajState as the key and the TrajSequence as the value
      */
+    // FIXME trajectories are passed by reference and parking breaks as a result
     private HashMap<TrajectoryState, TrajectorySequence> generateAllTrajectories() {
         HashMap<TrajectoryState, TrajectorySequence> trajMap = new HashMap<>();
 
@@ -102,6 +103,7 @@ public class TrajectoryGenerator {
 
             // Loop through each parking position
             for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
+                TrajectorySequenceBuilder posColorCopy = copyTrajectoryBuilder(posColor);
                 // Once again, make sure to log
                 Log.d("TrajectoryGenerator", String.format("Generating parking traj - %s %s", startPos, parkPos));
                 telemetry.addLine(String.format("Generating parking traj - %s %s", startPos, parkPos));
@@ -130,6 +132,11 @@ public class TrajectoryGenerator {
             }
         }
         return trajMap;
+    }
+
+    private TrajectorySequenceBuilder copyTrajectoryBuilder(TrajectorySequenceBuilder trajSequenceBuilder) {
+        TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(new Pose2d());
+        return null;
     }
 
     /**
@@ -397,7 +404,7 @@ public class TrajectoryGenerator {
                                 .waitSeconds(1);
                         break;
                 }
-                return gen;
+                break;
             case BACK:
                 switch (trajState.parkPos) {
                     case ONE:
@@ -412,9 +419,9 @@ public class TrajectoryGenerator {
                                 .waitSeconds(1);
                         break;
                 }
-                return gen;
+                break;
         }
-        return null;
+        return gen;
     }
 
     /**
