@@ -42,6 +42,7 @@ public class Auto extends LinearOpMode {
 
         // We only need the delay here, everything else just gets passed to TrajectoryGenerator
         AutoState autoState = getUserInput();
+        Constants.matchState = autoState;
         long delay = autoState.delay;
 
         // Ask the driver if they missed anything

@@ -6,7 +6,9 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
@@ -16,9 +18,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.autonomous.Color;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.ControlConfig;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
@@ -69,6 +73,7 @@ public class TeleopFinal extends OpMode {
     private boolean areInittingIMU = false;
 
     private boolean isClawClosed = false;
+    private Color currentColor;
 
     @Override
     public void init() {
@@ -76,6 +81,7 @@ public class TeleopFinal extends OpMode {
 
 //        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         Constants.linearSlideZeroOffset = 0;
+        currentColor = Constants.matchState.color;
 
         initIMU();
         areInittingIMU = false;
@@ -245,6 +251,8 @@ public class TeleopFinal extends OpMode {
             robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
         }
 
+        handleClawAutoGrab();
+
         // TODO work on this please
 //        if (ControlConfig.resetIMU && !areInittingIMU) {
 //            telemetry.addLine("Reinitting IMU");
@@ -253,6 +261,40 @@ public class TeleopFinal extends OpMode {
 //            areInittingIMU = false;
 //            gamepad2.rumble(500);
 //        }
+    }
+
+    private void handleClawAutoGrab() {
+        ColorSensor colorSensor = robot.colorSensor;
+        int red = colorSensor.red();
+        int blue = colorSensor.blue();
+        double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
+
+        if (distance > 3) {
+            return;
+        }
+
+        if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0]) {
+            return;
+        }
+
+        if (ControlConfig.openClaw) {
+            return;
+        }
+
+        switch (currentColor) {
+            case BLUE:
+                if (blue > red) {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                }
+                break;
+            case RED:
+                if (red > blue) {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                }
+                break;
+        }
     }
 
     private void initIMU() {

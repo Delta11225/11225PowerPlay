@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
+import org.firstinspires.ftc.teamcode.autonomous.AutoState;
+import org.firstinspires.ftc.teamcode.autonomous.Color;
+import org.firstinspires.ftc.teamcode.autonomous.StartPosition;
+
 /**
  * This is a class that holds all necessary constants for the robot. Put "magic numbers" here.
  * This class cannot be instantiated. Do not inherit from it.
@@ -32,8 +36,8 @@ public abstract class Constants {
     public final static double liftDownPower = 1;
     public final static double liftPosRunPower = 1;
 
-    public final static int upEncoderStep = 10;
-    public final static int downEncoderStep = 20;
+    public final static int upEncoderStep = 30;
+    public final static int downEncoderStep = 30;
 
     public static int linearSlideZeroOffset = 0;
 
@@ -41,6 +45,7 @@ public abstract class Constants {
 
     // Set at end of auto for teleop to sue
     public static Pose2d currentPose = new Pose2d();
+    public static AutoState matchState = new AutoState(Color.BLUE, StartPosition.FRONT, 0);
 
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;

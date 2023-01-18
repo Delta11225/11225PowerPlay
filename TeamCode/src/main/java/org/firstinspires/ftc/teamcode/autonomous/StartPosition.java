@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-enum StartPosition {
+public enum StartPosition {
     FRONT,
     BACK
 }
