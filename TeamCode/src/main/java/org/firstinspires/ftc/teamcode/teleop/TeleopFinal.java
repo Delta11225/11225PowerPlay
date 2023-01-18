@@ -264,6 +264,18 @@ public class TeleopFinal extends OpMode {
     }
 
     private void handleClawAutoGrab() {
+        if (ControlConfig.openClaw) {
+            return;
+        }
+
+        if (isClawClosed) {
+            return;
+        }
+
+        if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0] - 40) {
+            return;
+        }
+
         ColorSensor colorSensor = robot.colorSensor;
         int red = colorSensor.red();
         int blue = colorSensor.blue();
@@ -273,30 +285,12 @@ public class TeleopFinal extends OpMode {
             return;
         }
 
-        if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0] - 40) {
-            return;
-        }
-
-        if (ControlConfig.openClaw) {
-            return;
-        }
-
         // TODO make it only rumble once
-        switch (currentColor) {
-            case BLUE:
-                if (blue > red) {
-                    robot.rightClaw.setPosition(Constants.rightClawClosed);
-                    robot.leftClaw.setPosition(Constants.leftClawClosed);
-                    gamepad2.rumble(250);
-                }
-                break;
-            case RED:
-                if (red > blue) {
-                    robot.rightClaw.setPosition(Constants.rightClawClosed);
-                    robot.leftClaw.setPosition(Constants.leftClawClosed);
-                    gamepad2.rumble(250);
-                }
-                break;
+        if (currentColor == Color.BLUE ? blue > red : red > blue) {
+            robot.rightClaw.setPosition(Constants.rightClawClosed);
+            robot.leftClaw.setPosition(Constants.leftClawClosed);
+            gamepad2.rumble(250);
+            isClawClosed = true;
         }
     }
 
