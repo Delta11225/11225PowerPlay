@@ -30,7 +30,9 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -65,7 +67,7 @@ public class Hardware23 {
     public Servo rightClaw = null;
     public Servo leftClaw = null;
 
-    public NormalizedColorSensor colorSensor = null;
+    public ColorSensor colorSensor = null;
     // RoadRunner driver
     public SampleMecanumDrive drive;
     private BNO055IMU imu;
@@ -169,16 +171,21 @@ public class Hardware23 {
         }
 
         try {
-            colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color_sensor");
+            colorSensor = hardwareMap.get(ColorSensor.class, "color_sensor");
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 colorSensor = new NullColorSensor();
+            } else {
+                throw e;
             }
         }
 
         try {
             drive = new SampleMecanumDrive(hardwareMap);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (Constants.COMPETITION_MODE) {
+                throw e;
+            }
         }
     }
 }

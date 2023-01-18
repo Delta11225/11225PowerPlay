@@ -5,7 +5,7 @@ public class AutoState {
    public final StartPosition position;
    public final long delay;
 
-   AutoState(Color color, StartPosition position, long delay) {
+   public AutoState(Color color, StartPosition position, long delay) {
       this.color = color;
       this.position = position;
       this.delay = delay;

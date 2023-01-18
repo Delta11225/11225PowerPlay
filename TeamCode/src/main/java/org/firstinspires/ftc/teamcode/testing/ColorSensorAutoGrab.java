@@ -5,6 +5,7 @@ import android.graphics.Color;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -43,7 +44,7 @@ public class ColorSensorAutoGrab extends LinearOpMode {
         // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
         // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
         // the values you get from ColorSensor are dependent on the specific sensor you're using.
-        NormalizedColorSensor colorSensor = robot.colorSensor;
+        ColorSensor colorSensor = robot.colorSensor;
 
         // If possible, turn the light on in the beginning (it might already be on anyway,
         // we just make sure it is if we can).
@@ -73,7 +74,7 @@ public class ColorSensorAutoGrab extends LinearOpMode {
 
             // Tell the sensor our desired gain value (normally you would do this during initialization,
             // not during the loop)
-            colorSensor.setGain(gain);
+//            colorSensor.setGain(gain);
 
             // Check the status of the X button on the gamepad
             xButtonCurrentlyPressed = gamepad1.x;
@@ -91,7 +92,7 @@ public class ColorSensorAutoGrab extends LinearOpMode {
             xButtonPreviouslyPressed = xButtonCurrentlyPressed;
 
             // Get the normalized colors from the sensor
-            NormalizedRGBA colors = colorSensor.getNormalizedColors();
+            NormalizedRGBA colors = new NormalizedRGBA();//colorSensor.getNormalizedColors();
 
             /* Use telemetry to display feedback on the driver station. We show the red, green, and blue
              * normalized values from the sensor (in the range of 0 to 1), as well as the equivalent
