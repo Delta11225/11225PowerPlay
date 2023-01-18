@@ -5,8 +5,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -84,16 +86,17 @@ public class Auto extends LinearOpMode {
         telemetry.update();
 
 //        resetRuntime();
-        TrajectorySequence trajSequence;
-        trajSequence = trajGen.getAppropriateTrajectory(autoState, parkPos);
+        TrajectorySequence[] trajSequences;
+        trajSequences = trajGen.getAppropriateTrajectory(autoState, parkPos);
         telemetry.addData("Time taken (s)", getRuntime());
         telemetry.update();
 
         // Start of game delay, if we need it
         sleep(delay);
 
-        robot.drive.followTrajectorySequence(trajSequence);
-        // Set 0 override to linear slide position
+        for (TrajectorySequence trajSeq : trajSequences) {
+            robot.drive.followTrajectorySequence(trajSeq);
+        }
 
         Constants.currentPose = robot.drive.getPoseEstimate();
     }

@@ -24,8 +24,15 @@ public class TrajectoryGenerator {
     private final SampleMecanumDrive drive;
     private final Telemetry telemetry;
 
-    // Stores mapping between Auto State (color, start pos, park pos) and traj sequence to run.
-    private HashMap<TrajectoryState, TrajectorySequence> trajectories;
+    /**
+     * Stores mapping between Auto State (color, start pos, park pos) and traj sequence to run.
+     * Stores an array of start trajectory and parking trajectory for efficiency reasons. It is inefficient to
+     * regenerate start traj for each parking position, but we can't use the same start traj for each parking
+     * trajectory because there is no good way to copy a TrajectorySequenceBuilder. As a result, we generate start
+     * and parking trajectories separately, and store them in an array in this dictionary. It's annoying, but it's what
+     * we gotta do.
+     */
+    private HashMap<TrajectoryState, TrajectorySequence[]> trajectories;
 
     /**
      * General constructor. Generates all trajectories.
@@ -47,7 +54,7 @@ public class TrajectoryGenerator {
      * @param parkPos The required parking position
      * @return The appropriate trajectory sequence for this auto state
      */
-    public TrajectorySequence getAppropriateTrajectory(AutoState autoState, ParkingPosition parkPos) {
+    public TrajectorySequence[] getAppropriateTrajectory(AutoState autoState, ParkingPosition parkPos) {
         Log.d("TrajectoryGenerator", String.format("Requested trajectory - %s %s %S",
                 autoState.color, autoState.position, parkPos));
         // A TrajectoryState (combines AutoState and ParkingPosition) that corresponds to the parameters
@@ -66,7 +73,7 @@ public class TrajectoryGenerator {
 
         // Get the right trajectories with the traj state object we found earlier. If we don't find it, provide null instead of
         // throwing an error
-        TrajectorySequence traj = trajectories.getOrDefault(mapTrajState, null);
+        TrajectorySequence[] traj = trajectories.getOrDefault(mapTrajState, null);
         
         // If traj is null, it means it wasn't in our hashmap, and something has gone wrong. Let the user know.
         if (traj == null) {
@@ -78,7 +85,7 @@ public class TrajectoryGenerator {
         }
 
         // Make sure to tell the robot where it is
-        drive.setPoseEstimate(traj.start());
+        drive.setPoseEstimate(traj[0].start());
         return traj;
     }
 
@@ -86,8 +93,8 @@ public class TrajectoryGenerator {
      * Loops through all possible auto states and parking methods and generates appropriate trajectories.
      * @return A hashmap with the TrajState as the key and the TrajSequence as the value
      */
-    private HashMap<TrajectoryState, TrajectorySequence> generateAllTrajectories() {
-        HashMap<TrajectoryState, TrajectorySequence> trajMap = new HashMap<>();
+    private HashMap<TrajectoryState, TrajectorySequence[]> generateAllTrajectories() {
+        HashMap<TrajectoryState, TrajectorySequence[]> trajMap = new HashMap<>();
 
         // Loop through each possible color and start position
         for (StartPosition startPos : new StartPosition[]{StartPosition.FRONT, StartPosition.BACK}) {
@@ -98,10 +105,12 @@ public class TrajectoryGenerator {
 
             // Since the first part of each trajectory (the stuff before parking) is the same,
             // we generate it separately and don't build to avoid wasting a lot of time.
-            TrajectorySequenceBuilder posColor = prepareBlueStartTrajectories(startPos);
+            TrajectorySequence posColorTraj = prepareBlueStartTrajectories(startPos).build();
 
             // Loop through each parking position
             for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
+                // Have to make this generator here or we do all parking trajectories no matter what
+                TrajectorySequenceBuilder parkingGen = drive.trajectorySequenceBuilder(posColorTraj.end());
                 // Once again, make sure to log
                 Log.d("TrajectoryGenerator", String.format("Generating parking traj - %s %s", startPos, parkPos));
                 telemetry.addLine(String.format("Generating parking traj - %s %s", startPos, parkPos));
@@ -111,12 +120,12 @@ public class TrajectoryGenerator {
                 TrajectoryState trajState = new TrajectoryState(Color.BLUE, startPos, parkPos);
 
                 // Append the parking trajectories onto the start trajectories and build
-                TrajectorySequenceBuilder preparedTraj = prepareBlueParkingTrajectories(posColor, trajState);
-                TrajectorySequence traj = preparedTraj.build();
+                TrajectorySequenceBuilder preparedTraj = prepareBlueParkingTrajectories(parkingGen, trajState);
+                TrajectorySequence parkingTraj = preparedTraj.build();
 //                    TrajectorySequence traj = genTrajectory(trajState);
 
                 // Put finished trajectory sequence into hashmap
-                trajMap.put(trajState, traj);
+                trajMap.put(trajState, new TrajectorySequence[]{posColorTraj, parkingTraj});
 
                 // Since blue front and red back are identical and so are blue back and red front, we only generate
                 // trajectories from the blue perspective and just reverse the color and start pos and insert
@@ -125,7 +134,7 @@ public class TrajectoryGenerator {
                         Color.RED,
                         startPos == StartPosition.BACK ? StartPosition.FRONT : StartPosition.BACK,
                         parkPos);
-                trajMap.put(redReversedState, traj);
+                trajMap.put(redReversedState, new TrajectorySequence[]{posColorTraj, parkingTraj});
 //                    Log.d("TrajectoryGenerator", "Traj gen finished");
             }
         }
@@ -392,12 +401,12 @@ public class TrajectoryGenerator {
                     case TWO:
                         gen.waitSeconds(2);
                         break;
-                    default:
+                    case THREE:
                         gen.strafeTo(new Vector2d(-60, 12))
                                 .waitSeconds(1);
-                    break;
+                        break;
                 }
-                return gen;
+                break;
             case BACK:
                 switch (trajState.parkPos) {
                     case ONE:
@@ -407,14 +416,14 @@ public class TrajectoryGenerator {
                     case TWO:
                         gen.waitSeconds(2);
                         break;
-                    default:
+                    case THREE:
                         gen.strafeTo(new Vector2d(62, 8))
                                 .waitSeconds(1);
-                    break;
+                        break;
                 }
-                return gen;
+                break;
         }
-        return null;
+        return gen;
     }
 
     /**
