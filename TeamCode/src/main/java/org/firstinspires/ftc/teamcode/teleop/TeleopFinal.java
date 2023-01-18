@@ -281,6 +281,7 @@ public class TeleopFinal extends OpMode {
             return;
         }
 
+        // TODO make it only rumble once
         switch (currentColor) {
             case BLUE:
                 if (blue > red) {
