@@ -46,6 +46,7 @@ public abstract class Constants {
     // Set at end of auto for teleop to sue
     public static Pose2d currentPose = new Pose2d();
     public static AutoState matchState = new AutoState(Color.BLUE, StartPosition.FRONT, 0);
+    public static double minAutoGrabDistance = 3;
 
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;

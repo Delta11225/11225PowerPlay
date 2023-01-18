@@ -269,7 +269,7 @@ public class TeleopFinal extends OpMode {
         int blue = colorSensor.blue();
         double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
 
-        if (distance > 3) {
+        if (distance > Constants.minAutoGrabDistance) {
             return;
         }
 
