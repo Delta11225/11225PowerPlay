@@ -273,7 +273,7 @@ public class TeleopFinal extends OpMode {
             return;
         }
 
-        if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0]) {
+        if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0] - 40) {
             return;
         }
 
@@ -286,12 +286,14 @@ public class TeleopFinal extends OpMode {
                 if (blue > red) {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);
                     robot.leftClaw.setPosition(Constants.leftClawClosed);
+                    gamepad2.rumble(250);
                 }
                 break;
             case RED:
                 if (red > blue) {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);
                     robot.leftClaw.setPosition(Constants.leftClawClosed);
+                    gamepad2.rumble(250);
                 }
                 break;
         }
