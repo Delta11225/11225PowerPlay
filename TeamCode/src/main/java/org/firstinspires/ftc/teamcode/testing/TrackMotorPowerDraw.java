@@ -7,6 +7,7 @@ import com.qualcomm.hardware.lynx.LynxModuleIntf;
 import com.qualcomm.hardware.lynx.LynxNackException;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCCommand;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCResponse;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 @TeleOp
+@Disabled
 public class TrackMotorPowerDraw extends LinearOpMode {
     private int holdPosition;
     LynxModuleIntf expansionHub;

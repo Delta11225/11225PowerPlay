@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class ColorSensorTest extends OpMode {
     ColorSensor sensorColor;
     Hardware23 robot;

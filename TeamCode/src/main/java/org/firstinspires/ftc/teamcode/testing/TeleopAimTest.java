@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
-//@Disabled
+@Disabled
 @TeleOp
 public class TeleopAimTest extends OpMode {
     // FIXME in the future reduce number of global vars

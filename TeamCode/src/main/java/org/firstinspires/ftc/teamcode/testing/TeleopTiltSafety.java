@@ -8,6 +8,7 @@ import android.util.Log;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -30,7 +31,7 @@ import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
 
 import java.util.Locale;
 
-//@Disabled
+@Disabled
 @TeleOp
 public class TeleopTiltSafety extends OpMode {
     // FIXME in the future reduce number of global vars
