@@ -93,7 +93,6 @@ public class TrajectoryGenerator {
      * Loops through all possible auto states and parking methods and generates appropriate trajectories.
      * @return A hashmap with the TrajState as the key and the TrajSequence as the value
      */
-    // FIXME trajectories are passed by reference and parking breaks as a result
     private HashMap<TrajectoryState, TrajectorySequence[]> generateAllTrajectories() {
         HashMap<TrajectoryState, TrajectorySequence[]> trajMap = new HashMap<>();
 
@@ -107,10 +106,11 @@ public class TrajectoryGenerator {
             // Since the first part of each trajectory (the stuff before parking) is the same,
             // we generate it separately and don't build to avoid wasting a lot of time.
             TrajectorySequence posColorTraj = prepareBlueStartTrajectories(startPos).build();
-            TrajectorySequenceBuilder parkingGen = drive.trajectorySequenceBuilder(posColorTraj.end());
 
             // Loop through each parking position
             for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
+                // Have to make this generator here or we do all parking trajectories no matter what
+                TrajectorySequenceBuilder parkingGen = drive.trajectorySequenceBuilder(posColorTraj.end());
                 // Once again, make sure to log
                 Log.d("TrajectoryGenerator", String.format("Generating parking traj - %s %s", startPos, parkPos));
                 telemetry.addLine(String.format("Generating parking traj - %s %s", startPos, parkPos));

@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -96,7 +97,6 @@ public class Auto extends LinearOpMode {
         for (TrajectorySequence trajSeq : trajSequences) {
             robot.drive.followTrajectorySequence(trajSeq);
         }
-        // Set 0 override to linear slide position
 
         Constants.currentPose = robot.drive.getPoseEstimate();
     }
