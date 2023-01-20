@@ -64,7 +64,7 @@ public abstract class Constants {
 //    public final static int liftEncoderLow = 1780;
 
     // FIXME Test these, probably too high
-    private final static int[] liftEncoderConeStack = new int[]{709, 534, 369, 181, 0};
+    private final static int[] liftEncoderConeStack = new int[]{650, 534, 369, 181, 0};
     public static int[] getLiftEncoderConeStack() {
         return new int[] {
                 liftEncoderConeStack[0] + linearSlideZeroOffset,
