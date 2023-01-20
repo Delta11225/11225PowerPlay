@@ -407,7 +407,7 @@ public class TeleopFinal extends OpMode {
         // We shouldn't need to do this, but just in case
         robot.linearSlide.setPower(Constants.liftPosRunPower);
         telemetry.addData("Linear Slide set pos", linearSlideTarget);
-        Log.d("LinearSlide", String.valueOf(linearSlideTarget));
+//        Log.d("LinearSlide", String.valueOf(linearSlideTarget));
         telemetry.update();
     }
 

@@ -55,8 +55,8 @@ public abstract class Constants {
     //    private final static int[] liftEncoderJunctions = new int[] {1780, -1, -1, -1};
     public static int[] getLiftEncoderJunctions() {
         return new int[] {
-                1760 + linearSlideZeroOffset,
-                2970 + linearSlideZeroOffset,
+                1750 + linearSlideZeroOffset,
+                2910 + linearSlideZeroOffset,
                 4005 + linearSlideZeroOffset,
                 liftEncoderMax + linearSlideZeroOffset
         };
