@@ -48,20 +48,22 @@ public abstract class Constants {
     public static AutoState matchState = new AutoState(Color.BLUE, StartPosition.FRONT, 0);
     public static double minAutoGrabDistance = 3;
 
+    // FIXME low and medium is too high probably, test
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;
     }
     //    private final static int[] liftEncoderJunctions = new int[] {1780, -1, -1, -1};
     public static int[] getLiftEncoderJunctions() {
         return new int[] {
-                1770 + linearSlideZeroOffset,
-                2990 + linearSlideZeroOffset,
-                3990 + linearSlideZeroOffset,
+                1760 + linearSlideZeroOffset,
+                2970 + linearSlideZeroOffset,
+                4005 + linearSlideZeroOffset,
                 liftEncoderMax + linearSlideZeroOffset
         };
     }
 //    public final static int liftEncoderLow = 1780;
 
+    // FIXME Test these, probably too high
     private final static int[] liftEncoderConeStack = new int[]{709, 534, 369, 181, 0};
     public static int[] getLiftEncoderConeStack() {
         return new int[] {
@@ -73,10 +75,10 @@ public abstract class Constants {
         };
     }
 
-    public static final double maxTiltDegrees = 10;
+    public static final double maxTiltDegrees = 7;
 
-    // Deals with the logarithmic function that controls how aggresively we correct tilt. In a logistic
+    // Deals with the logarithmic function that controls how aggressively we correct tilt. In a logistic
     // growth function C log Ax, logisticScale is the C and valueScale is the A.
-    public static final double tiltCorrectionLogisticScale = .5;
+    public static final double tiltCorrectionLogisticScale = 1;
     public static final double tiltCorrectionValueScale = 2;
 }
