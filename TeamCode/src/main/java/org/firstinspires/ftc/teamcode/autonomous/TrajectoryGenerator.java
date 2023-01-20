@@ -260,16 +260,16 @@ public class TrajectoryGenerator {
                             robot.rightClaw.setPosition(Constants.rightClawClosed);
                             robot.leftClaw.setPosition(Constants.leftClawClosed);
                         })
-                        .strafeTo(new Vector2d(12.5, 65))
+                        .strafeTo(new Vector2d(12.5, 63.875))
                         .splineToConstantHeading(new Vector2d(10, 57.1), Math.toRadians(270))
                         .addDisplacementMarker(() -> {
                             robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                             robot.linearSlide.setPower(1);
                         })
-                        .splineToLinearHeading(new Pose2d(2, 32, Math.toRadians(240)), Math.toRadians(240))
+                        .splineToLinearHeading(new Pose2d(2, 31, Math.toRadians(240)), Math.toRadians(240))
 
-                        .splineToLinearHeading(new Pose2d(1, 30, Math.toRadians(240)), Math.toRadians(240))
+                        .splineToLinearHeading(new Pose2d(1, 29, Math.toRadians(240)), Math.toRadians(240))
                         .addDisplacementMarker(() -> {
                             robot.leftClaw.setPosition(Constants.leftClawOpen);
                             robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -295,7 +295,7 @@ public class TrajectoryGenerator {
                             robot.linearSlide.setPower(1);
                         })
                         //approach cone stack
-                        .splineToConstantHeading(new Vector2d(57, 8), Math.toRadians(0))
+                        .splineToConstantHeading(new Vector2d(56.5, 8), Math.toRadians(0))
                         .waitSeconds(0.25)
 
                         .addDisplacementMarker(() -> {
@@ -319,9 +319,9 @@ public class TrajectoryGenerator {
                             robot.linearSlide.setPower(1);
                         })
 
-                        .splineToLinearHeading(new Pose2d(29.5, 4.5, Math.toRadians(240)), Math.toRadians(240))
+                        .splineToLinearHeading(new Pose2d(28.5, 4.5, Math.toRadians(240)), Math.toRadians(240))
 
-                        .splineToLinearHeading(new Pose2d(27, 2, Math.toRadians(240)), Math.toRadians(240))
+                        .splineToLinearHeading(new Pose2d(26, 2, Math.toRadians(240)), Math.toRadians(240))
                         .addDisplacementMarker(() -> {
                             robot.rightClaw.setPosition(Constants.rightClawOpen);
                             robot.leftClaw.setPosition(Constants.leftClawOpen);
@@ -410,14 +410,14 @@ public class TrajectoryGenerator {
             case BACK:
                 switch (trajState.parkPos) {
                     case ONE:
-                        gen.strafeTo(new Vector2d(6, 8))
+                        gen.strafeTo(new Vector2d(62, 8))
                                 .waitSeconds(1);
                         break;
                     case TWO:
                         gen.waitSeconds(2);
                         break;
                     case THREE:
-                        gen.strafeTo(new Vector2d(62, 8))
+                        gen.strafeTo(new Vector2d(6, 8))
                                 .waitSeconds(1);
                         break;
                 }
