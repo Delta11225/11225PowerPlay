@@ -48,7 +48,6 @@ public abstract class Constants {
     public static AutoState matchState = new AutoState(Color.BLUE, StartPosition.FRONT, 0);
     public static double minAutoGrabDistance = 3;
 
-    // FIXME low and medium is too high probably, test
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;
     }
