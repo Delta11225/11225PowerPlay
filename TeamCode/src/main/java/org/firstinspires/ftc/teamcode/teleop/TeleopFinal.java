@@ -285,7 +285,6 @@ public class TeleopFinal extends OpMode {
             return;
         }
 
-        // TODO make it only rumble once
         if (currentColor == Color.BLUE ? blue > red : red > blue) {
             robot.rightClaw.setPosition(Constants.rightClawClosed);
             robot.leftClaw.setPosition(Constants.leftClawClosed);
@@ -355,7 +354,7 @@ public class TeleopFinal extends OpMode {
 
         // All these are the same. If we pushed the button to go to a certain location, set the
         // target there and change the mode
-        if (ControlConfig.goToGround && (!isClawClosed || robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderJunctions()[0])) {
+        if (ControlConfig.goToGround && (!isClawClosed || robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderJunctions()[0] - 20)) {
             linearSlideMode = LinearSlideMode.GROUD;
             linearSlideTarget = Constants.linearSlideZeroOffset;
         }
