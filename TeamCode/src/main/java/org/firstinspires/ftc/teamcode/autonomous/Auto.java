@@ -18,7 +18,6 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-// TODO add comments and more logging
 @Autonomous(preselectTeleOp = "TeleopFinal")
 public class Auto extends LinearOpMode {
     FtcDashboard ftcDashboard = FtcDashboard.getInstance();
@@ -34,7 +33,7 @@ public class Auto extends LinearOpMode {
         telemetry.addLine("Building trajectories...");
         telemetry.update();
         TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, telemetry);
-        telemetry.addData("Build! Time taken (s)", getRuntime());
+        telemetry.addData("Built! Time taken (s)", getRuntime());
         telemetry.update();
 
         // Init the camera. Save pipeline, as we need it later
