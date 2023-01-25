@@ -73,6 +73,8 @@ public class Auto extends LinearOpMode {
         // If we need to keep track of time
         resetRuntime();
 
+        Constants.linearSlideZeroOffset = robot.linearSlide.getCurrentPosition();
+
         // Add parking pos to telemetry to we don't have to worry and save last pos
         ParkingPosition parkPos = pipeline.getLastPos();
         telemetry.clearAll();
