@@ -63,9 +63,12 @@ public class TrackMotorPowerDraw extends LinearOpMode {
             } else {
                 linearSlide.setPower(0);
             }
-            telemetry.addData("Motor current draw", getExpansionHubMotorCurrentDraw(3));
-            Log.d("Power", String.valueOf(getExpansionHubMotorCurrentDraw(3)));
-            telemetry.update();
+            double powerDraw = getExpansionHubMotorCurrentDraw(3);
+            if (powerDraw > 0.01) {
+                telemetry.addData("Motor current draw", getExpansionHubMotorCurrentDraw(3));
+                Log.d("Power", String.valueOf(getExpansionHubMotorCurrentDraw(3)));
+                telemetry.update();
+            }
         }
     }
 
