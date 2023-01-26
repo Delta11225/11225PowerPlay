@@ -77,10 +77,14 @@ public abstract class Constants {
     public static final double maxTiltDegrees = 7;
 
     // The point at which it will stop correcting as we are on the ground and further movement would damage the robot
-    public static final double unrecoverableTiltDegrees = 70;
+    public static final double unrecoverableTiltDegrees = 60;
 
     // Deals with the logarithmic function that controls how aggressively we correct tilt. In a logistic
     // growth function C log Ax, logisticScale is the C and valueScale is the A.
-    public static final double tiltCorrectionLogisticScale = 1;
-    public static final double tiltCorrectionValueScale = 1;
+    public static final double tiltCorrectionLogisticScale = 0.5;
+    public static final double tiltCorrectionValueScale = 2;
+
+    // expTotalScale is C, expAngleScale is A, in equation y=Ce^Ax, where x is angle diff
+    public static final double expTotalScale = .06;
+    public static final double expAngleScale = .32;
 }

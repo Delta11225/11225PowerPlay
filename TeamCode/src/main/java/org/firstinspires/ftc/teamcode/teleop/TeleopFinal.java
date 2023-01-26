@@ -142,15 +142,17 @@ public class TeleopFinal extends OpMode {
         Vector3D robotNormalVec = getRobotNormalVector();
         if (isOverMaxTilt(robotNormalVec) && isBelowUnrecoverableTilt(robotNormalVec)) {
 //            Log.d("TiltCorr", "CORRECTION");
-            double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(calcTiltAngle(robotNormalVec));
+            double angleDiff = Math.abs(Math.toDegrees(calcTiltAngle(robotNormalVec)) - Constants.maxTiltDegrees);
             Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
 
+//            double correctionFactor = calcLogisticCorrectionFactor(angleDiff);
+            double correctionFactor = calcExponentialCorrectionFactor(angleDiff);
             // Correct based on how far off the axis we are
             responseVec = responseVec.normalize();
-            responseVec = responseVec.scalarMultiply(calcCorrectionFactor(angleDiff));
+            responseVec = responseVec.scalarMultiply(correctionFactor);
 
             Log.d("TiltCorr", String.format("Angle diff %f", (angleDiff)));
-            Log.d("TiltCorr", String.format("Correction factor %f", calcCorrectionFactor(angleDiff)));
+            Log.d("TiltCorr", String.format("Correction factor %f", correctionFactor));
 
             double responseX = responseVec.getX();
             double responseY = responseVec.getY();
@@ -228,6 +230,10 @@ public class TeleopFinal extends OpMode {
         robot.rearRight.setPower(-rearRight * powerMultiplier);
 
 
+    }
+
+    private double calcExponentialCorrectionFactor(double angleDiff) {
+        return Constants.expTotalScale * Math.pow(Math.E, Constants.expAngleScale * Math.abs(angleDiff));
     }
 
     private boolean isBelowUnrecoverableTilt(Vector3D normalVec) {
@@ -574,7 +580,7 @@ public class TeleopFinal extends OpMode {
     }
 
     // Uses a logarithmic growth sigmoid function to calculate correction
-    private double calcCorrectionFactor(double angleDiff) {
+    private double calcLogarithmicCorrectionFactor(double angleDiff) {
         return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * Math.abs(angleDiff) + 1);
     }
 
