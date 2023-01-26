@@ -140,7 +140,7 @@ public class TeleopFinal extends OpMode {
         // Deals with tilt. Prevents robot from tilting too far. If above certain tilt angle, corrects it
         // and locks driver control.
         Vector3D robotNormalVec = getRobotNormalVector();
-        if (isOverMaxTilt(robotNormalVec)) {
+        if (isOverMaxTilt(robotNormalVec) && isBelowUnrecoverableTilt(robotNormalVec)) {
 //            Log.d("TiltCorr", "CORRECTION");
             double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(calcTiltAngle(robotNormalVec));
             Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
@@ -228,6 +228,12 @@ public class TeleopFinal extends OpMode {
         robot.rearRight.setPower(-rearRight * powerMultiplier);
 
 
+    }
+
+    private boolean isBelowUnrecoverableTilt(Vector3D normalVec) {
+        double angleToZ = calcTiltAngle(normalVec);
+
+        return Math.abs(Math.toDegrees(angleToZ)) <= Constants.unrecoverableTiltDegrees;
     }
 
     public void peripheralMove() {
