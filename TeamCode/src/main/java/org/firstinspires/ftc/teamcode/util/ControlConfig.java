@@ -62,11 +62,11 @@ public abstract class ControlConfig {
     public static boolean resetIMU = false;
 
     public static void update(Gamepad pad1, Gamepad pad2) {
-        // Update movement controls;
-        forward = -pad1.left_stick_y;
-        backward = pad1.left_stick_y;
-        right = pad1.left_stick_x;
-        left = -pad1.left_stick_x;
+        // Update movement controls. Currently set so that facing 270 is forward
+        forward = pad1.left_stick_y;
+        backward = -pad1.left_stick_y;
+        right = -pad1.left_stick_x;
+        left = pad1.left_stick_x;
         clockwise = pad1.right_stick_x;
 //        clockwise = pad1.right_stick_y;
 

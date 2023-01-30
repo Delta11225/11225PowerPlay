@@ -141,29 +141,7 @@ public class TeleopFinal extends OpMode {
         // and locks driver control.
         Vector3D robotNormalVec = getRobotNormalVector();
         if (isOverMaxTilt(robotNormalVec) && isBelowUnrecoverableTilt(robotNormalVec)) {
-//            Log.d("TiltCorr", "CORRECTION");
-            double angleDiff = Math.abs(Math.toDegrees(calcTiltAngle(robotNormalVec)) - Constants.maxTiltDegrees);
-            Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
-
-//            double correctionFactor = calcLogisticCorrectionFactor(angleDiff);
-            double correctionFactor = calcExponentialCorrectionFactor(angleDiff);
-            // Correct based on how far off the axis we are
-            responseVec = responseVec.normalize();
-            responseVec = responseVec.scalarMultiply(correctionFactor);
-
-            Log.d("TiltCorr", String.format("Angle diff %f", (angleDiff)));
-            Log.d("TiltCorr", String.format("Correction factor %f", correctionFactor));
-
-            double responseX = responseVec.getX();
-            double responseY = responseVec.getY();
-            telemetry.addData("Response vec x", responseX);
-            telemetry.addData("Response vec y", responseY);
-            telemetry.update();
-
-            Log.d("TiltCorr", String.format("Response vec x %f", responseX));
-            Log.d("TiltCorr", String.format("Response vec y %f", responseY));
-
-            setMotorPower(responseVec);
+            handleTilt(robotNormalVec);
             return;
         }
 
@@ -172,6 +150,7 @@ public class TeleopFinal extends OpMode {
 //        telemetry.addData("CurrentAngle", currentAngle);
 //        telemetry.addData("Theta", theta);
 
+        // FIXME if possible make it so that it works with any orientation
         forward = ControlConfig.forward;
         right = ControlConfig.right;
         clockwise = ControlConfig.clockwise;
@@ -230,6 +209,32 @@ public class TeleopFinal extends OpMode {
         robot.rearRight.setPower(-rearRight * powerMultiplier);
 
 
+    }
+
+    private void handleTilt(Vector3D robotNormalVec) {
+        //            Log.d("TiltCorr", "CORRECTION");
+        double angleDiff = Math.abs(Math.toDegrees(calcTiltAngle(robotNormalVec)) - Constants.maxTiltDegrees);
+        Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
+
+//            double correctionFactor = calcLogisticCorrectionFactor(angleDiff);
+        double correctionFactor = calcExponentialCorrectionFactor(angleDiff);
+        // Correct based on how far off the axis we are
+        responseVec = responseVec.normalize();
+        responseVec = responseVec.scalarMultiply(correctionFactor);
+
+        Log.d("TiltCorr", String.format("Angle diff %f", (angleDiff)));
+        Log.d("TiltCorr", String.format("Correction factor %f", correctionFactor));
+
+        double responseX = responseVec.getX();
+        double responseY = responseVec.getY();
+        telemetry.addData("Response vec x", responseX);
+        telemetry.addData("Response vec y", responseY);
+        telemetry.update();
+
+        Log.d("TiltCorr", String.format("Response vec x %f", responseX));
+        Log.d("TiltCorr", String.format("Response vec y %f", responseY));
+
+        setMotorPower(responseVec);
     }
 
     private double calcExponentialCorrectionFactor(double angleDiff) {
