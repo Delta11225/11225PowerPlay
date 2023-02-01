@@ -25,7 +25,7 @@ public class AutoTestBlueBack extends LinearOpMode {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);
                     robot.leftClaw.setPosition(Constants.leftClawClosed);
                 })
-                .strafeTo(new Vector2d(12.5, 65))
+                .strafeTo(new Vector2d(-12.5, 60))
                 .splineToConstantHeading(new Vector2d(10, 57.1), Math.toRadians(270))
                 .addDisplacementMarker(() -> {
                     robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
