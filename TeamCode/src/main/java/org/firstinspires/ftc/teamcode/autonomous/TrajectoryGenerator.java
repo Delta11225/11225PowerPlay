@@ -209,7 +209,7 @@ public class TrajectoryGenerator {
                             robot.linearSlide.setPower(1);
                         })
                         .back(5)
-
+                        // backing up from cone stack
                         .splineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(180))
                         .addDisplacementMarker(() -> {
                             robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
