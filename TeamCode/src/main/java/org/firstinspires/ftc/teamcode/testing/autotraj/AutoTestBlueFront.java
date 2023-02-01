@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 @Autonomous(preselectTeleOp = "TeleopFinal")
-//@Disabled
+@Disabled
 public class AutoTestBlueFront extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
@@ -24,7 +24,7 @@ public class AutoTestBlueFront extends LinearOpMode {
                                     robot.rightClaw.setPosition(Constants.rightClawClosed);
                                     robot.leftClaw.setPosition(Constants.leftClawClosed);
                 })
-                .strafeTo(new Vector2d(-12.5, 63.875))
+                .strafeTo(new Vector2d(-12.5, 60))
                 .splineToConstantHeading(new Vector2d(-10, 57.1), Math.toRadians(270))
                 .addDisplacementMarker(() -> {
                                     robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
@@ -33,7 +33,7 @@ public class AutoTestBlueFront extends LinearOpMode {
                 })
                 .splineToLinearHeading(new Pose2d(-2, 32, Math.toRadians(300)), Math.toRadians(300))
 
-                .splineToLinearHeading(new Pose2d(-1, 30, Math.toRadians(300)), Math.toRadians(300))
+                .splineToLinearHeading(new Pose2d(-.5, 29.5, Math.toRadians(300)), Math.toRadians(300))
                 .addDisplacementMarker(() -> {
                                     robot.leftClaw.setPosition(Constants.leftClawOpen);
                                     robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -76,13 +76,13 @@ public class AutoTestBlueFront extends LinearOpMode {
 
                 .splineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(180))
                 .addDisplacementMarker(() -> {
-                                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
+                                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
                                     robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                                     robot.linearSlide.setPower(1);
                 })
 
-                .splineToLinearHeading(new Pose2d(-31.5, 8.5, Math.toRadians(60)), Math.toRadians(60))
-                .splineToLinearHeading(new Pose2d(-28.5, 16.5, Math.toRadians(60)), Math.toRadians(60))
+                .splineToLinearHeading(new Pose2d(-29.5, 8.5, Math.toRadians(60)), Math.toRadians(60))
+                .splineToLinearHeading(new Pose2d(-27, 15.5, Math.toRadians(60)), Math.toRadians(60))
                 .forward(1)
                 .addDisplacementMarker(() -> {
                                     robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -93,13 +93,14 @@ public class AutoTestBlueFront extends LinearOpMode {
                 .back(5)
 
                 .addDisplacementMarker(() -> {
-//                                    robot.linearSlide.setTargetPosition(0);
-//                                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                                    robot.linearSlide.setPower(1);
+                                    robot.linearSlide.setTargetPosition(0);
+                                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                                    robot.linearSlide.setPower(1);
                 })
                 .splineToLinearHeading(new Pose2d(-35, 11, Math.toRadians(90)), Math.toRadians(90))
 
 
+                .waitSeconds(2)
                 .build();
 
         waitForStart();

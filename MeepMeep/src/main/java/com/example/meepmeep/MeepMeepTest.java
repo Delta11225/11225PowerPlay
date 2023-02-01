@@ -20,6 +20,7 @@ public class MeepMeepTest {
                 .setConstraints(57.5 * 0.9, 30, 5.398889 * 0.9, Math.toRadians(180), 12.12)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
+
                                 .addDisplacementMarker(() -> {
 //                                    robot.rightClaw.setPosition(Constants.rightClawClosed);
 //                                    robot.leftClaw.setPosition(Constants.leftClawClosed);
@@ -74,14 +75,15 @@ public class MeepMeepTest {
                                 })
                                 .back(5)
 
-                                .splineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(180))
+                                .splineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(0))
                                 .addDisplacementMarker(() -> {
 //                                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
 //                                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                                    robot.linearSlide.setPower(1);
                                 })
 
-                                .splineToLinearHeading(new Pose2d(-31.5, 8.5, Math.toRadians(60)), Math.toRadians(60))
+                                .turn(Math.toRadians(-120))
+
                                 .splineToLinearHeading(new Pose2d(-28.5, 16.5, Math.toRadians(60)), Math.toRadians(60))
                                 .forward(1)
                                 .addDisplacementMarker(() -> {
