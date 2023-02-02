@@ -370,7 +370,13 @@ public class TeleopFinal extends OpMode {
 
         // All these are the same. If we pushed the button to go to a certain location, set the
         // target there and change the mode
-        if (ControlConfig.goToGround && (!isClawClosed || robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderJunctions()[0] - 20)) {
+
+        // Ella safety.
+        // For the ground, we don't want to go to ground if the claw is closed and we are above
+        // the low junction
+        long linearSlidePos = robot.linearSlide.getCurrentPosition();
+        long ellaSafetyThreshold = Constants.getLiftEncoderJunctions()[0] - 20;
+        if (ControlConfig.goToGround && !(isClawClosed && linearSlidePos > ellaSafetyThreshold)) {
             linearSlideMode = LinearSlideMode.GROUD;
             linearSlideTarget = Constants.linearSlideZeroOffset;
         }
