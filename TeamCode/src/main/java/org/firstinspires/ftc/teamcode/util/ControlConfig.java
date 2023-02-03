@@ -25,28 +25,6 @@ public abstract class ControlConfig {
     public static boolean fast = false;
 
     // Peripherals
-    public static boolean collectWheel =false;
-    public static boolean unCollectWheel =false;
-
-    public static boolean liftSlide = false;
-    public static boolean lowerSlide = false;
-    public static boolean runSlideToLowDump = false;
-
-    public static boolean overrideModifier = false;
-
-    public static boolean duckWheelBlue = false;
-    public static boolean duckWheelRed = false;
-
-    public static boolean dumpBucket = false;
-    public static boolean collectBucket = false;
-
-//    public static boolean toggleTseRodServo;
-//    public static boolean toggleTseArmServo;
-    public static boolean raiseTseArm = false;
-    public static boolean lowerTseArm = false;
-    public static boolean initTseArm = false;
-    public static boolean collectTseArm = false;
-
     public static boolean linSlideSlow = false;
 
     public static boolean playMotivSound = false;
