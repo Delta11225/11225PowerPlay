@@ -25,6 +25,9 @@ public abstract class ControlConfig {
     public static boolean fast = false;
 
     // Peripherals
+    public static boolean liftSlide = false;
+    public static boolean lowerSlide = false;
+
     public static boolean linSlideSlow = false;
 
     public static boolean playMotivSound = false;
@@ -38,6 +41,7 @@ public abstract class ControlConfig {
     public static boolean goToHigh = false;
 
     public static boolean resetIMU = false;
+    public static boolean overrideModifier = false;
 
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement controls. Currently set so that facing 270 is forward
