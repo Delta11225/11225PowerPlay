@@ -402,6 +402,7 @@ public class TeleopFinal extends OpMode {
         // If we override and are lifting the slide
         if (ControlConfig.overrideModifier && ControlConfig.liftSlide) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideMode = LinearSlideMode.MANUAL;
                 linearSlideTarget = linearSlide.getCurrentPosition();
             }
 
@@ -414,6 +415,7 @@ public class TeleopFinal extends OpMode {
         // Same as above.
         if (ControlConfig.overrideModifier && ControlConfig.lowerSlide) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideMode = LinearSlideMode.MANUAL;
                 linearSlideTarget = linearSlide.getCurrentPosition();
             }
 
