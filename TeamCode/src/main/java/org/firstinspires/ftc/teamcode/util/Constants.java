@@ -88,5 +88,5 @@ public abstract class Constants {
     public static final double expTotalScale = .06;
     public static final double expAngleScale = .32;
 
-    public static final double autoGrabCooldownSeconds = 1;
+    public static final double autoGrabCooldownSeconds = 2;
 }
