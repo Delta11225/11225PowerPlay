@@ -75,6 +75,8 @@ public class TeleopFinal extends OpMode {
     private boolean isClawClosed = false;
     private Color currentColor;
 
+    private ElapsedTime lastAutoGrab = new ElapsedTime();
+
     @Override
     public void init() {
         resetRuntime();
@@ -260,6 +262,7 @@ public class TeleopFinal extends OpMode {
         gamepad2.toString();
         if (ControlConfig.openClaw) {
             isClawClosed = false;
+            lastAutoGrab.reset();
             robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
             robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
         } else if (ControlConfig.closeClaw) {
@@ -281,6 +284,10 @@ public class TeleopFinal extends OpMode {
     }
 
     private void handleClawAutoGrab() {
+        if (lastAutoGrab.seconds() < Constants.autoGrabCooldownSeconds) {
+            return;
+        }
+
         if (ControlConfig.openClaw) {
             return;
         }
@@ -307,6 +314,7 @@ public class TeleopFinal extends OpMode {
             robot.leftClaw.setPosition(Constants.leftClawClosed);
             gamepad2.rumble(250);
             isClawClosed = true;
+            lastAutoGrab.reset();
         }
     }
 

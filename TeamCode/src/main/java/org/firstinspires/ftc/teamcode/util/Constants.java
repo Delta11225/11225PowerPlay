@@ -87,4 +87,6 @@ public abstract class Constants {
     // expTotalScale is C, expAngleScale is A, in equation y=Ce^Ax, where x is angle diff
     public static final double expTotalScale = .06;
     public static final double expAngleScale = .32;
+
+    public static final double autoGrabCooldownSeconds = 1;
 }
