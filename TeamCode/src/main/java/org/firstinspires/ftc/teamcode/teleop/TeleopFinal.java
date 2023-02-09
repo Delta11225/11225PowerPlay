@@ -284,6 +284,11 @@ public class TeleopFinal extends OpMode {
     }
 
     private void handleClawAutoGrab() {
+        // Prevent autograbbing at end of teleop
+        if (elapsedTime.seconds() >= 115) {
+            return;
+        }
+
         if (lastAutoGrab.seconds() < Constants.autoGrabCooldownSeconds) {
             return;
         }
