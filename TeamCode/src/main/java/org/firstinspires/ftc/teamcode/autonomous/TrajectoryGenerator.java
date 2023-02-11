@@ -210,7 +210,7 @@ public class TrajectoryGenerator {
                         })
                         .back(5)
                         // backing up from cone stack
-                        .splineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(180))
+                        .splineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(0))
                         .addDisplacementMarker(() -> {
                             robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -221,7 +221,7 @@ public class TrajectoryGenerator {
 //                        .turn(Math.toRadians(-120))
 
                         .splineToLinearHeading(new Pose2d(-30.001, 11, Math.toRadians(50)), Math.toRadians(50))
-                        .splineToLinearHeading(new Pose2d(-28, 13.75, Math.toRadians(50)), Math.toRadians(50))
+                        .splineToLinearHeading(new Pose2d(-26, 14, Math.toRadians(50)), Math.toRadians(50))
                         .forward(1)
                         .addDisplacementMarker(() -> {
                             robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -297,8 +297,8 @@ public class TrajectoryGenerator {
                             robot.linearSlide.setPower(1);
                         })
                         .back(5)
-//backing up from cone stack
-                        .splineToLinearHeading(new Pose2d(27.5, 5.5, Math.toRadians(0)), Math.toRadians(0))
+                        //backing up from cone stack
+                        .splineToLinearHeading(new Pose2d(27.5, 5.5, Math.toRadians(0)), Math.toRadians(180))
                         .addDisplacementMarker(() -> {
                             robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
                             robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -339,14 +339,14 @@ public class TrajectoryGenerator {
             case FRONT:
                 switch (trajState.parkPos) {
                     case ONE:
-                        gen.strafeTo(new Vector2d(-6, 11))
+                        gen.strafeTo(new Vector2d(-6, 6))
                                 .waitSeconds(1);
                         break;
                     case TWO:
                         gen.waitSeconds(2);
                         break;
                     case THREE:
-                        gen.strafeTo(new Vector2d(-60, 11))
+                        gen.strafeTo(new Vector2d(-60, 6))
                                 .waitSeconds(1);
                         break;
                 }
@@ -354,7 +354,7 @@ public class TrajectoryGenerator {
             case BACK:
                 switch (trajState.parkPos) {
                     case ONE:
-                        gen.strafeTo(new Vector2d(62, 6))
+                        gen.strafeTo(new Vector2d(60, 6))
                                 .waitSeconds(1);
                         break;
                     case TWO:
