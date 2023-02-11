@@ -119,6 +119,16 @@ public class DetectionPipeline extends OpenCvPipeline {
         // Set these for debugging
         rawColorVals = vals;
 
+        rMat.release();
+        gMat.release();
+        bMat.release();
+
+        hsvMat.release();
+        hMat.release();
+
+        satMat.release();
+        ones.release();
+
         return displayMat;
         // return input;
     }
