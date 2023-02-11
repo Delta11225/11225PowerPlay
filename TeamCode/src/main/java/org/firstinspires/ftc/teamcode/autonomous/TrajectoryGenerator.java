@@ -221,7 +221,7 @@ public class TrajectoryGenerator {
 //                        .turn(Math.toRadians(-120))
 
                         .splineToLinearHeading(new Pose2d(-30.001, 11, Math.toRadians(50)), Math.toRadians(50))
-                        .splineToLinearHeading(new Pose2d(-26, 14, Math.toRadians(50)), Math.toRadians(50))
+                        .splineToLinearHeading(new Pose2d(-26, 13.5, Math.toRadians(50)), Math.toRadians(50))
                         .forward(1)
                         .addDisplacementMarker(() -> {
                             robot.rightClaw.setPosition(Constants.rightClawOpen);
