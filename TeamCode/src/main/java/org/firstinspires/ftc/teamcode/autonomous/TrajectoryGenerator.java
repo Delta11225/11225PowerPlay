@@ -152,178 +152,188 @@ public class TrajectoryGenerator {
         // Do something different depending on start position
         switch (startPos) {
             case FRONT:
-                // Front trajectories
-                Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
-                TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
+                return getFrontTrajectories();
+            case BACK:
+                return getBackTrajectories();
+        }
+        return null;
+    }
+
+    private TrajectorySequenceBuilder getFrontTrajectories() {
+        // Front trajectories
+        Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
+        TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
 //                        .setTurnConstraint(60, 0.5)
-                        .addDisplacementMarker(() -> {
-                            robot.rightClaw.setPosition(Constants.rightClawClosed);
-                            robot.leftClaw.setPosition(Constants.leftClawClosed);
-                        })
-                        .strafeTo(new Vector2d(-12.5, 60))
-                        .splineToConstantHeading(new Vector2d(-10, 57.1), Math.toRadians(270))
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        .splineToLinearHeading(new Pose2d(-2, 32, Math.toRadians(300)), Math.toRadians(300))
+                .addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                })
+                .strafeTo(new Vector2d(-12.5, 60))
+                .splineToConstantHeading(new Vector2d(-10, 57.1), Math.toRadians(270))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                .splineToLinearHeading(new Pose2d(-2, 32, Math.toRadians(300)), Math.toRadians(300))
 
-                        .splineToLinearHeading(new Pose2d(-.5, 29.5, Math.toRadians(300)), Math.toRadians(300))
-                        .addDisplacementMarker(() -> {
-                            robot.leftClaw.setPosition(Constants.leftClawOpen);
-                            robot.rightClaw.setPosition(Constants.rightClawOpen);
-                        })
-                        .waitSeconds(0.25)
-                        // Back up
-                        .splineToLinearHeading(new Pose2d(-6, 36, Math.toRadians(300)), Math.toRadians(300))
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(0);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        // square up
-                        .splineToLinearHeading(new Pose2d(-10, 30, Math.toRadians(270)), Math.toRadians(270))
+                .splineToLinearHeading(new Pose2d(-.5, 29.5, Math.toRadians(300)), Math.toRadians(300))
+                .addDisplacementMarker(() -> {
+                    robot.leftClaw.setPosition(Constants.leftClawOpen);
+                    robot.rightClaw.setPosition(Constants.rightClawOpen);
+                })
+                .waitSeconds(0.25)
+                // Back up
+                .splineToLinearHeading(new Pose2d(-6, 36, Math.toRadians(300)), Math.toRadians(300))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(0);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                // square up
+                .splineToLinearHeading(new Pose2d(-10, 30, Math.toRadians(270)), Math.toRadians(270))
 
-                        // Go to turn
-                        .splineToLinearHeading(new Pose2d(-12, 11, Math.toRadians(180)), Math.toRadians(180))
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderConeStack()[0]);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        // Approach cone stack
-                        .splineToConstantHeading(new Vector2d(-56.7, 9.5), Math.toRadians(180))
-                        .waitSeconds(0.25)
+                // Go to turn
+                .splineToLinearHeading(new Pose2d(-12, 11, Math.toRadians(180)), Math.toRadians(180))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderConeStack()[0]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                // Approach cone stack
+                .splineToConstantHeading(new Vector2d(-56.7, 9.5), Math.toRadians(180))
+                .waitSeconds(0.25)
 
-                        .addDisplacementMarker(() -> {
-                            robot.rightClaw.setPosition(Constants.rightClawClosed);
-                            robot.leftClaw.setPosition(Constants.leftClawClosed);
-                        })
-                        // Do not ever do this. This is a hack.
-                        .forward(0.001)
-                        .waitSeconds(0.25)
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        .back(5)
-                        // backing up from cone stack
-                        .splineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(0))
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
+                .addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                })
+                // Do not ever do this. This is a hack.
+                .forward(0.001)
+                .waitSeconds(0.25)
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                .back(5)
+                // backing up from cone stack
+                .splineToLinearHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(0))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
 
 //                        .setTurnConstraint(60, 2)
 //                        .turn(Math.toRadians(-120))
 
-                        .splineToLinearHeading(new Pose2d(-30.001, 11, Math.toRadians(50)), Math.toRadians(50))
-                        .splineToLinearHeading(new Pose2d(-26, 13.5, Math.toRadians(50)), Math.toRadians(50))
-                        .forward(1)
-                        .addDisplacementMarker(() -> {
-                            robot.rightClaw.setPosition(Constants.rightClawOpen);
-                            robot.leftClaw.setPosition(Constants.leftClawOpen);
-                        })
-                        .waitSeconds(0.25)
+                .splineToLinearHeading(new Pose2d(-30.001, 11, Math.toRadians(50)), Math.toRadians(50))
+                .splineToLinearHeading(new Pose2d(-26, 13.5, Math.toRadians(50)), Math.toRadians(50))
+                .forward(1)
+                .addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawOpen);
+                    robot.leftClaw.setPosition(Constants.leftClawOpen);
+                })
+                .waitSeconds(0.25)
 
-                        .back(5)
+                .back(5)
 
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(0);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        .splineToLinearHeading(new Pose2d(-35, 11, Math.toRadians(90)), Math.toRadians(90));
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(0);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                .splineToLinearHeading(new Pose2d(-35, 11, Math.toRadians(90)), Math.toRadians(90));
 
-                return gen;
-            case BACK:
-                startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
-                gen = robot.drive.trajectorySequenceBuilder(startPose)
-                        .addDisplacementMarker(() -> {
-                            robot.rightClaw.setPosition(Constants.rightClawClosed);
-                            robot.leftClaw.setPosition(Constants.leftClawClosed);
-                        })
-                        .strafeTo(new Vector2d(12.5, 60))
-                        .splineToConstantHeading(new Vector2d(10, 57.1), Math.toRadians(270))
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        .splineToLinearHeading(new Pose2d(1, 32, Math.toRadians(240)), Math.toRadians(240))
+        return gen;
+    }
 
-                        .splineToLinearHeading(new Pose2d(0, 30.5, Math.toRadians(240)), Math.toRadians(240))
-                        .addDisplacementMarker(() -> {
-                            robot.leftClaw.setPosition(Constants.leftClawOpen);
-                            robot.rightClaw.setPosition(Constants.rightClawOpen);
-                        })
-                        .waitSeconds(0.25)
+    private TrajectorySequenceBuilder getBackTrajectories() {
+        TrajectorySequenceBuilder gen;
+        Pose2d startPose;
+        startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
+        gen = robot.drive.trajectorySequenceBuilder(startPose)
+                .addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                })
+                .strafeTo(new Vector2d(12.5, 60))
+                .splineToConstantHeading(new Vector2d(10, 57.1), Math.toRadians(270))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[2]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                .splineToLinearHeading(new Pose2d(1, 32, Math.toRadians(240)), Math.toRadians(240))
 
-                        // Back up
-                        .splineToLinearHeading(new Pose2d(6, 36, Math.toRadians(240)), Math.toRadians(240))
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(0);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
+                .splineToLinearHeading(new Pose2d(0, 30.5, Math.toRadians(240)), Math.toRadians(240))
+                .addDisplacementMarker(() -> {
+                    robot.leftClaw.setPosition(Constants.leftClawOpen);
+                    robot.rightClaw.setPosition(Constants.rightClawOpen);
+                })
+                .waitSeconds(0.25)
 
-                        // square up
-                        .splineToLinearHeading(new Pose2d(10, 30, Math.toRadians(270)), Math.toRadians(270))
+                // Back up
+                .splineToLinearHeading(new Pose2d(6, 36, Math.toRadians(240)), Math.toRadians(240))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(0);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
 
-                        // Go to turn
-                        .splineToLinearHeading(new Pose2d(11.5, 8.5, Math.toRadians(0)), Math.toRadians(0))
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderConeStack()[0]);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        //approach cone stack
-                        .splineToConstantHeading(new Vector2d(56, 8), Math.toRadians(0))
-                        .waitSeconds(0.25)
+                // square up
+                .splineToLinearHeading(new Pose2d(10, 30, Math.toRadians(270)), Math.toRadians(270))
 
-                        .addDisplacementMarker(() -> {
-                            robot.rightClaw.setPosition(Constants.rightClawClosed);
-                            robot.leftClaw.setPosition(Constants.leftClawClosed);
-                        })
-                        // Do not ever do this. This is a hack.
-                        .forward(0.001)
-                        .waitSeconds(0.25)
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        .back(5)
-                        //backing up from cone stack
-                        .splineToLinearHeading(new Pose2d(27.5, 5.5, Math.toRadians(0)), Math.toRadians(180))
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
+                // Go to turn
+                .splineToLinearHeading(new Pose2d(11.5, 8.5, Math.toRadians(0)), Math.toRadians(0))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderConeStack()[0]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                //approach cone stack
+                .splineToConstantHeading(new Vector2d(56, 8), Math.toRadians(0))
+                .waitSeconds(0.25)
 
-                        .splineToLinearHeading(new Pose2d(27.5, 9, Math.toRadians(120)), Math.toRadians(210))
+                .addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                })
+                // Do not ever do this. This is a hack.
+                .forward(0.001)
+                .waitSeconds(0.25)
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                .back(5)
+                //backing up from cone stack
+                .splineToLinearHeading(new Pose2d(27.5, 5.5, Math.toRadians(0)), Math.toRadians(180))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
 
-                        .splineToLinearHeading(new Pose2d(26.5, 12.5, Math.toRadians(120)), Math.toRadians(120))
-                        .addDisplacementMarker(() -> {
-                            robot.rightClaw.setPosition(Constants.rightClawOpen);
-                            robot.leftClaw.setPosition(Constants.leftClawOpen);
-                        })
-                        .waitSeconds(0.25)
-                        .back(5)
+                .splineToLinearHeading(new Pose2d(27.5, 9, Math.toRadians(120)), Math.toRadians(210))
 
-                        .addDisplacementMarker(() -> {
-                            robot.linearSlide.setTargetPosition(0);
-                            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            robot.linearSlide.setPower(1);
-                        })
-                        .splineToLinearHeading(new Pose2d(35, 6, Math.toRadians(90)), Math.toRadians(90));
-                return gen;
-        }
-        return null;
+                .splineToLinearHeading(new Pose2d(26.5, 12.5, Math.toRadians(120)), Math.toRadians(120))
+                .addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawOpen);
+                    robot.leftClaw.setPosition(Constants.leftClawOpen);
+                })
+                .waitSeconds(0.25)
+                .back(5)
+
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(0);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                .splineToLinearHeading(new Pose2d(35, 6, Math.toRadians(90)), Math.toRadians(90));
+        return gen;
     }
 
     /**
