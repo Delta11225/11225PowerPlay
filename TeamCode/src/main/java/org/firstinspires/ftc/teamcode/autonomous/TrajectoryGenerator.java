@@ -201,7 +201,7 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setPower(1);
                 })
                 // Approach cone stack
-                .splineToConstantHeading(new Vector2d(-56, 8), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-56.5, 8), Math.toRadians(180))
                 .waitSeconds(0.25)
 
                 .addDisplacementMarker(() -> {
@@ -228,8 +228,8 @@ public class TrajectoryGenerator {
 //                        .setTurnConstraint(60, 2)
 //                        .turn(Math.toRadians(-120))
 
-                .splineToLinearHeading(new Pose2d(-30.001, 11, Math.toRadians(50)), Math.toRadians(50))
-                .splineToLinearHeading(new Pose2d(-25, 12.5, Math.toRadians(50)), Math.toRadians(50))
+                .splineToLinearHeading(new Pose2d(-32, 11, Math.toRadians(50)), Math.toRadians(50))
+                .splineToLinearHeading(new Pose2d(-27.25, 13.25, Math.toRadians(50)), Math.toRadians(50))
                 .forward(1)
                 .addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -349,14 +349,14 @@ public class TrajectoryGenerator {
             case FRONT:
                 switch (trajState.parkPos) {
                     case ONE:
-                        gen.strafeTo(new Vector2d(-6, 6))
+                        gen.strafeTo(new Vector2d(-6, 7))
                                 .waitSeconds(1);
                         break;
                     case TWO:
                         gen.waitSeconds(2);
                         break;
                     case THREE:
-                        gen.strafeTo(new Vector2d(-60, 6))
+                        gen.strafeTo(new Vector2d(-60, 7))
                                 .waitSeconds(1);
                         break;
                 }
@@ -364,14 +364,14 @@ public class TrajectoryGenerator {
             case BACK:
                 switch (trajState.parkPos) {
                     case ONE:
-                        gen.strafeTo(new Vector2d(60, 6))
+                        gen.strafeTo(new Vector2d(60, 7))
                                 .waitSeconds(1);
                         break;
                     case TWO:
                         gen.waitSeconds(2);
                         break;
                     case THREE:
-                        gen.strafeTo(new Vector2d(6, 6))
+                        gen.strafeTo(new Vector2d(6, 7))
                                 .waitSeconds(1);
                         break;
                 }
