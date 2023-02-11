@@ -177,7 +177,7 @@ public class TrajectoryGenerator {
                 })
                 .splineToLinearHeading(new Pose2d(-2, 32, Math.toRadians(300)), Math.toRadians(300))
 
-                .splineToLinearHeading(new Pose2d(-.5, 29.5, Math.toRadians(300)), Math.toRadians(300))
+                .splineToLinearHeading(new Pose2d(-.5, 30, Math.toRadians(300)), Math.toRadians(300))
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -201,7 +201,7 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setPower(1);
                 })
                 // Approach cone stack
-                .splineToConstantHeading(new Vector2d(-56.7, 9.5), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-56, 8), Math.toRadians(180))
                 .waitSeconds(0.25)
 
                 .addDisplacementMarker(() -> {
@@ -229,7 +229,7 @@ public class TrajectoryGenerator {
 //                        .turn(Math.toRadians(-120))
 
                 .splineToLinearHeading(new Pose2d(-30.001, 11, Math.toRadians(50)), Math.toRadians(50))
-                .splineToLinearHeading(new Pose2d(-26, 13.5, Math.toRadians(50)), Math.toRadians(50))
+                .splineToLinearHeading(new Pose2d(-25, 12.5, Math.toRadians(50)), Math.toRadians(50))
                 .forward(1)
                 .addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
