@@ -17,9 +17,12 @@ import com.sun.tools.javac.code.SymbolMetadata;
 
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
+import org.firstinspires.ftc.teamcode.util.SizedStack;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+// NVM, i am working on something that might work maybe
 
 // IMPORTANT this has been declared as currently impossible with a string-fed linear slide.
 // The intention of this class was to track the motor's power draw to see if we could detect
@@ -27,14 +30,16 @@ import java.lang.reflect.Method;
 // it is very difficult to detect whether the current spike is due to the slide being stuck
 // or to the slide changing direction. There is probably a way to do it, but I don't care and it
 // probably doesn't matter right now. I will wait until we get a belt-fed slide.
-@Deprecated
+//@Deprecated
 @TeleOp
-@Disabled
+//@Disabled
 public class TrackMotorPowerDraw extends LinearOpMode {
     private int holdPosition;
     LynxModuleIntf expansionHub;
     double maxPowerDraw = 0;
     private ElapsedTime slideCooldown = new ElapsedTime();
+    private SizedStack<Integer> lastControls = new SizedStack<>(50);
+    private SizedStack<Double> lastPowerVals = new SizedStack<>(50);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -65,33 +70,50 @@ public class TrackMotorPowerDraw extends LinearOpMode {
         while (opModeIsActive()) {
             DcMotor linearSlide = robot.linearSlide;
             if (slideCooldown.seconds() < 2) {
+                lastControls.push(0);
+                lastPowerVals.push(0d);
                 linearSlide.setPower(0);
                 continue;
             }
             /////////////////////////////LINEAR SLIDE//////////////////////////////
             if (gamepad1.dpad_up && linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax()) {
+                lastControls.push(1);
                 linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 linearSlide.setPower(0.5);
             } else if (gamepad1.dpad_down && linearSlide.getCurrentPosition() > 0) {
+                lastControls.push(-1);
                 linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 linearSlide.setPower(-0.5);
             } else {
+                lastControls.push(0);
                 linearSlide.setPower(0);
             }
             double powerDraw = getExpansionHubMotorCurrentDraw(3);
-            if (powerDraw > 0.01) {
-                telemetry.addData("Motor current draw", powerDraw);
-                Log.d("Power", String.valueOf(powerDraw));
-                telemetry.update();
+            lastPowerVals.push(powerDraw);
+            telemetry.addData("Motor current draw", powerDraw);
+            Log.d("Power", String.valueOf(powerDraw));
 
-                if (powerDraw > maxPowerDraw) {
-                    maxPowerDraw = powerDraw;
-                }
-                if (powerDraw >= 1700) {
-                    slideCooldown.reset();
-                }
-                Log.d("PowerMax", String.valueOf(maxPowerDraw));
+            if (powerDraw > maxPowerDraw) {
+                maxPowerDraw = powerDraw;
             }
+
+            double avg = lastPowerVals.stream()
+                    .mapToDouble(Double::valueOf)
+                    .average()
+                    .orElse(0);
+
+            double controlAvg = lastControls.stream()
+                    .mapToInt(Integer::valueOf)
+                    .average()
+                    .orElse(0);
+            telemetry.addData("Power avg", avg);
+            telemetry.addData("Control avg", controlAvg);
+            if (avg >= 1700 && (controlAvg == -1 || controlAvg == 1)) {
+                slideCooldown.reset();
+            }
+            Log.d("PowerMax", String.valueOf(maxPowerDraw));
+            telemetry.update();
+
         }
     }
 
