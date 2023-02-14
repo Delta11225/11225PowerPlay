@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.sun.tools.javac.code.SymbolMetadata;
 
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
@@ -19,11 +21,20 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+// IMPORTANT this has been declared as currently impossible with a string-fed linear slide.
+// The intention of this class was to track the motor's power draw to see if we could detect
+// when it was stuck, but since current spikes when the linear slide suddenly changes direction
+// it is very difficult to detect whether the current spike is due to the slide being stuck
+// or to the slide changing direction. There is probably a way to do it, but I don't care and it
+// probably doesn't matter right now. I will wait until we get a belt-fed slide.
+@Deprecated
 @TeleOp
 @Disabled
 public class TrackMotorPowerDraw extends LinearOpMode {
     private int holdPosition;
     LynxModuleIntf expansionHub;
+    double maxPowerDraw = 0;
+    private ElapsedTime slideCooldown = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -53,6 +64,10 @@ public class TrackMotorPowerDraw extends LinearOpMode {
 
         while (opModeIsActive()) {
             DcMotor linearSlide = robot.linearSlide;
+            if (slideCooldown.seconds() < 2) {
+                linearSlide.setPower(0);
+                continue;
+            }
             /////////////////////////////LINEAR SLIDE//////////////////////////////
             if (gamepad1.dpad_up && linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax()) {
                 linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -65,9 +80,17 @@ public class TrackMotorPowerDraw extends LinearOpMode {
             }
             double powerDraw = getExpansionHubMotorCurrentDraw(3);
             if (powerDraw > 0.01) {
-                telemetry.addData("Motor current draw", getExpansionHubMotorCurrentDraw(3));
-                Log.d("Power", String.valueOf(getExpansionHubMotorCurrentDraw(3)));
+                telemetry.addData("Motor current draw", powerDraw);
+                Log.d("Power", String.valueOf(powerDraw));
                 telemetry.update();
+
+                if (powerDraw > maxPowerDraw) {
+                    maxPowerDraw = powerDraw;
+                }
+                if (powerDraw >= 1700) {
+                    slideCooldown.reset();
+                }
+                Log.d("PowerMax", String.valueOf(maxPowerDraw));
             }
         }
     }
