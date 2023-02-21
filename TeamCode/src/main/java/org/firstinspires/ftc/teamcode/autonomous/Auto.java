@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -17,6 +19,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
+
+import java.util.Vector;
 
 @Autonomous(preselectTeleOp = "TeleopFinal")
 public class Auto extends LinearOpMode {
@@ -41,6 +45,8 @@ public class Auto extends LinearOpMode {
         Constants.matchState = autoState;
         long delay = autoState.delay;
 
+        Vector2d startOffset = getUserOffset();
+
         telemetry.addLine("Building trajectories...");
         telemetry.update();
         TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, autoState, telemetry);
@@ -59,6 +65,7 @@ public class Auto extends LinearOpMode {
             telemetry.addData("Color", autoState.color);
             telemetry.addData("Start pos", autoState.position);
             telemetry.addData("Delay", delay);
+            telemetry.addData("Offset", startOffset);
             telemetry.addData("Camera detection", pipeline.getLastPos());
             telemetry.update();
         }
@@ -102,6 +109,38 @@ public class Auto extends LinearOpMode {
         }
 
         Constants.currentPose = robot.drive.getPoseEstimate();
+    }
+
+    private Vector2d getUserOffset() {
+        // To make the user press and unpress the button, as otherwise increases really fast
+        boolean buttonUnpressed = true;
+        Vector2d offset = new Vector2d(0, 0);
+
+        while (!isStopRequested()) {
+            gamepad2.toString();
+            telemetry.addData("Start offset? use dpad. Circle done", offset.toString());
+            telemetry.update();
+            if (gamepad2.dpad_up && buttonUnpressed) {
+                offset = new Vector2d(offset.getX(), offset.getY() - 0.1);
+                buttonUnpressed = false;
+            } else if (gamepad2.dpad_down && buttonUnpressed) {
+                offset = new Vector2d(offset.getX(), offset.getY() + 0.1);
+                buttonUnpressed = false;
+            } else if (gamepad2.dpad_left) {
+                offset = new Vector2d(offset.getX() + 0.1, offset.getY());
+                buttonUnpressed = false;
+            } else if (gamepad2.dpad_right) {
+                offset = new Vector2d(offset.getX() - 0.1, offset.getY());
+                buttonUnpressed = false;
+            } else if (gamepad2.circle) {
+                break;
+            } else if (!gamepad2.right_bumper && !gamepad2.left_bumper) {
+                buttonUnpressed = true;
+            }
+        }
+        telemetry.addLine("Offset confirmed");
+        telemetry.update();
+        return offset;
     }
 
     private OpenCvCamera initCamera(OpenCvPipeline pipeline) {
