@@ -22,6 +22,9 @@ import org.firstinspires.ftc.teamcode.util.SizedStack;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+
+// 2/21 Honestly this will be obsoleted by belt fed linear slide so idk why im doing this
+
 // NVM, i am working on something that might work maybe
 
 // IMPORTANT this has been declared as currently impossible with a string-fed linear slide.
@@ -30,9 +33,9 @@ import java.lang.reflect.Method;
 // it is very difficult to detect whether the current spike is due to the slide being stuck
 // or to the slide changing direction. There is probably a way to do it, but I don't care and it
 // probably doesn't matter right now. I will wait until we get a belt-fed slide.
-//@Deprecated
+@Deprecated
 @TeleOp
-//@Disabled
+@Disabled
 public class TrackMotorPowerDraw extends LinearOpMode {
     private int holdPosition;
     LynxModuleIntf expansionHub;
