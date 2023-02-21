@@ -29,13 +29,6 @@ public class Auto extends LinearOpMode {
 //        telemetry.setAutoClear(true);
         Hardware23 robot = new Hardware23(hardwareMap);
 
-        // Do this here, as it takes a while
-        telemetry.addLine("Building trajectories...");
-        telemetry.update();
-        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, telemetry);
-        telemetry.addData("Built! Time taken (s)", getRuntime());
-        telemetry.update();
-
         // Init the camera. Save pipeline, as we need it later
         DetectionPipeline pipeline = new DetectionPipeline();
         OpenCvCamera webcam = initCamera(pipeline);
@@ -47,6 +40,12 @@ public class Auto extends LinearOpMode {
         AutoState autoState = getUserInput();
         Constants.matchState = autoState;
         long delay = autoState.delay;
+
+        telemetry.addLine("Building trajectories...");
+        telemetry.update();
+        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, autoState, telemetry);
+        telemetry.addData("Built! Time taken (s)", getRuntime());
+        telemetry.update();
 
         // Ask the driver if they missed anything
         confirmAutoGood();

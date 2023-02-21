@@ -4,11 +4,8 @@ import android.util.Log;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
-import com.google.gson.annotations.Since;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -17,8 +14,6 @@ import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 import java.util.HashMap;
-
-import androidx.annotation.NonNull;
 
 public class TrajectoryGenerator {
     // Various useful variables
@@ -48,6 +43,65 @@ public class TrajectoryGenerator {
 
         // Self explanatory. Populates trajectories variable
         this.trajectories = generateAllTrajectories();
+    }
+
+    /**
+     * Same as general constructor, but only generates trajectories for autoState
+     * @param robot
+     * @param autoState The trajectories to generate
+     * @param telemetry
+     */
+    public TrajectoryGenerator(Hardware23 robot, AutoState autoState, Telemetry telemetry) {
+        this.robot = robot;
+        this.drive = robot.drive;
+        this.telemetry = telemetry;
+
+        // Self explanatory. Populates trajectories variable
+        this.trajectories = generateSpecificTrajectories(autoState);
+    }
+
+    private HashMap<TrajectoryState, TrajectorySequence[]> generateSpecificTrajectories(AutoState autoState) {
+        HashMap<TrajectoryState, TrajectorySequence[]> trajMap = new HashMap<>();
+
+        StartPosition startPos;
+        // Invert start position if color is red
+        if (autoState.color == Color.RED) {
+            startPos = autoState.position == StartPosition.FRONT ? StartPosition.BACK : StartPosition.FRONT;
+        } else {
+            startPos = autoState.position;
+        }
+
+        // Log to the console to tell user what we are working on
+        Log.d("TrajectoryGenerator", String.format("Generating start traj - %s", startPos));
+        telemetry.addLine(String.format("Generating start traj - %s", startPos));
+        telemetry.update();
+
+        // Since the first part of each trajectory (the stuff before parking) is the same,
+        // we generate it separately and don't build to avoid wasting a lot of time.
+        TrajectorySequence posColorTraj = prepareBlueStartTrajectories(startPos).build();
+
+        // Loop through each parking position
+        for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
+            // Have to make this generator here or we do all parking trajectories no matter what
+            TrajectorySequenceBuilder parkingGen = drive.trajectorySequenceBuilder(posColorTraj.end());
+            // Once again, make sure to log
+            Log.d("TrajectoryGenerator", String.format("Generating parking traj - %s %s", startPos, parkPos));
+            telemetry.addLine(String.format("Generating parking traj - %s %s", startPos, parkPos));
+            telemetry.update();
+
+            // Construct this to pass into parking trajectories method
+            TrajectoryState trajState = new TrajectoryState(Color.BLUE, startPos, parkPos);
+
+            // Append the parking trajectories onto the start trajectories and build
+            TrajectorySequenceBuilder preparedTraj = prepareBlueParkingTrajectories(parkingGen, trajState);
+            TrajectorySequence parkingTraj = preparedTraj.build();
+//                    TrajectorySequence traj = genTrajectory(trajState);
+
+            // Put finished trajectory sequence into hashmap
+            trajMap.put(trajState, new TrajectorySequence[]{posColorTraj, parkingTraj});
+//                    Log.d("TrajectoryGenerator", "Traj gen finished");
+        }
+        return trajMap;
     }
 
     /**
