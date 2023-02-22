@@ -20,14 +20,15 @@ public class TrajectoryGenerator {
     private final Hardware23 robot;
     private final SampleMecanumDrive drive;
     private final Telemetry telemetry;
+    private Vector2d offset = new Vector2d(0, 0);
 
-    /**
-     * Stores mapping between Auto State (color, start pos, park pos) and traj sequence to run.
-     * Stores an array of start trajectory and parking trajectory for efficiency reasons. It is inefficient to
-     * regenerate start traj for each parking position, but we can't use the same start traj for each parking
-     * trajectory because there is no good way to copy a TrajectorySequenceBuilder. As a result, we generate start
-     * and parking trajectories separately, and store them in an array in this dictionary. It's annoying, but it's what
-     * we gotta do.
+    /*
+      Stores mapping between Auto State (color, start pos, park pos) and traj sequence to run.
+      Stores an array of start trajectory and parking trajectory for efficiency reasons. It is inefficient to
+      regenerate start traj for each parking position, but we can't use the same start traj for each parking
+      trajectory because there is no good way to copy a TrajectorySequenceBuilder. As a result, we generate start
+      and parking trajectories separately, and store them in an array in this dictionary. It's annoying, but it's what
+      we gotta do.
      */
     private HashMap<TrajectoryState, TrajectorySequence[]> trajectories;
 
@@ -36,6 +37,7 @@ public class TrajectoryGenerator {
      * @param robot The hardware file corresponding to the robot we are using
      * @param telemetry The telemetry object to direct telem calls to
      */
+    @Deprecated
     public TrajectoryGenerator(Hardware23 robot, Telemetry telemetry) {
         this.robot = robot;
         this.drive = robot.drive;
@@ -46,15 +48,17 @@ public class TrajectoryGenerator {
     }
 
     /**
-     * Same as general constructor, but only generates trajectories for autoState
-     * @param robot
+     * Contructor. Calls a method to generate only appropriate trajectories for current auto state
+     * @param robot The hardware file for the robot
      * @param autoState The trajectories to generate
-     * @param telemetry
+     * @param offset The start offset
+     * @param telemetry The telemetry object
      */
-    public TrajectoryGenerator(Hardware23 robot, AutoState autoState, Telemetry telemetry) {
+    public TrajectoryGenerator(Hardware23 robot, AutoState autoState, Vector2d offset, Telemetry telemetry) {
         this.robot = robot;
         this.drive = robot.drive;
         this.telemetry = telemetry;
+        this.offset = offset;
 
         // Self explanatory. Populates trajectories variable
         this.trajectories = generateSpecificTrajectories(autoState);
@@ -149,6 +153,7 @@ public class TrajectoryGenerator {
      * Loops through all possible auto states and parking methods and generates appropriate trajectories.
      * @return A hashmap with the TrajState as the key and the TrajSequence as the value
      */
+    @Deprecated
     private HashMap<TrajectoryState, TrajectorySequence[]> generateAllTrajectories() {
         HashMap<TrajectoryState, TrajectorySequence[]> trajMap = new HashMap<>();
 
@@ -216,6 +221,9 @@ public class TrajectoryGenerator {
     private TrajectorySequenceBuilder getFrontTrajectories() {
         // Front trajectories
         Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
+        // To handle offsetting
+        startPose.plus(new Pose2d(offset.getX(), offset.getY()));
+
         TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
 //                        .setTurnConstraint(60, 0.5)
                 .addDisplacementMarker(() -> {
@@ -305,8 +313,9 @@ public class TrajectoryGenerator {
 
     private TrajectorySequenceBuilder getBackTrajectories() {
         TrajectorySequenceBuilder gen;
-        Pose2d startPose;
-        startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
+        Pose2d startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
+        startPose.plus(new Pose2d(offset.getX(), offset.getY()));
+
         gen = robot.drive.trajectorySequenceBuilder(startPose)
                 .addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);

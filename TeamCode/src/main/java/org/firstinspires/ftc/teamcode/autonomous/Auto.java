@@ -45,11 +45,11 @@ public class Auto extends LinearOpMode {
         Constants.matchState = autoState;
         long delay = autoState.delay;
 
-        Vector2d startOffset = getUserOffset();
+        Vector2d startOffset = getUserOffset(autoState);
 
         telemetry.addLine("Building trajectories...");
         telemetry.update();
-        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, autoState, telemetry);
+        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, autoState, startOffset, telemetry);
         telemetry.addData("Built! Time taken (s)", getRuntime());
         telemetry.update();
 
@@ -111,30 +111,36 @@ public class Auto extends LinearOpMode {
         Constants.currentPose = robot.drive.getPoseEstimate();
     }
 
-    private Vector2d getUserOffset() {
-        // To make the user press and unpress the button, as otherwise increases really fast
+    private Vector2d getUserOffset(AutoState autoState) {
         boolean buttonUnpressed = true;
         Vector2d offset = new Vector2d(0, 0);
+
+        // Basically, ask the user for an offset and add it properly. Make sure to keep user orientation in mind.
+        double modifier = 0.1;
+        if (autoState.color == Color.RED) {
+            modifier *= -1;
+        }
 
         while (!isStopRequested()) {
             gamepad2.toString();
             telemetry.addData("Start offset? use dpad. Circle done", offset.toString());
             telemetry.update();
+
             if (gamepad2.dpad_up && buttonUnpressed) {
-                offset = new Vector2d(offset.getX(), offset.getY() - 0.1);
+                offset = new Vector2d(offset.getX(), offset.getY() + modifier);
                 buttonUnpressed = false;
             } else if (gamepad2.dpad_down && buttonUnpressed) {
-                offset = new Vector2d(offset.getX(), offset.getY() + 0.1);
+                offset = new Vector2d(offset.getX(), offset.getY() - modifier);
                 buttonUnpressed = false;
             } else if (gamepad2.dpad_left) {
-                offset = new Vector2d(offset.getX() + 0.1, offset.getY());
+                offset = new Vector2d(offset.getX() - modifier, offset.getY());
                 buttonUnpressed = false;
             } else if (gamepad2.dpad_right) {
-                offset = new Vector2d(offset.getX() - 0.1, offset.getY());
+                offset = new Vector2d(offset.getX() + modifier, offset.getY());
                 buttonUnpressed = false;
             } else if (gamepad2.circle) {
                 break;
-            } else if (!gamepad2.right_bumper && !gamepad2.left_bumper) {
+            } else if (!(gamepad2.dpad_down || gamepad2.dpad_up || gamepad2.dpad_left || gamepad2.dpad_right)) {
                 buttonUnpressed = true;
             }
         }
