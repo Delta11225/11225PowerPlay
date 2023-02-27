@@ -53,61 +53,54 @@ public class TeleopFinal extends OpMode {
     double right;
     double clockwise;
     double powerMultiplier = 1;
-    double deadZone = Math.abs(0.2);
 
     double temp;
     double side;
     double currentAngle;
 
-    boolean motivated = false;
-    boolean hasRumbled = false;
-    boolean didRumble1 = false;
-
-    double offset = 0;
-    int holdPosition;
-    ElapsedTime elapsedTime = new ElapsedTime();
-    private final ElapsedTime runtime = new ElapsedTime();
-//    private boolean runningToPos = false;
+    private final ElapsedTime elapsedTime = new ElapsedTime();
     private LinearSlideMode linearSlideMode = LinearSlideMode.MANUAL;
     private int linearSlideTarget = 0;
-    private boolean areInittingIMU = false;
 
     private boolean isClawClosed = false;
     private Color currentColor;
 
-    private ElapsedTime lastAutoGrab = new ElapsedTime();
+    private final ElapsedTime lastAutoGrab = new ElapsedTime();
 
     @Override
     public void init() {
         resetRuntime();
-
-//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        Constants.linearSlideZeroOffset = 0;
-        currentColor = Constants.matchState.color;
-
-        initIMU();
-        areInittingIMU = false;
-        telemetry.addData("IMU init time", getRuntime());
-        telemetry.update();
-
-        resetRuntime();
         robot = new Hardware23(hardwareMap);
 
+        // Reset linear slide offset, as we reinit the linear slide
+        Constants.linearSlideZeroOffset = 0;
+
+        initIMU();
+        telemetry.addData("Hardware init time", getRuntime());
+        telemetry.update();
+
+        // Get color of match as we need it for auto grab
+        currentColor = Constants.matchState.color;
+
+        // Stop all motors just in case
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
         robot.rearLeft.setPower(0);
         robot.rearRight.setPower(0);
 
+        // Set appropriate motor directions
         robot.frontLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.frontRight.setDirection(DcMotor.Direction.REVERSE);
         robot.rearLeft.setDirection(DcMotor.Direction.REVERSE);
         robot.rearRight.setDirection(DcMotor.Direction.REVERSE);
 
+        // Initalize linear slide
         robot.linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        // Need to set target position before we set run to position mode
         robot.linearSlide.setTargetPosition(linearSlideTarget);
         robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        telemetry.addData("Robot HWMap init time", getRuntime());
+        telemetry.addLine("Init complete, ready to run");
         telemetry.update();
     }
 
@@ -314,20 +307,32 @@ public class TeleopFinal extends OpMode {
         }
     }
 
+    /**
+     * Initialize IMU with proper parameters
+     */
     private void initIMU() {
-        areInittingIMU = true;
+        // IDK I copied this stuff from last year here's my best guess
+
+        // Create IMU parameters object
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        // Set appropriate units for IMU reporting. We want to report in degrees as default as it is easier
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+
+        // Black magic
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+
+        // Make sure to log stuff from IMU and set logging tag so we know it is from the IMU
         parameters.loggingEnabled = true;
         parameters.loggingTag = "IMU";
+        // Which black magic algorithm to use
+        // This one seems to just log acceleration and nothing else
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
+        // Actually get the IMU and initalize it
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-
-        composeTelemetry();
     }
 
     private void linearSlideMoveWithOverride() {
@@ -433,14 +438,14 @@ public class TeleopFinal extends OpMode {
         robot.linearSlide.setTargetPosition(linearSlideTarget);
         // We shouldn't need to do this, but just in case
         robot.linearSlide.setPower(Constants.liftPosRunPower);
-        telemetry.addData("Linear Slide set pos", linearSlideTarget);
+        telemetry.addData("Linear Slide target pos", linearSlideTarget);
 //        Log.d("LinearSlide", String.valueOf(linearSlideTarget));
         telemetry.update();
     }
 
     private void setMotorPower(Vector2D responseVec) {
-        // For some reason, as it is now, this causes spinning when correcting, but I am too lazy
-        // to fix. It's not a bug, it's a feature, I guess.
+        // For some reason, as it is now, this causes  the robot to spin when correcting,
+        // but I am too lazy to try to fix. It's not a bug, it's a feature, I guess.
         double x = responseVec.getX();
         double y = responseVec.getY();
         double frontLeftPower = y - x;
@@ -454,29 +459,13 @@ public class TeleopFinal extends OpMode {
         return Math.acos(robotNormalVec.getZ());
     }
 
-    // Uses a logarithmic growth sigmoid function to calculate correction
-    private double calcLogarithmicCorrectionFactor(double angleDiff) {
-        return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * Math.abs(angleDiff) + 1);
-    }
-
     private Vector3D getRobotNormalVector() {
-        Orientation orientation = imu.getAngularOrientation();
+        // We already have angles from IMU for telemetry and driver oriented control, so we can just get that
+        // It is in the order of ZYX
 
-        // AxesOrder.indices() returns an array of integers corresponding to what order the axes are
-        // in. For example, if the AxesOrder is ZYX, indices() is [2, 1, 0], since the X-axis (pos 1
-        // of the indices array] is the third reported angle (index 2).
-        int[] axisIndicies = orientation.axesOrder.indices();
-
-        // All these calcuations work only in radians, so gotta do this
-        orientation = orientation.toAngleUnit(AngleUnit.RADIANS);
-
-        double[] angles = new double[]{orientation.firstAngle, orientation.secondAngle, orientation.thirdAngle};
-
-        // All this code basically just figures out how the IMU is reporting angles and saves that
-        // in a way we can acually deal with
-        double x = angles[axisIndicies[0]];
-        double y = angles[axisIndicies[1]];
-        double z = angles[axisIndicies[2]];
+        double x = angles.thirdAngle;
+        double y = angles.secondAngle;
+        double z = angles.firstAngle;
 
 //        telemetry.addData("Angle 1 (x)", x);
 //        telemetry.addData("Angle 2 (y)", y);
@@ -490,22 +479,17 @@ public class TeleopFinal extends OpMode {
         // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
         // website at the bottom of the answer for the rotation matrix used.
         // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
-        //        Vector3D normalVec = new Vector3D(
-//                -sin(x) * cos(z) - cos(x) * sin(y) * sin(z),
-//                sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
-//                cos(x) * cos(y)
-//        );
+
         Vector3D normalVec = new Vector3D(
                 sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
                 sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
                 cos(x) * cos(y)
         );
-        // Just in case. Above should be normal, but just in case.
-        // Also, can't normalize vectors of length 0 so gotta do this
+        // Above should be normal, but just in case.
         try {
             normalVec = normalVec.normalize();
         } catch (MathArithmeticException e) {
-
+            // Normalizing vectors of length 0 throws an error so we just ignore it
         }
 //        telemetry.addData("Component x", normalVec.getX());
 //        telemetry.addData("Component y", normalVec.getY());
@@ -539,64 +523,13 @@ public class TeleopFinal extends OpMode {
      * DO NOT WRITE CODE BELOW THIS LINE  *
      * -----------------------------------*/
     void composeTelemetry() {
-        // At the beginning of each telemetry update, grab a bunch of data
-        // from the IMU that we will then display in separate lines.
-        telemetry.addAction(new Runnable() {
-            @Override
-            public void run() {
-                // Acquiring the angles is relatively expensive; we don't want
-                // to do that in each of the three items that need that info, as that's
-                // three times the necessary expense.
-                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-                gravity = imu.getGravity();
-            }
+        // At the beginning of each telemetry update, grab angles from IMU
+        telemetry.addAction(() -> {
+            // Acquiring the angles is relatively expensive; we don't want
+            // to do that in each of the three items that need that info, as that's
+            // three times the necessary expense.
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         });
-
-//        telemetry.addLine()
-//                .addData("status", new Func<String>() {
-//                    @Override public String value() {
-//                        return imu.getSystemStatus().toShortString();
-//                    }
-//                })
-//                .addData("calib", new Func<String>() {
-//                    @Override public String value() {
-//                        return imu.getCalibrationStatus().toString();
-//                    }
-//                });
-//
-//        telemetry.addLine()
-//                .addData("heading", new Func<String>() {
-//                    @Override public String value() {
-//                        return formatAngle(angles.angleUnit, angles.firstAngle);
-//                    }
-//                })
-//                .addData("roll", new Func<String>() {
-//                    @Override public String value() {
-//                        return formatAngle(angles.angleUnit, angles.secondAngle);
-//                    }
-//                })
-//                .addData("pitch", new Func<String>() {
-//                    @Override public String value() {
-//                        return formatAngle(angles.angleUnit, angles.thirdAngle);
-//                    }
-//                });
-//
-//        telemetry.addLine()
-//                .addData("grvty", new Func<String>() {
-//                    @Override public String value() {
-//                        return gravity.toString();
-//                    }
-//                })
-//                .addData("mag", new Func<String>() {
-//                    @Override public String value() {
-//                        return String.format(Locale.getDefault(), "%.3f",
-//                                Math.sqrt(gravity.xAccel*gravity.xAccel
-//                                        + gravity.yAccel*gravity.yAccel
-//                                        + gravity.zAccel*gravity.zAccel));
-//                    }
-//                });
-
-        // telemetry.addData("currentAngle", "%.1f", currentAngle);
     }
 
     //----------------------------------------------------------------------------------------------
