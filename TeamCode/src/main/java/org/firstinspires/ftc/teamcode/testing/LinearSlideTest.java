@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.testing;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -8,14 +10,17 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.ControlConfig;
+
 @TeleOp
-//@Disabled
+@Disabled
 public class LinearSlideTest extends LinearOpMode {
 
     DcMotor linearSlide;
     Servo rightClaw;
     Servo leftClaw;
-    int holdPosition;
+    int holdPosition = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,38 +41,24 @@ public class LinearSlideTest extends LinearOpMode {
 
         //puts the motor in run using encoder mode so that motors can run while tracking encoder values
         //Must have this line after stop/reset encoders or motor can't run
-        linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        linearSlide.setTargetPosition(0);
+        linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         waitForStart();
 
         while (opModeIsActive()) {
-
+            linearSlide.setTargetPosition(holdPosition);
             /////////////////////////////LINEAR SLIDE//////////////////////////////
-            if (gamepad1.dpad_up && linearSlide.getCurrentPosition() < 1555) {
-                linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                linearSlide.setPower(0.5);
-                if (linearSlide.getCurrentPosition() > 1555) {
-                    holdPosition = 1555;
-                } else {
-                    holdPosition = linearSlide.getCurrentPosition();
-                }
-            } else if (gamepad1.dpad_down && linearSlide.getCurrentPosition() > 0) {
-                linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                linearSlide.setPower(-0.4);
-                holdPosition = linearSlide.getCurrentPosition();
+            if (ControlConfig.liftSlide) {
+                holdPosition += 10;
+            } else if (ControlConfig.lowerSlide) {
+                holdPosition -= 10;
             } else {
-                if (linearSlide.getCurrentPosition() < 1555 && linearSlide.getCurrentPosition() > 600) {
-                    linearSlide.setTargetPosition(holdPosition);
-                    linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    linearSlide.setPower(0.05);
-                    //linearSlide.setPower(0);
-                } else {
-                    linearSlide.setPower(0);
-                    linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                }
-                telemetry.addData("encoder", linearSlide.getCurrentPosition());
-                telemetry.update();
+                holdPosition = linearSlide.getCurrentPosition();
             }
+            telemetry.addData("encoder", linearSlide.getCurrentPosition());
+            Log.d("LinEncoder", String.valueOf(linearSlide.getCurrentPosition()));
+            telemetry.update();
 
 ////////////////////GRABBER////////////////////////////////////////////////////////
 

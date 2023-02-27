@@ -25,27 +25,8 @@ public abstract class ControlConfig {
     public static boolean fast = false;
 
     // Peripherals
-    public static boolean collectWheel =false;
-    public static boolean unCollectWheel =false;
-
     public static boolean liftSlide = false;
     public static boolean lowerSlide = false;
-    public static boolean runSlideToLowDump = false;
-
-    public static boolean overrideModifier = false;
-
-    public static boolean duckWheelBlue = false;
-    public static boolean duckWheelRed = false;
-
-    public static boolean dumpBucket = false;
-    public static boolean collectBucket = false;
-
-//    public static boolean toggleTseRodServo;
-//    public static boolean toggleTseArmServo;
-    public static boolean raiseTseArm = false;
-    public static boolean lowerTseArm = false;
-    public static boolean initTseArm = false;
-    public static boolean collectTseArm = false;
 
     public static boolean linSlideSlow = false;
 
@@ -59,12 +40,15 @@ public abstract class ControlConfig {
     public static boolean goToMedium = false;
     public static boolean goToHigh = false;
 
+    public static boolean resetIMU = false;
+    public static boolean overrideModifier = false;
+
     public static void update(Gamepad pad1, Gamepad pad2) {
-        // Update movement controls;
-        forward = -pad1.left_stick_y;
-        backward = pad1.left_stick_y;
-        right = pad1.left_stick_x;
-        left = -pad1.left_stick_x;
+        // Update movement controls. Currently set so that facing 270 is forward
+        forward = pad1.left_stick_y;
+        backward = -pad1.left_stick_y;
+        right = -pad1.left_stick_x;
+        left = pad1.left_stick_x;
         clockwise = pad1.right_stick_x;
 //        clockwise = pad1.right_stick_y;
 
@@ -86,5 +70,7 @@ public abstract class ControlConfig {
         goToHigh = pad2.circle || pad2.b;
 
         overrideModifier = pad2.left_stick_button;
+
+        resetIMU = pad1.left_stick_button && pad1.right_stick_button;
     }
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.testing;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,7 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class AutoBigClaw extends OpMode {
 
     DcMotor linearSlide;
@@ -25,7 +26,7 @@ public class AutoBigClaw extends OpMode {
 
     @Override
     public void init() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         rightClaw = hardwareMap.get(Servo.class, "right_claw");
         leftClaw = hardwareMap.get(Servo.class, "left_claw");

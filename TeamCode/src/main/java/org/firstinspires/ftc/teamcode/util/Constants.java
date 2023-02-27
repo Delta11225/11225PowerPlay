@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
+import org.firstinspires.ftc.teamcode.autonomous.AutoState;
+import org.firstinspires.ftc.teamcode.autonomous.Color;
+import org.firstinspires.ftc.teamcode.autonomous.StartPosition;
+
 /**
  * This is a class that holds all necessary constants for the robot. Put "magic numbers" here.
  * This class cannot be instantiated. Do not inherit from it.
@@ -16,52 +22,48 @@ public abstract class Constants {
     public final static double slowMultiplier = 0.3;
     public final static double superSlowMultiplier = 0.2;
 
-//    public final static double towerWheelSpeedEndgame = .6009;
-//    public final static double towerWheelSpeedAuto = .420;
-//    public final static double duckAccelIncrement = 0.05;
-
-//    public final static double tseStep = 0.0005;
-
-//    public final static int lowEncoder = 1120;
-//    public final static int midEncoder = 2270;
-//    public final static int highEncoder = 3470;
-
-//    public final static double lowestDump = 1100;
     public final static int motivationQuantity = 4;
 
     public final static int autoLiftEncoderStart = 40;
 
-    public final static double rightClawOpen = 0.44;
-    public final static double rightClawClosed = 0.6;
+    public final static double leftClawOpen = 0.48;
+    public final static double leftClawClosed = 0.6;
+    //right claw is plugged into port 0, left into 1
+    public final static double rightClawOpen = 0.64;
+    public final static double rightClawClosed = 0.53;
 
-    public final static double leftClawOpen = 0.7;
-    public final static double leftClawClosed = 0.53;
-
-    public final static double liftUpPower = 0.75;
-    public final static double liftDownPower = 0.5;
+    public final static double liftUpPower = 1;
+    public final static double liftDownPower = 1;
     public final static double liftPosRunPower = 1;
 
-    public final static int upEncoderStep = 10;
-    public final static int downEncoderStep = 10;
+    public final static int upEncoderStep = 30;
+    public final static int downEncoderStep = 30;
 
     public static int linearSlideZeroOffset = 0;
 
-    private final static int liftEncoderMax = 2200;
+    private final static int liftEncoderMax = 4530;
+
+    // Set at end of auto for teleop to sue
+    public static Pose2d currentPose = new Pose2d();
+    public static AutoState matchState = new AutoState(Color.BLUE, StartPosition.FRONT, 0);
+    public static double minAutoGrabDistance = 3;
+
     public static int getLiftEncoderMax() {
             return liftEncoderMax + linearSlideZeroOffset;
     }
     //    private final static int[] liftEncoderJunctions = new int[] {1780, -1, -1, -1};
     public static int[] getLiftEncoderJunctions() {
         return new int[] {
-                1780 + linearSlideZeroOffset,
-                3010 + linearSlideZeroOffset,
-                4120 + linearSlideZeroOffset,
+                1750 + linearSlideZeroOffset,
+                2910 + linearSlideZeroOffset,
+                4005 + linearSlideZeroOffset,
                 liftEncoderMax + linearSlideZeroOffset
         };
     }
 //    public final static int liftEncoderLow = 1780;
 
-    private final static int[] liftEncoderConeStack = new int[]{709, 534, 369, 181, 0};
+    // FIXME Test these, probably too high
+    private final static int[] liftEncoderConeStack = new int[]{650, 534, 369, 181, 0};
     public static int[] getLiftEncoderConeStack() {
         return new int[] {
                 liftEncoderConeStack[0] + linearSlideZeroOffset,
@@ -71,4 +73,20 @@ public abstract class Constants {
                 liftEncoderConeStack[4] + linearSlideZeroOffset
         };
     }
+
+    public static final double maxTiltDegrees = 7;
+
+    // The point at which it will stop correcting as we are on the ground and further movement would damage the robot
+    public static final double unrecoverableTiltDegrees = 60;
+
+    // Deals with the logarithmic function that controls how aggressively we correct tilt. In a logistic
+    // growth function C log Ax, logisticScale is the C and valueScale is the A.
+    public static final double tiltCorrectionLogisticScale = 0.5;
+    public static final double tiltCorrectionValueScale = 2;
+
+    // expTotalScale is C, expAngleScale is A, in equation y=Ce^Ax, where x is angle diff
+    public static final double expTotalScale = .06;
+    public static final double expAngleScale = .32;
+
+    public static final double autoGrabCooldownSeconds = 2;
 }

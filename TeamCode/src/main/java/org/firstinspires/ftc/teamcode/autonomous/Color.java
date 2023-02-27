@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-enum Color {
+public enum Color {
  BLUE(0),
  RED(1);
 

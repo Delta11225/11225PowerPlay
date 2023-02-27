@@ -1,19 +1,19 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-// TODO add comments and more logging
 @Autonomous(preselectTeleOp = "TeleopFinal")
 public class Auto extends LinearOpMode {
     FtcDashboard ftcDashboard = FtcDashboard.getInstance();
@@ -25,13 +25,6 @@ public class Auto extends LinearOpMode {
 //        telemetry.setAutoClear(true);
         Hardware23 robot = new Hardware23(hardwareMap);
 
-        // Do this here, as it takes a while
-        telemetry.addLine("Building trajectories...");
-        telemetry.update();
-        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, telemetry);
-        telemetry.addData("Build! Time taken (s)", getRuntime());
-        telemetry.update();
-
         // Init the camera. Save pipeline, as we need it later
         DetectionPipeline pipeline = new DetectionPipeline();
         OpenCvCamera webcam = initCamera(pipeline);
@@ -41,7 +34,16 @@ public class Auto extends LinearOpMode {
 
         // We only need the delay here, everything else just gets passed to TrajectoryGenerator
         AutoState autoState = getUserInput();
+        Constants.matchState = autoState;
         long delay = autoState.delay;
+
+        Vector2d startOffset = getUserOffset(autoState);
+
+        telemetry.addLine("Building trajectories...");
+        telemetry.update();
+        TrajectoryGenerator trajGen = new TrajectoryGenerator(robot, autoState, startOffset, telemetry);
+        telemetry.addData("Built! Time taken (s)", getRuntime());
+        telemetry.update();
 
         // Ask the driver if they missed anything
         confirmAutoGood();
@@ -55,6 +57,7 @@ public class Auto extends LinearOpMode {
             telemetry.addData("Color", autoState.color);
             telemetry.addData("Start pos", autoState.position);
             telemetry.addData("Delay", delay);
+            telemetry.addData("Offset", startOffset);
             telemetry.addData("Camera detection", pipeline.getLastPos());
             telemetry.update();
         }
@@ -67,6 +70,8 @@ public class Auto extends LinearOpMode {
         waitForStart();
         // If we need to keep track of time
         resetRuntime();
+
+        Constants.linearSlideZeroOffset = robot.linearSlide.getCurrentPosition();
 
         // Add parking pos to telemetry to we don't have to worry and save last pos
         ParkingPosition parkPos = pipeline.getLastPos();
@@ -83,15 +88,57 @@ public class Auto extends LinearOpMode {
         telemetry.update();
 
 //        resetRuntime();
-        TrajectorySequence trajSequence;
-        trajSequence = trajGen.getAppropriateTrajectory(autoState, parkPos);
+        TrajectorySequence[] trajSequences;
+        trajSequences = trajGen.getAppropriateTrajectory(autoState, parkPos);
         telemetry.addData("Time taken (s)", getRuntime());
         telemetry.update();
 
         // Start of game delay, if we need it
         sleep(delay);
 
-        robot.drive.followTrajectorySequence(trajSequence);
+        for (TrajectorySequence trajSeq : trajSequences) {
+            robot.drive.followTrajectorySequence(trajSeq);
+        }
+
+        Constants.currentPose = robot.drive.getPoseEstimate();
+    }
+
+    private Vector2d getUserOffset(AutoState autoState) {
+        boolean buttonUnpressed = true;
+        Vector2d offset = new Vector2d(0, 0);
+
+        // Basically, ask the user for an offset and add it properly. Make sure to keep user orientation in mind.
+        double modifier = 0.1;
+        if (autoState.color == Color.RED) {
+            modifier *= -1;
+        }
+
+        while (!isStopRequested()) {
+            gamepad2.toString();
+            telemetry.addData("Start offset? use dpad. Circle done", offset.toString());
+            telemetry.update();
+
+            if (gamepad2.dpad_up && buttonUnpressed) {
+                offset = new Vector2d(offset.getX(), offset.getY() + modifier);
+                buttonUnpressed = false;
+            } else if (gamepad2.dpad_down && buttonUnpressed) {
+                offset = new Vector2d(offset.getX(), offset.getY() - modifier);
+                buttonUnpressed = false;
+            } else if (gamepad2.dpad_left) {
+                offset = new Vector2d(offset.getX() - modifier, offset.getY());
+                buttonUnpressed = false;
+            } else if (gamepad2.dpad_right) {
+                offset = new Vector2d(offset.getX() + modifier, offset.getY());
+                buttonUnpressed = false;
+            } else if (gamepad2.circle) {
+                break;
+            } else if (!(gamepad2.dpad_down || gamepad2.dpad_up || gamepad2.dpad_left || gamepad2.dpad_right)) {
+                buttonUnpressed = true;
+            }
+        }
+        telemetry.addLine("Offset confirmed");
+        telemetry.update();
+        return offset;
     }
 
     private OpenCvCamera initCamera(OpenCvPipeline pipeline) {

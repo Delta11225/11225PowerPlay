@@ -1,14 +1,17 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.testing;
+
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 import android.util.Log;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
@@ -18,11 +21,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.teamcode.autonomous.Color;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.ControlConfig;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
@@ -30,12 +31,9 @@ import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
 
 import java.util.Locale;
 
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-
-//@Disabled
+@Disabled
 @TeleOp
-public class TeleopFinal extends OpMode {
+public class TeleopTiltSafety extends OpMode {
     // FIXME in the future reduce number of global vars
 
     Hardware23 robot;
@@ -67,15 +65,9 @@ public class TeleopFinal extends OpMode {
     int holdPosition;
     ElapsedTime elapsedTime = new ElapsedTime();
     private final ElapsedTime runtime = new ElapsedTime();
-//    private boolean runningToPos = false;
+    //    private boolean runningToPos = false;
     private LinearSlideMode linearSlideMode = LinearSlideMode.MANUAL;
     private int linearSlideTarget = 0;
-    private boolean areInittingIMU = false;
-
-    private boolean isClawClosed = false;
-    private Color currentColor;
-
-    private ElapsedTime lastAutoGrab = new ElapsedTime();
 
     @Override
     public void init() {
@@ -83,10 +75,19 @@ public class TeleopFinal extends OpMode {
 
 //        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         Constants.linearSlideZeroOffset = 0;
-        currentColor = Constants.matchState.color;
 
-        initIMU();
-        areInittingIMU = false;
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+        composeTelemetry();
         telemetry.addData("IMU init time", getRuntime());
         telemetry.update();
 
@@ -139,26 +140,43 @@ public class TeleopFinal extends OpMode {
     public void move() {
         ControlConfig.update(gamepad1, gamepad2);
 
-        // Deals with tilt. Prevents robot from tilting too far. If above certain tilt angle, corrects it
-        // and locks driver control.
         Vector3D robotNormalVec = getRobotNormalVector();
-        if (isOverMaxTilt(robotNormalVec) && isBelowUnrecoverableTilt(robotNormalVec)) {
-            handleTilt(robotNormalVec);
+        if (isOverMaxTilt(robotNormalVec)) {
+            Log.d("TiltCorr", "CORRECTION");
+            double angleDiff = Constants.maxTiltDegrees - Math.toDegrees(calcTiltAngle(robotNormalVec));
+            Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
+
+            // Correct based on how far off the axis we are
+            responseVec = responseVec.normalize();
+            responseVec = responseVec.scalarMultiply(calcCorrectionFactor(angleDiff));
+
+            Log.d("TiltCorr", String.format("Angle diff %f", (angleDiff)));
+            Log.d("TiltCorr", String.format("Correction factor %f", calcCorrectionFactor(angleDiff)));
+
+            double responseX = responseVec.getX();
+            double responseY = responseVec.getY();
+            telemetry.addData("Response vec x", responseX);
+            telemetry.addData("Response vec y", responseY);
+            telemetry.update();
+
+            Log.d("TiltCorr", String.format("Response vec x %f", responseX));
+            Log.d("TiltCorr", String.format("Response vec y %f", responseY));
+
+            Pose2d responsePose = new Pose2d(responseX, responseY, 0);
+            setMotorPower(responseVec);
             return;
         }
-
         double theta = Math.toRadians(currentAngle);
 
 //        telemetry.addData("CurrentAngle", currentAngle);
 //        telemetry.addData("Theta", theta);
 
-        // FIXME if possible make it so that it works with any orientation
         forward = ControlConfig.forward;
         right = ControlConfig.right;
         clockwise = ControlConfig.clockwise;
 
-        temp = (forward * Math.cos(theta) - right * Math.sin(theta));
-        side = (forward * Math.sin(theta) + right * Math.cos(theta));
+        temp = (forward * cos(theta) - right * sin(theta));
+        side = (forward * sin(theta) + right * cos(theta));
 
         forward = temp;
         right = side;
@@ -183,15 +201,8 @@ public class TeleopFinal extends OpMode {
         if (ControlConfig.slow && ControlConfig.fast) {
             powerMultiplier = Constants.superSlowMultiplier;
 //            telemetry.addLine("super fast");
-
         } else if (ControlConfig.fast) {
-            // Prevent robot from moving fast when linear slide is up. Avoids dangerous tilt issues when
-            // robot suddenly stops.
-            if (robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderJunctions()[0] + 10) {
-                powerMultiplier = Constants.fastMultiplier;
-            } else {
-                powerMultiplier = Constants.normalMultiplier;
-            }
+            powerMultiplier = Constants.fastMultiplier;
 //            telemetry.addLine("fast");
         } else if (ControlConfig.slow) {
             powerMultiplier = Constants.slowMultiplier;
@@ -213,40 +224,99 @@ public class TeleopFinal extends OpMode {
 
     }
 
-    private void handleTilt(Vector3D robotNormalVec) {
-        //            Log.d("TiltCorr", "CORRECTION");
-        double angleDiff = Math.abs(Math.toDegrees(calcTiltAngle(robotNormalVec)) - Constants.maxTiltDegrees);
-        Vector2D responseVec = getNormalAxisProjection(robotNormalVec);
+    private void setMotorPower(Vector2D responseVec) {
+        double x = responseVec.getX();
+        double y = responseVec.getY();
+        double frontLeftPower = y - x;
+        double rearLeftPower = y - x;
+        double rearRightPower = -y - x;
+        double frontRightPower = x + y;
+        robot.drive.setMotorPowers(frontLeftPower, rearLeftPower, rearRightPower, frontRightPower);
+    }
 
-//            double correctionFactor = calcLogisticCorrectionFactor(angleDiff);
-        double correctionFactor = calcExponentialCorrectionFactor(angleDiff);
-        // Correct based on how far off the axis we are
-        responseVec = responseVec.normalize();
-        responseVec = responseVec.scalarMultiply(correctionFactor);
+    private double calcTiltAngle(Vector3D robotNormalVec) {
+        return Math.acos(robotNormalVec.getZ());
+    }
 
-        Log.d("TiltCorr", String.format("Angle diff %f", (angleDiff)));
-        Log.d("TiltCorr", String.format("Correction factor %f", correctionFactor));
+    // Uses a logarithmic growth sigmoid function to calculate correction
+    private double calcCorrectionFactor(double angleDiff) {
+        return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * Math.abs(angleDiff) + 1);
+    }
 
-        double responseX = responseVec.getX();
-        double responseY = responseVec.getY();
-        telemetry.addData("Response vec x", responseX);
-        telemetry.addData("Response vec y", responseY);
+    private Vector3D getRobotNormalVector() {
+        Orientation orientation = imu.getAngularOrientation();
+
+        // AxesOrder.indices() returns an array of integers corresponding to what order the axes are
+        // in. For example, if the AxesOrder is ZYX, indices() is [2, 1, 0], since the X-axis (pos 1
+        // of the indices array] is the third reported angle (index 2).
+        int[] axisIndicies = orientation.axesOrder.indices();
+
+        // All these calcuations work only in radians, so gotta do this
+        orientation = orientation.toAngleUnit(AngleUnit.RADIANS);
+
+        double[] angles = new double[]{orientation.firstAngle, orientation.secondAngle, orientation.thirdAngle};
+
+        // All this code basically just figures out how the IMU is reporting angles and saves that
+        // in a way we can acually deal with
+        double x = angles[axisIndicies[0]];
+        double y = angles[axisIndicies[1]];
+        double z = angles[axisIndicies[2]];
+
+        telemetry.addData("Angle 1 (x)", x);
+        telemetry.addData("Angle 2 (y)", y);
+        telemetry.addData("Angle 3 (z)", z);
+
+        Log.d("Tilt", String.format("Angle 1 (x) %f", x));
+        Log.d("Tilt", String.format("Angle 2 (y) %f", y));
+        Log.d("Tilt", String.format("Angle 3 (z) %f", z));
+
+        // All this math just gets the robot's normal vector. In technical terms, it rotates a unit
+        // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
+        // website at the bottom of the answer for the rotation matrix used.
+        // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
+        //        Vector3D normalVec = new Vector3D(
+//                -sin(x) * cos(z) - cos(x) * sin(y) * sin(z),
+//                sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
+//                cos(x) * cos(y)
+//        );
+        Vector3D normalVec = new Vector3D(
+                sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
+                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
+                cos(x) * cos(y)
+        );
+        // Just in case. Above should be normal, but just in case.
+        // Also, can't normalize vectors of length 0 so gotta do this
+        try {
+            normalVec = normalVec.normalize();
+        } catch (MathArithmeticException e) {
+
+        }
+        telemetry.addData("Component x", normalVec.getX());
+        telemetry.addData("Component y", normalVec.getY());
+        telemetry.addData("Component z", normalVec.getZ());
+
+        Log.d("Tilt", String.format("Component x %f", normalVec.getX()));
+        Log.d("Tilt", String.format("Component y %f", normalVec.getY()));
+        Log.d("Tilt", String.format("Component z %f", normalVec.getZ()));
+
         telemetry.update();
 
-        Log.d("TiltCorr", String.format("Response vec x %f", responseX));
-        Log.d("TiltCorr", String.format("Response vec y %f", responseY));
-
-        setMotorPower(responseVec);
+        return normalVec;
     }
 
-    private double calcExponentialCorrectionFactor(double angleDiff) {
-        return Constants.expTotalScale * Math.pow(Math.E, Constants.expAngleScale * Math.abs(angleDiff));
-    }
-
-    private boolean isBelowUnrecoverableTilt(Vector3D normalVec) {
+    private boolean isOverMaxTilt(Vector3D normalVec) {
+        // To compute the angle to the Z axis (tilt angle) we need the dot product with this vector
+        // and the Z axis, but fortunately the dot product simplifies down to this since two of
+        // the components of the z unit vector are zero (0, 0, 1)
         double angleToZ = calcTiltAngle(normalVec);
 
-        return Math.abs(Math.toDegrees(angleToZ)) <= Constants.unrecoverableTiltDegrees;
+        return Math.abs(Math.toDegrees(angleToZ)) >= Constants.maxTiltDegrees;
+    }
+
+    private Vector2D getNormalAxisProjection(Vector3D normalVec) {
+        // Generates the ideal robot response to the given normal vector. Does not normalize intentionally
+        // as we don't want to respond with full force no matter what
+        return new Vector2D(normalVec.getX(), normalVec.getY());
     }
 
     public void peripheralMove() {
@@ -261,91 +331,21 @@ public class TeleopFinal extends OpMode {
         // Prevents weirdness with gamepad2 locking up
         gamepad2.toString();
         if (ControlConfig.openClaw) {
-            isClawClosed = false;
-            lastAutoGrab.reset();
             robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
             robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
         } else if (ControlConfig.closeClaw) {
-            isClawClosed = true;
             robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
             robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
         }
 
-        handleClawAutoGrab();
-
-        // TODO work on this please
-//        if (ControlConfig.resetIMU && !areInittingIMU) {
-//            telemetry.addLine("Reinitting IMU");
-//            telemetry.update();
-//            initIMU();
-//            areInittingIMU = false;
-//            gamepad2.rumble(500);
-//        }
     }
 
-    private void handleClawAutoGrab() {
-        // Prevent autograbbing at end of teleop
-        if (elapsedTime.seconds() >= 115) {
-            return;
-        }
-
-        if (lastAutoGrab.seconds() < Constants.autoGrabCooldownSeconds) {
-            return;
-        }
-
-        if (ControlConfig.openClaw) {
-            return;
-        }
-
-        if (isClawClosed) {
-            return;
-        }
-
-        if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0] - 40) {
-            return;
-        }
-
-        ColorSensor colorSensor = robot.colorSensor;
-        int red = colorSensor.red();
-        int blue = colorSensor.blue();
-        double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
-
-        if (distance > Constants.minAutoGrabDistance) {
-            return;
-        }
-
-        if (currentColor == Color.BLUE ? blue > red : red > blue) {
-            robot.rightClaw.setPosition(Constants.rightClawClosed);
-            robot.leftClaw.setPosition(Constants.leftClawClosed);
-            gamepad2.rumble(250);
-            isClawClosed = true;
-            lastAutoGrab.reset();
-        }
-    }
-
-    private void initIMU() {
-        areInittingIMU = true;
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-
-        composeTelemetry();
-    }
-
+    // TODO cap speed if linear slide is too high
     private void linearSlideMoveWithOverride() {
         DcMotor linearSlide = robot.linearSlide;
-
-        telemetry.update();
 //        int linearSlideOffetPos = linearSlide.getCurrentPosition() + Constants.linearSlideZeroOffset;
         // Log linear slide offset for debug reasons
-//        Log.d("LinearSlideMovement", String.valueOf(Constants.linearSlideZeroOffset));
+        Log.d("LinearSlideMovement", String.valueOf(Constants.linearSlideZeroOffset));
 
         // Complex if statement, but if we want to lift the lide and the linear slide is below the max
         // AND we are not overriding, lift the slide
@@ -362,8 +362,8 @@ public class TeleopFinal extends OpMode {
             // linear slide max to prevent linear slide from going too high
             linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.getLiftEncoderMax());
 
-        // Same logic as above, just for going down. Make sure to use zeroOffset and not 0 since
-        // we don't know where 0 is and zeroOffset should be the minimum for the slide
+            // Same logic as above, just for going down. Make sure to use zeroOffset and not 0 since
+            // we don't know where 0 is and zeroOffset should be the minimum for the slide
         } else if (ControlConfig.lowerSlide && linearSlide.getCurrentPosition() > Constants.linearSlideZeroOffset && !ControlConfig.overrideModifier) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
                 linearSlideTarget = linearSlide.getCurrentPosition();
@@ -375,21 +375,15 @@ public class TeleopFinal extends OpMode {
             // too far.
             linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, Constants.linearSlideZeroOffset);
 
-        // If we are not overriding and in manual mode, set target to current position. Prevents
-        // slide from moving after button is released.
+            // If we are not overriding and in manual mode, set target to current position. Prevents
+            // slide from moving after button is released.
         } else if (linearSlideMode == LinearSlideMode.MANUAL && !ControlConfig.overrideModifier) {
             linearSlideTarget = linearSlide.getCurrentPosition();
         }
 
         // All these are the same. If we pushed the button to go to a certain location, set the
         // target there and change the mode
-
-        // Ella safety.
-        // For the ground, we don't want to go to ground if the claw is closed and we are above
-        // the low junction
-        long linearSlidePos = robot.linearSlide.getCurrentPosition();
-        long ellaSafetyThreshold = Constants.getLiftEncoderJunctions()[0] - 20;
-        if (ControlConfig.goToGround && !(isClawClosed && linearSlidePos > ellaSafetyThreshold)) {
+        if (ControlConfig.goToGround) {
             linearSlideMode = LinearSlideMode.GROUD;
             linearSlideTarget = Constants.linearSlideZeroOffset;
         }
@@ -415,7 +409,6 @@ public class TeleopFinal extends OpMode {
         // If we override and are lifting the slide
         if (ControlConfig.overrideModifier && ControlConfig.liftSlide) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
-                linearSlideMode = LinearSlideMode.MANUAL;
                 linearSlideTarget = linearSlide.getCurrentPosition();
             }
 
@@ -428,7 +421,6 @@ public class TeleopFinal extends OpMode {
         // Same as above.
         if (ControlConfig.overrideModifier && ControlConfig.lowerSlide) {
             if (linearSlideMode != LinearSlideMode.MANUAL) {
-                linearSlideMode = LinearSlideMode.MANUAL;
                 linearSlideTarget = linearSlide.getCurrentPosition();
             }
 
@@ -441,107 +433,151 @@ public class TeleopFinal extends OpMode {
         // up. Here we set the target pos to whatever we have calculated it to be.
         robot.linearSlide.setTargetPosition(linearSlideTarget);
         // We shouldn't need to do this, but just in case
-        robot.linearSlide.setPower(Constants.liftPosRunPower);
+        robot.linearSlide.setPower(0.5);
         telemetry.addData("Linear Slide set pos", linearSlideTarget);
-//        Log.d("LinearSlide", String.valueOf(linearSlideTarget));
         telemetry.update();
     }
 
-    private void setMotorPower(Vector2D responseVec) {
-        // For some reason, as it is now, this causes spinning when correcting, but I am too lazy
-        // to fix. It's not a bug, it's a feature, I guess.
-        double x = responseVec.getX();
-        double y = responseVec.getY();
-        double frontLeftPower = y - x;
-        double rearLeftPower = y - x;
-        double rearRightPower = -y - x;
-        double frontRightPower = x + y;
-        robot.drive.setMotorPowers(frontLeftPower, rearLeftPower, rearRightPower, frontRightPower);
-    }
+    @Deprecated
+    private void linearSlideMove() {
+        DcMotor linearSlide = robot.linearSlide;
+        // Use this modified variable for any bounds checking. For target setting it will be offset
+        // at the end of the method, so just use linearSlide.getCurrentPosition() for that
+        int linearSlideComparisonPos = linearSlide.getCurrentPosition() - Constants.linearSlideZeroOffset;
 
-    private double calcTiltAngle(Vector3D robotNormalVec) {
-        return Math.acos(robotNormalVec.getZ());
-    }
+        if (ControlConfig.liftSlide && ((linearSlideComparisonPos < Constants.getLiftEncoderMax()) || ControlConfig.overrideModifier)) {
+            if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideTarget = linearSlide.getCurrentPosition();
+            }
 
-    // Uses a logarithmic growth sigmoid function to calculate correction
-    private double calcLogarithmicCorrectionFactor(double angleDiff) {
-        return Constants.tiltCorrectionLogisticScale * Math.log(Constants.tiltCorrectionValueScale * Math.abs(angleDiff) + 1);
-    }
+            linearSlideMode = LinearSlideMode.MANUAL;
+            if (ControlConfig.overrideModifier) {
+                linearSlideTarget = linearSlideTarget + Constants.upEncoderStep;
+                Constants.linearSlideZeroOffset = robot.linearSlide.getCurrentPosition();
+            } else {
+                linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.getLiftEncoderMax());
+            }
+        } else if (ControlConfig.lowerSlide && ((linearSlideComparisonPos > 0) || ControlConfig.overrideModifier)) {
+            if (linearSlideMode != LinearSlideMode.MANUAL) {
+                linearSlideTarget = linearSlide.getCurrentPosition();
+            }
 
-    private Vector3D getRobotNormalVector() {
-        Orientation orientation = imu.getAngularOrientation();
-
-        // AxesOrder.indices() returns an array of integers corresponding to what order the axes are
-        // in. For example, if the AxesOrder is ZYX, indices() is [2, 1, 0], since the X-axis (pos 1
-        // of the indices array] is the third reported angle (index 2).
-        int[] axisIndicies = orientation.axesOrder.indices();
-
-        // All these calcuations work only in radians, so gotta do this
-        orientation = orientation.toAngleUnit(AngleUnit.RADIANS);
-
-        double[] angles = new double[]{orientation.firstAngle, orientation.secondAngle, orientation.thirdAngle};
-
-        // All this code basically just figures out how the IMU is reporting angles and saves that
-        // in a way we can acually deal with
-        double x = angles[axisIndicies[0]];
-        double y = angles[axisIndicies[1]];
-        double z = angles[axisIndicies[2]];
-
-//        telemetry.addData("Angle 1 (x)", x);
-//        telemetry.addData("Angle 2 (y)", y);
-//        telemetry.addData("Angle 3 (z)", z);
-
-//        Log.d("Tilt", String.format("Angle 1 (x) %f", x));
-//        Log.d("Tilt", String.format("Angle 2 (y) %f", y));
-//        Log.d("Tilt", String.format("Angle 3 (z) %f", z));
-
-        // All this math just gets the robot's normal vector. In technical terms, it rotates a unit
-        // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
-        // website at the bottom of the answer for the rotation matrix used.
-        // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
-        //        Vector3D normalVec = new Vector3D(
-//                -sin(x) * cos(z) - cos(x) * sin(y) * sin(z),
-//                sin(x) * sin(z) - cos(x) * sin(y) * cos(z),
-//                cos(x) * cos(y)
-//        );
-        Vector3D normalVec = new Vector3D(
-                sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
-                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
-                cos(x) * cos(y)
-        );
-        // Just in case. Above should be normal, but just in case.
-        // Also, can't normalize vectors of length 0 so gotta do this
-        try {
-            normalVec = normalVec.normalize();
-        } catch (MathArithmeticException e) {
-
+            linearSlideMode = LinearSlideMode.MANUAL;
+            if (ControlConfig.overrideModifier) {
+                linearSlideTarget = linearSlideTarget - Constants.downEncoderStep;
+                Constants.linearSlideZeroOffset = robot.linearSlide.getCurrentPosition();
+            } else {
+                linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, 0);
+            }
+        } else if (linearSlideMode == LinearSlideMode.MANUAL) {
+            linearSlideTarget = linearSlide.getCurrentPosition();
         }
-//        telemetry.addData("Component x", normalVec.getX());
-//        telemetry.addData("Component y", normalVec.getY());
-//        telemetry.addData("Component z", normalVec.getZ());
 
-//        Log.d("Tilt", String.format("Component x %f", normalVec.getX()));
-//        Log.d("Tilt", String.format("Component y %f", normalVec.getY()));
-//        Log.d("Tilt", String.format("Component z %f", normalVec.getZ()));
+        if (ControlConfig.goToLow) {
+            linearSlideMode = LinearSlideMode.LOW;
+            linearSlideTarget = Constants.getLiftEncoderJunctions()[0];
+        }
 
+        if (ControlConfig.goToGround) {
+            linearSlideMode = LinearSlideMode.GROUD;
+            linearSlideTarget = Constants.linearSlideZeroOffset;
+        }
+
+        robot.linearSlide.setTargetPosition(calcWithOffset(linearSlideTarget));
+        robot.linearSlide.setPower(0.5);
+        telemetry.addData("Linear Slide set pos", linearSlideTarget);
         telemetry.update();
-
-        return normalVec;
     }
 
-    private boolean isOverMaxTilt(Vector3D normalVec) {
-        // To compute the angle to the Z axis (tilt angle) we need the dot product with this vector
-        // and the Z axis, but fortunately the dot product simplifies down to this since two of
-        // the components of the z unit vector are zero (0, 0, 1)
-        double angleToZ = calcTiltAngle(normalVec);
-
-        return Math.abs(Math.toDegrees(angleToZ)) >= Constants.maxTiltDegrees;
+    @Deprecated
+    private int calcWithOffset(int rawLinearSlideTarget) {
+        return rawLinearSlideTarget + Constants.linearSlideZeroOffset;
     }
 
-    private Vector2D getNormalAxisProjection(Vector3D normalVec) {
-        // Generates the ideal robot response to the given normal vector. Does not normalize intentionally
-        // as we don't want to respond with full force no matter what
-        return new Vector2D(normalVec.getX(), normalVec.getY());
+    @Deprecated
+    private void linearSlideMoveOld() {
+        /////////////////////////////LINEAR SLIDE//////////////////////////////
+        if (ControlConfig.liftSlide && robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax()) {
+            // If we give it any input, stop running to a certain set position
+//            runningToPos = false;
+            linearSlideMode = LinearSlideMode.MANUAL;
+            robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            robot.linearSlide.setPower(Constants.liftUpPower);
+            if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderMax()) {
+                holdPosition = Constants.getLiftEncoderMax();
+            } else {
+                holdPosition = robot.linearSlide.getCurrentPosition();
+            }
+        } else if (ControlConfig.lowerSlide && robot.linearSlide.getCurrentPosition() > 0) {
+//            runningToPos = false;
+            linearSlideMode = LinearSlideMode.MANUAL;
+            robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            robot.linearSlide.setPower(-Constants.liftDownPower);
+            holdPosition = robot.linearSlide.getCurrentPosition();
+        } else if (linearSlideMode == LinearSlideMode.MANUAL) {
+            if (robot.linearSlide.getCurrentPosition() < Constants.getLiftEncoderMax() && robot.linearSlide.getCurrentPosition() > 600) {
+                robot.linearSlide.setTargetPosition(holdPosition);
+                robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.linearSlide.setPower(0.05);
+                //linearSlide.setPower(0);
+            } else {
+                robot.linearSlide.setPower(0);
+                robot.linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            telemetry.addData("encoder", robot.linearSlide.getCurrentPosition());
+            telemetry.update();
+        }
+
+        // Handle rumblies for low junction drop pos
+        int currentPos = robot.linearSlide.getCurrentPosition();
+        // liftEncoderLow is the lowest dump pos, but we add some encoder counts to it to make a larger
+        // rumble zone as robot could just skip past it
+        if (currentPos > Constants.getLiftEncoderJunctions()[0] && currentPos < Constants.getLiftEncoderJunctions()[0] + 60) {
+            // There is probably a better way to do this, but basically, rumble if we haven't
+            // rumbled while we have been in the rumble range. Reset when we leave it
+            if (!hasRumbled) {
+                gamepad2.rumble(250);
+            }
+            hasRumbled = true;
+        } else {
+            hasRumbled = false;
+        }
+
+        // Initialization code. If we want to start running goToLow, set appropriate target pos,
+        // put linear slide in correct mode, and tell everyone we are running to a position.
+        if (ControlConfig.goToLow && linearSlideMode != LinearSlideMode.LOW) {
+            telemetry.addData("Go to pos", Constants.getLiftEncoderJunctions()[0]);
+            telemetry.update();
+
+            robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
+            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            runningToPos = true;
+            linearSlideMode = LinearSlideMode.LOW;
+        }
+
+        // Same as above, but running to bottom
+        if (ControlConfig.goToGround && linearSlideMode != LinearSlideMode.GROUD) {
+            telemetry.addData("Go to pos", 0);
+            telemetry.update();
+
+            robot.linearSlide.setTargetPosition(0);
+            robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            runningToPos = true;
+            linearSlideMode = LinearSlideMode.GROUD;
+        }
+
+        // If we are running to a position and the slide is busy, set its power to .5. Otherwise,
+        // set its power to 0 and tell everyone we are done running to a position
+        if (linearSlideMode != LinearSlideMode.MANUAL) {
+            if (robot.linearSlide.isBusy()) {
+                robot.linearSlide.setPower(Constants.liftPosRunPower);
+            } // else {
+//                runningToPos = false;
+//                robot.linearSlide.setPower(0);
+//            }
+        }
     }
 
     /*-----------------------------------//

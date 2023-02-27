@@ -30,8 +30,11 @@
 package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -39,6 +42,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.nulldevices.NullColorSensor;
 import org.firstinspires.ftc.teamcode.util.nulldevices.NullDcMotor;
 import org.firstinspires.ftc.teamcode.util.nulldevices.NullDrive;
 import org.firstinspires.ftc.teamcode.util.nulldevices.NullServo;
@@ -62,6 +66,8 @@ public class Hardware23 {
     public DcMotor linearSlide = null;
     public Servo rightClaw = null;
     public Servo leftClaw = null;
+
+    public ColorSensor colorSensor = null;
     // RoadRunner driver
     public SampleMecanumDrive drive;
     private BNO055IMU imu;
@@ -81,7 +87,7 @@ public class Hardware23 {
         // NEVER DO THIS
         try {
             rearLeft = hardwareMap.dcMotor.get("rear_left");
-            rearLeft.setDirection(DcMotor.Direction.REVERSE);
+//            rearLeft.setDirection(DcMotor.Direction.REVERSE);
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 rearLeft = new NullDcMotor();
@@ -92,7 +98,7 @@ public class Hardware23 {
 
         try {
             frontLeft = hardwareMap.dcMotor.get("front_left");
-            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+//            frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 frontLeft = new NullDcMotor();
@@ -103,7 +109,7 @@ public class Hardware23 {
 
         try {
             frontRight = hardwareMap.dcMotor.get("front_right");
-            frontRight.setDirection(DcMotor.Direction.FORWARD);
+//            frontRight.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 frontRight = new NullDcMotor();
@@ -114,7 +120,7 @@ public class Hardware23 {
 
         try {
             rearRight = hardwareMap.dcMotor.get("rear_right");
-            rearRight.setDirection(DcMotor.Direction.FORWARD);
+//            rearRight.setDirection(DcMotor.Direction.FORWARD);
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 rearRight = new NullDcMotor();
@@ -165,16 +171,21 @@ public class Hardware23 {
         }
 
         try {
+            colorSensor = hardwareMap.get(ColorSensor.class, "color_sensor");
+        } catch (Exception e) {
+            if (!Constants.COMPETITION_MODE) {
+                colorSensor = new NullColorSensor();
+            } else {
+                throw e;
+            }
+        }
+
+        try {
             drive = new SampleMecanumDrive(hardwareMap);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (Constants.COMPETITION_MODE) {
+                throw e;
+            }
         }
     }
 }
-
-
-
-
-
-
-
-
