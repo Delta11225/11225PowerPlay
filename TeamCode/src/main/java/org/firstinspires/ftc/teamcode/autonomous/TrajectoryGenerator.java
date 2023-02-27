@@ -32,6 +32,7 @@ public class TrajectoryGenerator {
       and parking trajectories separately, and store them in an array in this dictionary. It's annoying, but it's what
       we gotta do.
      */
+    // TODO can be restructured to only hold parking position probably
     private HashMap<TrajectoryState, TrajectorySequence[]> trajectories;
 
     /**
