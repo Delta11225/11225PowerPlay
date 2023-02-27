@@ -56,6 +56,7 @@ public class Auto extends LinearOpMode {
             telemetry.addLine("Init complete, ready to run");
             telemetry.addData("Color", autoState.color);
             telemetry.addData("Start pos", autoState.position);
+            telemetry.addData("Auto Type", autoState.autoType);
             telemetry.addData("Delay", delay);
             telemetry.addData("Offset", startOffset);
             telemetry.addData("Camera detection", pipeline.getLastPos());
@@ -175,10 +176,40 @@ public class Auto extends LinearOpMode {
         StartPosition startPosition = getPosition();
         sleep(100);
 
+        AutoType autoType = getAutoType();
+
         long delay = getDelay();
         sleep(100);
 
-        return new AutoState(color, startPosition, delay);
+        return new AutoState(color, startPosition, autoType, delay);
+    }
+
+    private AutoType getAutoType() {
+        telemetry.clear();
+        telemetry.addData("Auto Type?","");
+        telemetry.addData("Blue", "X or Square");
+        telemetry.addData("Red", "B or Circle");
+        telemetry.update();
+
+        AutoType autoType = null;
+
+        // Delay until we get a result or a stop is requested. Otherwise robot gets stuck
+        while (!isStopRequested()) {
+            // This is for some reason required as otherwise we can only run autonomous once
+            // before we need to restart the robot. Included at the beginning of each while loop
+            gamepad2.toString();
+            if (gamepad2.x) {
+                autoType = AutoType.LONG;
+                break;
+            } else if (gamepad2.b) {
+                autoType = AutoType.SWEAT;
+                break;
+            }
+        }
+        telemetry.addLine("Auto Type confirmed, " + autoType);
+        telemetry.update();
+
+        return autoType;
     }
 
     private Color getColor() {

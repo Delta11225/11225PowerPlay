@@ -272,15 +272,6 @@ public class TeleopFinal extends OpMode {
         }
 
         handleClawAutoGrab();
-
-        // TODO work on this please
-//        if (ControlConfig.resetIMU && !areInittingIMU) {
-//            telemetry.addLine("Reinitting IMU");
-//            telemetry.update();
-//            initIMU();
-//            areInittingIMU = false;
-//            gamepad2.rumble(500);
-//        }
     }
 
     private void handleClawAutoGrab() {

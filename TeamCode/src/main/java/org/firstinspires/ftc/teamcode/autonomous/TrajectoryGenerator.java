@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 import java.util.HashMap;
 
+import kotlin.NotImplementedError;
+
 public class TrajectoryGenerator {
     // Various useful variables
     private final Hardware23 robot;
@@ -31,21 +33,6 @@ public class TrajectoryGenerator {
       we gotta do.
      */
     private HashMap<TrajectoryState, TrajectorySequence[]> trajectories;
-
-    /**
-     * General constructor. Generates all trajectories.
-     * @param robot The hardware file corresponding to the robot we are using
-     * @param telemetry The telemetry object to direct telem calls to
-     */
-    @Deprecated
-    public TrajectoryGenerator(Hardware23 robot, Telemetry telemetry) {
-        this.robot = robot;
-        this.drive = robot.drive;
-        this.telemetry = telemetry;
-
-        // Self explanatory. Populates trajectories variable
-        this.trajectories = generateAllTrajectories();
-    }
 
     /**
      * Contructor. Calls a method to generate only appropriate trajectories for current auto state
@@ -75,26 +62,28 @@ public class TrajectoryGenerator {
             startPos = autoState.position;
         }
 
+        autoState = new AutoState(autoState.color, startPos, autoState.autoType, autoState.delay);
+
         // Log to the console to tell user what we are working on
-        Log.d("TrajectoryGenerator", String.format("Generating start traj - %s", startPos));
-        telemetry.addLine(String.format("Generating start traj - %s", startPos));
+        Log.d("TrajectoryGenerator", String.format("Generating start traj - %s %s", startPos, autoState.autoType));
+        telemetry.addLine(String.format("Generating start traj - %s %s", startPos, autoState.autoType));
         telemetry.update();
 
         // Since the first part of each trajectory (the stuff before parking) is the same,
         // we generate it separately and don't build to avoid wasting a lot of time.
-        TrajectorySequence posColorTraj = prepareBlueStartTrajectories(startPos).build();
+        TrajectorySequence posColorTraj = prepareBlueStartTrajectories(autoState).build();
 
         // Loop through each parking position
         for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
             // Have to make this generator here or we do all parking trajectories no matter what
             TrajectorySequenceBuilder parkingGen = drive.trajectorySequenceBuilder(posColorTraj.end());
             // Once again, make sure to log
-            Log.d("TrajectoryGenerator", String.format("Generating parking traj - %s %s", startPos, parkPos));
-            telemetry.addLine(String.format("Generating parking traj - %s %s", startPos, parkPos));
+            Log.d("TrajectoryGenerator", String.format("Generating parking traj - %s %s %s", startPos, autoState.autoType, parkPos));
+            telemetry.addLine(String.format("Generating parking traj - %s %s %s", startPos, autoState.autoType, parkPos));
             telemetry.update();
 
             // Construct this to pass into parking trajectories method
-            TrajectoryState trajState = new TrajectoryState(Color.BLUE, startPos, parkPos);
+            TrajectoryState trajState = new TrajectoryState(Color.BLUE, startPos, parkPos, autoState.autoType);
 
             // Append the parking trajectories onto the start trajectories and build
             TrajectorySequenceBuilder preparedTraj = prepareBlueParkingTrajectories(parkingGen, trajState);
@@ -118,7 +107,7 @@ public class TrajectoryGenerator {
         Log.d("TrajectoryGenerator", String.format("Requested trajectory - %s %s %S",
                 autoState.color, autoState.position, parkPos));
         // A TrajectoryState (combines AutoState and ParkingPosition) that corresponds to the parameters
-        TrajectoryState tempTrajState = new TrajectoryState(autoState.color, autoState.position, parkPos);
+        TrajectoryState tempTrajState = new TrajectoryState(autoState.color, autoState.position, parkPos, autoState.autoType);
         // Used later for fetching appropriate value from hashmap
         TrajectoryState mapTrajState = new TrajectoryState();
 
@@ -150,75 +139,42 @@ public class TrajectoryGenerator {
     }
 
     /**
-     * Loops through all possible auto states and parking methods and generates appropriate trajectories.
-     * @return A hashmap with the TrajState as the key and the TrajSequence as the value
-     */
-    @Deprecated
-    private HashMap<TrajectoryState, TrajectorySequence[]> generateAllTrajectories() {
-        HashMap<TrajectoryState, TrajectorySequence[]> trajMap = new HashMap<>();
-
-        // Loop through each possible color and start position
-        for (StartPosition startPos : new StartPosition[]{StartPosition.FRONT, StartPosition.BACK}) {
-            // Log to the console to tell user what we are working on
-            Log.d("TrajectoryGenerator", String.format("Generating start traj - %s", startPos));
-            telemetry.addLine(String.format("Generating start traj - %s", startPos));
-            telemetry.update();
-
-            // Since the first part of each trajectory (the stuff before parking) is the same,
-            // we generate it separately and don't build to avoid wasting a lot of time.
-            TrajectorySequence posColorTraj = prepareBlueStartTrajectories(startPos).build();
-
-            // Loop through each parking position
-            for (ParkingPosition parkPos : new ParkingPosition[]{ParkingPosition.ONE, ParkingPosition.TWO, ParkingPosition.THREE}) {
-                // Have to make this generator here or we do all parking trajectories no matter what
-                TrajectorySequenceBuilder parkingGen = drive.trajectorySequenceBuilder(posColorTraj.end());
-                // Once again, make sure to log
-                Log.d("TrajectoryGenerator", String.format("Generating parking traj - %s %s", startPos, parkPos));
-                telemetry.addLine(String.format("Generating parking traj - %s %s", startPos, parkPos));
-                telemetry.update();
-
-                // Construct this to pass into parking trajectories method
-                TrajectoryState trajState = new TrajectoryState(Color.BLUE, startPos, parkPos);
-
-                // Append the parking trajectories onto the start trajectories and build
-                TrajectorySequenceBuilder preparedTraj = prepareBlueParkingTrajectories(parkingGen, trajState);
-                TrajectorySequence parkingTraj = preparedTraj.build();
-//                    TrajectorySequence traj = genTrajectory(trajState);
-
-                // Put finished trajectory sequence into hashmap
-                trajMap.put(trajState, new TrajectorySequence[]{posColorTraj, parkingTraj});
-
-                // Since blue front and red back are identical and so are blue back and red front, we only generate
-                // trajectories from the blue perspective and just reverse the color and start pos and insert
-                //into the dictionary. Saves time and maintenace effort.
-                TrajectoryState redReversedState = new TrajectoryState(
-                        Color.RED,
-                        startPos == StartPosition.BACK ? StartPosition.FRONT : StartPosition.BACK,
-                        parkPos);
-                trajMap.put(redReversedState, new TrajectorySequence[]{posColorTraj, parkingTraj});
-//                    Log.d("TrajectoryGenerator", "Traj gen finished");
-            }
-        }
-        return trajMap;
-    }
-
-    /**
-     * Generate blue parking trajectories given start position
-     * @param startPos The blue start position to generate trajectories for
+     * Generate blue parking trajectories given auto state
+     * @param autoState The state of the autonomous to generate trajectories for. Ignores color
      * @return The trajectory builder, with the start trajectories applied
      */
-    private TrajectorySequenceBuilder prepareBlueStartTrajectories(StartPosition startPos) {
+    private TrajectorySequenceBuilder prepareBlueStartTrajectories(AutoState autoState) {
         // Do something different depending on start position
-        switch (startPos) {
-            case FRONT:
-                return getFrontTrajectories();
-            case BACK:
-                return getBackTrajectories();
+        switch (autoState.autoType) {
+            case LONG:
+                switch (autoState.position) {
+                    case FRONT:
+                        return getLongFrontTrajectories();
+                    case BACK:
+                        return getLongBackTrajectories();
+                };
+            case SWEAT:
+                switch (autoState.position) {
+                    case FRONT:
+                        return getSweatFrontTrajectories();
+                    case BACK:
+                        return getSweatBackTrajectories();
+                }
         }
         return null;
     }
 
-    private TrajectorySequenceBuilder getFrontTrajectories() {
+    // TODO work on this
+    private TrajectorySequenceBuilder getSweatFrontTrajectories() {
+        throw new NotImplementedError("Moron were not done with this");
+    }
+
+    // TODO work on this
+    private TrajectorySequenceBuilder getSweatBackTrajectories() {
+        throw new NotImplementedError("Moron were not done with this");
+    }
+
+    private TrajectorySequenceBuilder getLongFrontTrajectories() {
         // Front trajectories
         Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
         // To handle offsetting
@@ -311,7 +267,7 @@ public class TrajectoryGenerator {
         return gen;
     }
 
-    private TrajectorySequenceBuilder getBackTrajectories() {
+    private TrajectorySequenceBuilder getLongBackTrajectories() {
         TrajectorySequenceBuilder gen;
         Pose2d startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
         startPose.plus(new Pose2d(offset.getX(), offset.getY()));
@@ -408,6 +364,16 @@ public class TrajectoryGenerator {
      */
     private TrajectorySequenceBuilder prepareBlueParkingTrajectories(TrajectorySequenceBuilder gen, TrajectoryState trajState) {
         // Basically, just dispatch according to where we need to go. Not super complex.
+        switch (trajState.autoType) {
+            case LONG:
+                return getLongParkingTrajectories(gen, trajState);
+            case SWEAT:
+                return getSweatParkingTrajectories(gen, trajState);
+        }
+        return gen;
+    }
+
+    private TrajectorySequenceBuilder getLongParkingTrajectories(TrajectorySequenceBuilder gen, TrajectoryState trajState) {
         switch (trajState.startPosition) {
             case FRONT:
                 switch (trajState.parkPos) {
@@ -443,6 +409,33 @@ public class TrajectoryGenerator {
         return gen;
     }
 
+    // TODO work on this for parking
+    private TrajectorySequenceBuilder getSweatParkingTrajectories(TrajectorySequenceBuilder gen, TrajectoryState trajState) {
+        switch (trajState.startPosition) {
+            case FRONT:
+                switch (trajState.parkPos) {
+                    case ONE:
+                        break;
+                    case TWO:
+                        break;
+                    case THREE:
+                        break;
+                }
+                break;
+            case BACK:
+                switch (trajState.parkPos) {
+                    case ONE:
+                        break;
+                    case TWO:
+                        break;
+                    case THREE:
+                        break;
+                }
+                break;
+        }
+        return gen;
+    }
+
     /**
      * Internal class that represents all facets of autonomous (color, startPos, parkPos)
      */
@@ -450,17 +443,20 @@ public class TrajectoryGenerator {
         public final Color color;
         public final StartPosition startPosition;
         public final ParkingPosition parkPos;
+        public final AutoType autoType;
 
         TrajectoryState() {
             this.color = null;
             this.startPosition = null;
             this.parkPos = null;
+            this.autoType = null;
         }
 
-        TrajectoryState(Color color, StartPosition startPosition, ParkingPosition parkPos) {
+        TrajectoryState(Color color, StartPosition startPosition, ParkingPosition parkPos, AutoType autoType) {
             this.color = color;
             this.startPosition = startPosition;
             this.parkPos = parkPos;
+            this.autoType = autoType;
         }
 
         public boolean hasSameValue(TrajectoryState state) {

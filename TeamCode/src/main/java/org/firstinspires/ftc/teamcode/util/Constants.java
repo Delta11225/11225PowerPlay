@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.firstinspires.ftc.teamcode.autonomous.AutoState;
+import org.firstinspires.ftc.teamcode.autonomous.AutoType;
 import org.firstinspires.ftc.teamcode.autonomous.Color;
 import org.firstinspires.ftc.teamcode.autonomous.StartPosition;
 
@@ -45,7 +46,7 @@ public abstract class Constants {
 
     // Set at end of auto for teleop to sue
     public static Pose2d currentPose = new Pose2d();
-    public static AutoState matchState = new AutoState(Color.BLUE, StartPosition.FRONT, 0);
+    public static AutoState matchState = new AutoState(Color.BLUE, StartPosition.FRONT, AutoType.LONG, 0);
     public static double minAutoGrabDistance = 3;
 
     public static int getLiftEncoderMax() {
@@ -62,7 +63,6 @@ public abstract class Constants {
     }
 //    public final static int liftEncoderLow = 1780;
 
-    // FIXME Test these, probably too high
     private final static int[] liftEncoderConeStack = new int[]{650, 534, 369, 181, 0};
     public static int[] getLiftEncoderConeStack() {
         return new int[] {

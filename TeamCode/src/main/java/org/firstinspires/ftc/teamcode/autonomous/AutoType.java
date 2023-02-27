@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-public enum Color {
-    BLUE(0),
-    RED(1);
+public enum AutoType {
+    LONG(0),
+    SWEAT(1);
 
     private int val;
-    Color(int val) {
+    AutoType(int val) {
         this.val = val;
     }
 }
