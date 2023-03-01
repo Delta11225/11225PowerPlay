@@ -68,6 +68,9 @@ public class TeleopFinal extends OpMode {
     // drops cone
     private final ElapsedTime lastAutoGrab = new ElapsedTime();
 
+    /**
+     * Runs once when init button is pressed
+     */
     @Override
     public void init() {
         resetRuntime();
@@ -105,6 +108,9 @@ public class TeleopFinal extends OpMode {
         telemetry.update();
     }
 
+    /**
+     * Runs once at the start of teleop
+     */
     @Override
     public void start() {
         // Tell the IMU to start keeping track of whatever it needs to
@@ -115,6 +121,37 @@ public class TeleopFinal extends OpMode {
         resetRuntime();
     }
 
+    /**
+     * Initialize IMU with proper parameters
+     */
+    private void initIMU() {
+        // IDK I copied this stuff from last year here's my best guess
+
+        // Create IMU parameters object
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        // Set appropriate units for IMU reporting. We want to report in degrees as default as it is easier
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+
+        // Black magic
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+
+        // Make sure to log stuff from IMU and set logging tag so we know it is from the IMU
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        // Which black magic algorithm to use
+        // This one seems to just log acceleration and nothing else
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        // Actually get the IMU and initalize it
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+    }
+
+    /**
+     * Runs constantly, in a loop, as long as teleop is active
+     */
     @Override
     public void loop() {
         // Every time we loop, we need to update the controls as this class handles our control mapping
@@ -134,8 +171,10 @@ public class TeleopFinal extends OpMode {
         }
     }
 
-    // TODO this needs better comments, but in the meantime, its *magic*
-    public void move() {
+    /**
+     * Handle robot movement (driver oriented control)
+     */
+    private void move() {
         // Just in case
         ControlConfig.update(gamepad1, gamepad2);
 
@@ -214,11 +253,88 @@ public class TeleopFinal extends OpMode {
     }
 
     /**
-     * This method handles all movement control if the robot is tilted too far
+     * Calculates the normal vector of the robot based on reported IMU angles
+     * @return The robot's normal vector
+     */
+    private Vector3D getRobotNormalVector() {
+        // We already have angles from IMU for telemetry and driver oriented control, so we can just get that
+        // It is in the order of ZYX
+
+        // Angles are reported in degrees, but we need radians because that is what the trig functions take
+        double x = Math.toRadians(angles.thirdAngle);
+        double y = Math.toRadians(angles.secondAngle);
+        double z = Math.toRadians(angles.firstAngle);
+
+//        telemetry.addData("Angle 1 (x)", x);
+//        telemetry.addData("Angle 2 (y)", y);
+//        telemetry.addData("Angle 3 (z)", z);
+
+//        Log.d("Tilt", String.format("Angle 1 (x) %f", x));
+//        Log.d("Tilt", String.format("Angle 2 (y) %f", y));
+//        Log.d("Tilt", String.format("Angle 3 (z) %f", z));
+
+        // All this math just gets the robot's normal vector. In technical terms, it rotates a unit
+        // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
+        // website at the bottom of the answer for the rotation matrix used.
+        // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
+
+        Vector3D normalVec = new Vector3D(
+                sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
+                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
+                cos(x) * cos(y)
+        );
+        // Above should be normal, but just in case.
+        try {
+            normalVec = normalVec.normalize();
+        } catch (MathArithmeticException e) {
+            // Normalizing vectors of length 0 throws an error so we just ignore it if it happens
+        }
+
+        telemetry.update();
+
+        return normalVec;
+    }
+
+    /**
+     * Calculates the angle of the given normal vector to the Z axis
+     * @param robotNormalVec The vector to find the angle of
+     * @return The angle of the given vector to the Z axis
+     */
+    private double calcTiltAngle(Vector3D robotNormalVec) {
+        // To compute the angle to the Z axis (tilt angle) we need arccos of the the dot product
+        // with the given vector and the Z axis. Fortunately the dot product simplifies down to
+        // this single term since two of the components of the z unit vector are zero (0, 0, 1)
+        return Math.acos(robotNormalVec.getZ());
+    }
+
+    /**
+     * Given the robot's normal vector, determines whether the robot has exceeded acceptable tilt
+     * @param normalVec The robot's normal vector
+     * @return Whether the robot is tilting too much
+     */
+    private boolean isOverMaxTilt(Vector3D normalVec) {
+        double angleToZ = calcTiltAngle(normalVec);
+
+        // Need to take absolute value in case angle is negative
+        return Math.abs(Math.toDegrees(angleToZ)) >= Constants.maxTiltDegrees;
+    }
+
+    /**
+     * Calculates whether the robot has tilted past an unrecoverable state
+     * @param normalVec The robot's normal vector
+     * @return Whether the vector is tilted too far
+     */
+    private boolean isBelowUnrecoverableTilt(Vector3D normalVec) {
+        double angleToZ = calcTiltAngle(normalVec);
+
+        return Math.abs(Math.toDegrees(angleToZ)) <= Constants.unrecoverableTiltDegrees;
+    }
+
+    /**
+     * Handle all movement control if the robot is tilted too far
      * @param robotNormalVec The normal vector of the robot
      */
     private void handleTilt(Vector3D robotNormalVec) {
-        //            Log.d("TiltCorr", "CORRECTION");
         // Find the difference between the robot's tilt angle and the maximum acceptable tilt
         double angleDiff = Math.abs(Math.toDegrees(calcTiltAngle(robotNormalVec)) - Constants.maxTiltDegrees);
         // Project the vector onto the XY plane to find direction robot should move
@@ -246,6 +362,35 @@ public class TeleopFinal extends OpMode {
     }
 
     /**
+     * Find the normalized projection of the given vector onto the XY plane
+     * @param normalVec The vector to find the projection of
+     * @return The normalized projection onto the XY plane
+     */
+    private Vector2D getNormalAxisProjection(Vector3D normalVec) {
+        // The projection of a vector onto the XY axis is just the X and Y components. We don't normalize
+        return new Vector2D(normalVec.getX(), normalVec.getY()).normalize();
+    }
+
+    /**
+     * Set the motor power to correct tilt based off the response vector if the robot is tilted.
+     * @param responseVec The vector to set motor power based off
+     */
+    private void setTiltMotorPower(Vector2D responseVec) {
+        // Because two motors are off the ground, the powers of the motors have to be set in a specific
+        // way, and this method handles all of that.
+
+        // For some reason, as it is now, this causes  the robot to spin when correcting,
+        // but I am too lazy to try to fix. It's not a bug, it's a feature, I guess.
+        double x = responseVec.getX();
+        double y = responseVec.getY();
+        double frontLeftPower = y - x;
+        double rearLeftPower = y - x;
+        double rearRightPower = -y - x;
+        double frontRightPower = x + y;
+        robot.drive.setMotorPowers(frontLeftPower, rearLeftPower, rearRightPower, frontRightPower);
+    }
+
+    /**
      * Find the correction factor based off of an exponential scaling function
      * @param angleDiff The angle difference to scale by
      * @return The calculated correction factor
@@ -255,17 +400,9 @@ public class TeleopFinal extends OpMode {
     }
 
     /**
-     * Calculates whether the robot has tilted past an unrecoverable state
-     * @param normalVec The robot's normal vector
-     * @return Whether the vector is tilted too far
+     * Handle all non-wheel movement (linear slide, etc)
      */
-    private boolean isBelowUnrecoverableTilt(Vector3D normalVec) {
-        double angleToZ = calcTiltAngle(normalVec);
-
-        return Math.abs(Math.toDegrees(angleToZ)) <= Constants.unrecoverableTiltDegrees;
-    }
-
-    public void peripheralMove() {
+    private void peripheralMove() {
         // Just to be sage
         ControlConfig.update(gamepad1, gamepad2);
 
@@ -276,106 +413,8 @@ public class TeleopFinal extends OpMode {
     }
 
     /**
-     * Handles claw control and movement
+     * Move the linear slide, and take overrides into account.
      */
-    private void handleClaw() {
-        // A button = open claw, b button = closed claw
-        // Prevents weirdness with gamepad2 locking up
-        gamepad2.toString();
-        if (ControlConfig.openClaw) {
-            isClawClosed = false;
-            // Reset claw grab cooldown
-            lastAutoGrab.reset();
-            robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
-            robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
-        } else if (ControlConfig.closeClaw) {
-            isClawClosed = true;
-            robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
-            robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
-        }
-    }
-
-    /**
-     * Deal with auto grabbing claw
-     */
-    private void handleClawAutoGrab() {
-        // Prevent autograbbing at end of teleop so if we let go of a cone right as teleop ends
-        // it doesn't grab it back
-        if (getRuntime() >= 115) {
-            return;
-        }
-
-        // If the cooldown has not expired, stop
-        if (lastAutoGrab.seconds() < Constants.autoGrabCooldownSeconds) {
-            return;
-        }
-
-        // Don't autograb if we are holding the button to open the claw
-        if (ControlConfig.openClaw) {
-            return;
-        }
-
-        // If the claw is closed, don't auto grab
-        if (isClawClosed) {
-            return;
-        }
-
-        // If the claw is above the low junction, don't auto grab
-        if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0] - 40) {
-            return;
-        }
-
-        // Get color (red and blue) of and distance to cone.
-        ColorSensor colorSensor = robot.colorSensor;
-        int red = colorSensor.red();
-        int blue = colorSensor.blue();
-        double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
-
-        // If we are too far from the cone, don't auto grab
-        if (distance > Constants.minAutoGrabDistance) {
-            return;
-        }
-
-        // Only grab the cone if the cone is the same color as our team
-        if (currentColor == Color.BLUE ? blue > red : red > blue) {
-            robot.rightClaw.setPosition(Constants.rightClawClosed);
-            robot.leftClaw.setPosition(Constants.leftClawClosed);
-            // Rumble peripheral controller to let user know auto grab has happened
-            gamepad2.rumble(250);
-            isClawClosed = true;
-            // Rest claw auto grab cooldown
-            lastAutoGrab.reset();
-        }
-    }
-
-    /**
-     * Initialize IMU with proper parameters
-     */
-    private void initIMU() {
-        // IDK I copied this stuff from last year here's my best guess
-
-        // Create IMU parameters object
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-
-        // Set appropriate units for IMU reporting. We want to report in degrees as default as it is easier
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-
-        // Black magic
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-
-        // Make sure to log stuff from IMU and set logging tag so we know it is from the IMU
-        parameters.loggingEnabled = true;
-        parameters.loggingTag = "IMU";
-        // Which black magic algorithm to use
-        // This one seems to just log acceleration and nothing else
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        // Actually get the IMU and initalize it
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-    }
-
     private void linearSlideMoveWithOverride() {
         // We refer to it a lot, so we fetch it here for easy use
         DcMotor linearSlide = robot.linearSlide;
@@ -394,9 +433,9 @@ public class TeleopFinal extends OpMode {
             // linear slide go up
             linearSlideTarget = Math.min(linearSlideTarget + Constants.upEncoderStep, Constants.getLiftEncoderMax());
 
-        // Same logic as above, just for going down. Make sure to use zeroOffset and not 0 since
-        // we don't know where linear side 0 is (if it has been overriden) and zeroOffset should be
-        // the minimum for the slide
+            // Same logic as above, just for going down. Make sure to use zeroOffset and not 0 since
+            // we don't know where linear side 0 is (if it has been overriden) and zeroOffset should be
+            // the minimum for the slide
         } else if (ControlConfig.lowerSlide && linearSlide.getCurrentPosition() > Constants.linearSlideZeroOffset && !ControlConfig.overrideModifier) {
             linearSlideMode = LinearSlideMode.MANUAL;
 
@@ -404,8 +443,8 @@ public class TeleopFinal extends OpMode {
             // Prevents slide from going down too far.
             linearSlideTarget = Math.max(linearSlideTarget - Constants.downEncoderStep, Constants.linearSlideZeroOffset);
 
-        // If we are not overriding and in manual mode, set target to current position. Prevents
-        // slide from moving after button is released.
+            // If we are not overriding and in manual mode, set target to current position. Prevents
+            // slide from moving after button is released.
         } else if (linearSlideMode == LinearSlideMode.MANUAL && !ControlConfig.overrideModifier) {
             linearSlideTarget = linearSlide.getCurrentPosition();
         }
@@ -482,99 +521,76 @@ public class TeleopFinal extends OpMode {
     }
 
     /**
-     * Set the motor power to correct tilt based off the response vector if the robot is tilted.
-     * @param responseVec The vector to set motor power based off
+     * Handles claw control and movement
      */
-    private void setTiltMotorPower(Vector2D responseVec) {
-        // Because two motors are off the ground, the powers of the motors have to be set in a specific
-        // way, and this method handles all of that.
-
-        // For some reason, as it is now, this causes  the robot to spin when correcting,
-        // but I am too lazy to try to fix. It's not a bug, it's a feature, I guess.
-        double x = responseVec.getX();
-        double y = responseVec.getY();
-        double frontLeftPower = y - x;
-        double rearLeftPower = y - x;
-        double rearRightPower = -y - x;
-        double frontRightPower = x + y;
-        robot.drive.setMotorPowers(frontLeftPower, rearLeftPower, rearRightPower, frontRightPower);
+    private void handleClaw() {
+        // A button = open claw, b button = closed claw
+        // Prevents weirdness with gamepad2 locking up
+        gamepad2.toString();
+        if (ControlConfig.openClaw) {
+            isClawClosed = false;
+            // Reset claw grab cooldown
+            lastAutoGrab.reset();
+            robot.rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
+            robot.leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
+        } else if (ControlConfig.closeClaw) {
+            isClawClosed = true;
+            robot.rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
+            robot.leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
+        }
     }
 
     /**
-     * Calculates the angle of the given normal vector to the Z axis
-     * @param robotNormalVec The vector to find the angle of
-     * @return The angle of the given vector to the Z axis
+     * Deal with auto grabbing claw
      */
-    private double calcTiltAngle(Vector3D robotNormalVec) {
-        // To compute the angle to the Z axis (tilt angle) we need arccos of the the dot product
-        // with the given vector and the Z axis. Fortunately the dot product simplifies down to
-        // this single term since two of the components of the z unit vector are zero (0, 0, 1)
-        return Math.acos(robotNormalVec.getZ());
-    }
-
-    /**
-     * Calculates the normal vector of the robot based on reported IMU angles
-     * @return The robot's normal vector
-     */
-    private Vector3D getRobotNormalVector() {
-        // We already have angles from IMU for telemetry and driver oriented control, so we can just get that
-        // It is in the order of ZYX
-
-        // Angles are reported in degrees, but we need radians because that is what the trig functions take
-        double x = Math.toRadians(angles.thirdAngle);
-        double y = Math.toRadians(angles.secondAngle);
-        double z = Math.toRadians(angles.firstAngle);
-
-//        telemetry.addData("Angle 1 (x)", x);
-//        telemetry.addData("Angle 2 (y)", y);
-//        telemetry.addData("Angle 3 (z)", z);
-
-//        Log.d("Tilt", String.format("Angle 1 (x) %f", x));
-//        Log.d("Tilt", String.format("Angle 2 (y) %f", y));
-//        Log.d("Tilt", String.format("Angle 3 (z) %f", z));
-
-        // All this math just gets the robot's normal vector. In technical terms, it rotates a unit
-        // z vector using roll (x), pitch (y), and yaw/bank/heading (z) angles. Refer to the following
-        // website at the bottom of the answer for the rotation matrix used.
-        // https://math.stackexchange.com/questions/1637464/find-unit-vector-given-roll-pitch-and-yaw
-
-        Vector3D normalVec = new Vector3D(
-                sin(x) * cos(y) * cos(z) + sin(y) * sin(z),
-                sin(y) * cos(z) - sin(x) * cos(y) * sin(z),
-                cos(x) * cos(y)
-        );
-        // Above should be normal, but just in case.
-        try {
-            normalVec = normalVec.normalize();
-        } catch (MathArithmeticException e) {
-            // Normalizing vectors of length 0 throws an error so we just ignore it if it happens
+    private void handleClawAutoGrab() {
+        // Prevent autograbbing at end of teleop so if we let go of a cone right as teleop ends
+        // it doesn't grab it back
+        if (getRuntime() >= 115) {
+            return;
         }
 
-        telemetry.update();
+        // If the cooldown has not expired, stop
+        if (lastAutoGrab.seconds() < Constants.autoGrabCooldownSeconds) {
+            return;
+        }
 
-        return normalVec;
-    }
+        // Don't autograb if we are holding the button to open the claw
+        if (ControlConfig.openClaw) {
+            return;
+        }
 
-    /**
-     * Given the robot's normal vector, determines whether the robot has exceeded acceptable tilt
-     * @param normalVec The robot's normal vector
-     * @return Whether the robot is tilting too much
-     */
-    private boolean isOverMaxTilt(Vector3D normalVec) {
-        double angleToZ = calcTiltAngle(normalVec);
+        // If the claw is closed, don't auto grab
+        if (isClawClosed) {
+            return;
+        }
 
-        // Need to take absolute value in case angle is negative
-        return Math.abs(Math.toDegrees(angleToZ)) >= Constants.maxTiltDegrees;
-    }
+        // If the claw is above the low junction, don't auto grab
+        if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0] - 40) {
+            return;
+        }
 
-    /**
-     * Find the normalized projection of the given vector onto the XY plane
-     * @param normalVec The vector to find the projection of
-     * @return The normalized projection onto the XY plane
-     */
-    private Vector2D getNormalAxisProjection(Vector3D normalVec) {
-        // The projection of a vector onto the XY axis is just the X and Y components. We don't normalize
-        return new Vector2D(normalVec.getX(), normalVec.getY()).normalize();
+        // Get color (red and blue) of and distance to cone.
+        ColorSensor colorSensor = robot.colorSensor;
+        int red = colorSensor.red();
+        int blue = colorSensor.blue();
+        double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
+
+        // If we are too far from the cone, don't auto grab
+        if (distance > Constants.minAutoGrabDistance) {
+            return;
+        }
+
+        // Only grab the cone if the cone is the same color as our team
+        if (currentColor == Color.BLUE ? blue > red : red > blue) {
+            robot.rightClaw.setPosition(Constants.rightClawClosed);
+            robot.leftClaw.setPosition(Constants.leftClawClosed);
+            // Rumble peripheral controller to let user know auto grab has happened
+            gamepad2.rumble(250);
+            isClawClosed = true;
+            // Rest claw auto grab cooldown
+            lastAutoGrab.reset();
+        }
     }
 
     /*-----------------------------------//
