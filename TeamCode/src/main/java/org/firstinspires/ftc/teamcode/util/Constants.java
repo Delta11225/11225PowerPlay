@@ -27,7 +27,7 @@ public abstract class Constants {
     public final static int autoLiftEncoderStart = 40;
 
     public final static double leftClawOpen = 0.48;
-    public final static double leftClawClosed = 0.6;
+    public final static double leftClawClosed = 0.7;
     //right claw is plugged into port 0, left into 1
     public final static double rightClawOpen = 0.64;
     public final static double rightClawClosed = 0.53;
@@ -54,9 +54,9 @@ public abstract class Constants {
     //    private final static int[] liftEncoderJunctions = new int[] {1780, -1, -1, -1};
     public static int[] getLiftEncoderJunctions() {
         return new int[] {
-                1750 + linearSlideZeroOffset,
-                2910 + linearSlideZeroOffset,
-                4005 + linearSlideZeroOffset,
+                1750 + linearSlideZeroOffset, // 0 = low junction
+                2910 + linearSlideZeroOffset, // 1 = med junction
+                4005 + linearSlideZeroOffset, // 2 = high junction
                 liftEncoderMax + linearSlideZeroOffset
         };
     }
