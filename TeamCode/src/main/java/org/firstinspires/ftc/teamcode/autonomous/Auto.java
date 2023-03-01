@@ -92,7 +92,7 @@ public class Auto extends LinearOpMode {
 
         // Get the trajectories we need to run for this autonomous
         TrajectorySequence[] trajSequences;
-        trajSequences = trajGen.getAppropriateTrajectory(autoState, parkPos);
+        trajSequences = trajGen.getAppropriateTrajectory(parkPos);
 
         // Execute start of game delay
         sleep(delay);

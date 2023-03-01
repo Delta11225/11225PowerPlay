@@ -22,18 +22,14 @@ public class TrajectoryGenerator {
     private final Hardware23 robot;
     private final SampleMecanumDrive drive;
     private final Telemetry telemetry;
-    private Vector2d offset = new Vector2d(0, 0);
+    private final Vector2d offset;
 
     /*
-      Stores mapping between Auto State (color, start pos, park pos) and traj sequence to run.
-      Stores an array of start trajectory and parking trajectory for efficiency reasons. It is inefficient to
-      regenerate start traj for each parking position, but we can't use the same start traj for each parking
-      trajectory because there is no good way to copy a TrajectorySequenceBuilder. As a result, we generate start
-      and parking trajectories separately, and store them in an array in this dictionary. It's annoying, but it's what
-      we gotta do.
+    Stores a mapping between parking position and trajectory sequences, as we don't know parking
+    position before auto starts, so we generate all possible trajectories for the given autostate
+    beforehand and store them in this hashmap
      */
-    // TODO can be restructured to only hold parking position probably
-    private HashMap<TrajectoryState, TrajectorySequence[]> trajectories;
+    private final HashMap<ParkingPosition, TrajectorySequence[]> trajectories;
 
     /**
      * Contructor. Calls a method to generate only appropriate trajectories for current auto state
@@ -52,8 +48,8 @@ public class TrajectoryGenerator {
         this.trajectories = generateSpecificTrajectories(autoState);
     }
 
-    private HashMap<TrajectoryState, TrajectorySequence[]> generateSpecificTrajectories(AutoState autoState) {
-        HashMap<TrajectoryState, TrajectorySequence[]> trajMap = new HashMap<>();
+    private HashMap<ParkingPosition, TrajectorySequence[]> generateSpecificTrajectories(AutoState autoState) {
+        HashMap<ParkingPosition, TrajectorySequence[]> trajMap = new HashMap<>();
 
         StartPosition startPos;
         // Invert start position if color is red
@@ -92,38 +88,22 @@ public class TrajectoryGenerator {
 //                    TrajectorySequence traj = genTrajectory(trajState);
 
             // Put finished trajectory sequence into hashmap
-            trajMap.put(trajState, new TrajectorySequence[]{posColorTraj, parkingTraj});
+            trajMap.put(trajState.parkPos, new TrajectorySequence[]{posColorTraj, parkingTraj});
 //                    Log.d("TrajectoryGenerator", "Traj gen finished");
         }
         return trajMap;
     }
 
     /**
-     * Return the trajectory sequence corresponding with the auto state given
-     * @param autoState The state that auto is in (color, start pos)
+     * Return the trajectory sequence corresponding with the parking position given
      * @param parkPos The required parking position
      * @return The appropriate trajectory sequence for this auto state
      */
-    public TrajectorySequence[] getAppropriateTrajectory(AutoState autoState, ParkingPosition parkPos) {
-        Log.d("TrajectoryGenerator", String.format("Requested trajectory - %s %s %S",
-                autoState.color, autoState.position, parkPos));
-        // A TrajectoryState (combines AutoState and ParkingPosition) that corresponds to the parameters
-        TrajectoryState tempTrajState = new TrajectoryState(autoState.color, autoState.position, parkPos, autoState.autoType);
-        // Used later for fetching appropriate value from hashmap
-        TrajectoryState mapTrajState = new TrajectoryState();
+    public TrajectorySequence[] getAppropriateTrajectory(ParkingPosition parkPos) {
+        // We only need parkpos as we don't generate all the trajectories all at once
+        Log.d("TrajectoryGenerator", String.format("Requested trajectory - %s", parkPos));
 
-        // Since hashmaps are not by value but by reference, we need to manually loop through the hashmap to find
-        // the key with the same VALUE as the trajectory state we have, and save it
-        for (TrajectoryState trajState : trajectories.keySet()) {
-            if (tempTrajState.hasSameValue(trajState)) {
-                mapTrajState = trajState;
-                break;
-            }
-        }
-
-        // Get the right trajectories with the traj state object we found earlier. If we don't find it, provide null instead of
-        // throwing an error
-        TrajectorySequence[] traj = trajectories.getOrDefault(mapTrajState, null);
+        TrajectorySequence[] traj = trajectories.getOrDefault(parkPos, null);
         
         // If traj is null, it means it wasn't in our hashmap, and something has gone wrong. Let the user know.
         if (traj == null) {
