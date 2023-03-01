@@ -50,6 +50,11 @@ public class TrajectoryGenerator {
         this.trajectories = generateSpecificTrajectories(autoState);
     }
 
+    /**
+     * Generates trajectories based off of provided autostate. Also generates all parking trajectories.
+     * @param autoState The autostate to generate trajectories by
+     * @return A HashMap between parking position and appropriate list of trajectories
+     */
     private HashMap<ParkingPosition, TrajectorySequence[]> generateSpecificTrajectories(AutoState autoState) {
         HashMap<ParkingPosition, TrajectorySequence[]> trajMap = new HashMap<>();
 
@@ -148,11 +153,19 @@ public class TrajectoryGenerator {
     }
 
     // TODO work on this
+    /**
+     * Get front position trajectories for sweat autonomous type
+     * @return A builder for the sweat front trajectories
+     */
     private TrajectorySequenceBuilder getSweatFrontTrajectories() {
         throw new NotImplementedError("Moron were not done with this");
     }
 
     // TODO work on this
+    /**
+     * Get back position trajectories for sweat autonomous type
+     * @return A builder for the sweat back trajectories
+     */
     private TrajectorySequenceBuilder getSweatBackTrajectories() {
         throw new NotImplementedError("Moron were not done with this");
     }
@@ -393,6 +406,12 @@ public class TrajectoryGenerator {
     }
 
     // TODO work on this for parking
+    /**
+     * Get parking trajectories for sweat autonomous
+     * @param gen The trajectory generator to append trajectories to
+     * @param trajState The trajectory state to generate off of
+     * @return A builder of the appropriate parking trajectory
+     */
     private TrajectorySequenceBuilder getSweatParkingTrajectories(TrajectorySequenceBuilder gen, TrajectoryState trajState) {
         switch (trajState.startPosition) {
             case FRONT:
