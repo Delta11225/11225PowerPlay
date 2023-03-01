@@ -22,6 +22,8 @@ public class TrajectoryGenerator {
     private final Hardware23 robot;
     private final SampleMecanumDrive drive;
     private final Telemetry telemetry;
+
+    // Stores start position offset provided by user
     private final Vector2d offset;
 
     /*
