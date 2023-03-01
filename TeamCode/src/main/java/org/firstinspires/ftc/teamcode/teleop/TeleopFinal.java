@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -41,7 +40,6 @@ public class TeleopFinal extends OpMode {
 
     BNO055IMU imu;
     Orientation angles;
-    Acceleration gravity;
 
     double frontLeft;
     double rearLeft;
@@ -485,7 +483,7 @@ public class TeleopFinal extends OpMode {
 
     /**
      * Set the motor power to correct tilt based off the response vector if the robot is tilted.
-     * @param responseVec
+     * @param responseVec The vector to set motor power based off
      */
     private void setTiltMotorPower(Vector2D responseVec) {
         // Because two motors are off the ground, the powers of the motors have to be set in a specific
@@ -551,13 +549,6 @@ public class TeleopFinal extends OpMode {
         } catch (MathArithmeticException e) {
             // Normalizing vectors of length 0 throws an error so we just ignore it if it happens
         }
-//        telemetry.addData("Component x", normalVec.getX());
-//        telemetry.addData("Component y", normalVec.getY());
-//        telemetry.addData("Component z", normalVec.getZ());
-
-//        Log.d("Tilt", String.format("Component x %f", normalVec.getX()));
-//        Log.d("Tilt", String.format("Component y %f", normalVec.getY()));
-//        Log.d("Tilt", String.format("Component z %f", normalVec.getZ()));
 
         telemetry.update();
 
