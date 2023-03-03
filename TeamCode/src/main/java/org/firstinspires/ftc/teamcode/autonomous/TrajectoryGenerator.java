@@ -55,6 +55,32 @@ public class TrajectoryGenerator {
         // Populates trajectories variable with generated trajectories
         this.trajectories = generateAppropriateTrajectories(autoState);
     }
+    
+    /**
+     * Return the trajectory sequence corresponding with the parking position given
+     * @param parkPos The required parking position
+     * @return The appropriate trajectory sequence for this auto state
+     */
+    public TrajectorySequence[] getAppropriateTrajectory(ParkingPosition parkPos) {
+        // We only need to take parkpos as we don't generate all possible trajectories all at once
+        Log.d("TrajectoryGenerator", String.format("Requested trajectory - %s", parkPos));
+        
+        // Fetch the appropriate trajectories from the hashmap
+        TrajectorySequence[] traj = trajectories.getOrDefault(parkPos, null);
+        
+        // If traj is null, it means it wasn't in our hashmap, and something has gone wrong. Let the user know.
+        if (traj == null) {
+            // Throw and error and report the error to the log (debug reasons)
+            Log.e("TrajectoryGenerator", "WTF? How? You somehow have provide an auto state that there" +
+                    "aren't trajectories for.");
+            throw new IllegalStateException("WTF? How? You somehow have provide an auto state that there" +
+                    "aren't trajectories for.");
+        }
+        
+        // Make sure to tell the robot where it is based on where the trajectory starts
+        drive.setPoseEstimate(traj[0].start());
+        return traj;
+    }
 
     /**
      * Generates trajectories based off of provided autostate. Also generates all parking trajectories.
@@ -107,33 +133,7 @@ public class TrajectoryGenerator {
         }
         return trajMap;
     }
-
-    /**
-     * Return the trajectory sequence corresponding with the parking position given
-     * @param parkPos The required parking position
-     * @return The appropriate trajectory sequence for this auto state
-     */
-    public TrajectorySequence[] getAppropriateTrajectory(ParkingPosition parkPos) {
-        // We only need to take parkpos as we don't generate all possible trajectories all at once
-        Log.d("TrajectoryGenerator", String.format("Requested trajectory - %s", parkPos));
-
-        // Fetch the appropriate trajectories from the hashmap
-        TrajectorySequence[] traj = trajectories.getOrDefault(parkPos, null);
-        
-        // If traj is null, it means it wasn't in our hashmap, and something has gone wrong. Let the user know.
-        if (traj == null) {
-            // Throw and error and report the error to the log (debug reasons)
-            Log.e("TrajectoryGenerator", "WTF? How? You somehow have provide an auto state that there" +
-                    "aren't trajectories for.");
-            throw new IllegalStateException("WTF? How? You somehow have provide an auto state that there" +
-                    "aren't trajectories for.");
-        }
-
-        // Make sure to tell the robot where it is based on where the trajectory starts
-        drive.setPoseEstimate(traj[0].start());
-        return traj;
-    }
-
+    
     /**
      * Generate blue parking trajectories given auto state
      * @param autoState The state of the autonomous to generate trajectories for. Ignores color
@@ -159,25 +159,7 @@ public class TrajectoryGenerator {
         }
         return null;
     }
-
-    // TODO work on this
-    /**
-     * Get front position trajectories for sweat autonomous type
-     * @return A builder for the sweat front trajectories
-     */
-    private TrajectorySequenceBuilder getSweatFrontTrajectories() {
-        throw new NotImplementedError("Moron we're not done with this");
-    }
-
-    // TODO work on this
-    /**
-     * Get back position trajectories for sweat autonomous type
-     * @return A builder for the sweat back trajectories
-     */
-    private TrajectorySequenceBuilder getSweatBackTrajectories() {
-        throw new NotImplementedError("Moron we're not done with this");
-    }
-
+    
     /**
      * Get the start trajectories for the long auto and the front starting position
      * @return The appropriate trajectories
@@ -187,7 +169,7 @@ public class TrajectoryGenerator {
         Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
         // Add offset to start pose
         startPose.plus(new Pose2d(offset.getX(), offset.getY()));
-
+        
         // We return a generator instead of the trajectory in case we want to add to it
         TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
 //                        .setTurnConstraint(60, 0.5)
@@ -235,7 +217,7 @@ public class TrajectoryGenerator {
                 // Approach cone stack and wait a second
                 .splineToConstantHeading(new Vector2d(-56.5, 8), Math.toRadians(180))
                 .waitSeconds(0.25)
-
+                
                 // Grab cone
                 .addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);
@@ -280,10 +262,10 @@ public class TrajectoryGenerator {
                 })
                 // Go to position to prepare for parking
                 .splineToLinearHeading(new Pose2d(-35, 11, Math.toRadians(90)), Math.toRadians(90));
-
+        
         return gen;
     }
-
+    
     /**
      * Get the start trajectories for the long auto and the back starting position
      * @return The appropriate trajectories
@@ -293,7 +275,7 @@ public class TrajectoryGenerator {
         Pose2d startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
         // Add offset to start pose
         startPose.plus(new Pose2d(offset.getX(), offset.getY()));
-
+        
         // We return a generator instead of the trajectory in case we want to add to it
         TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
                 // Close the claw at start
@@ -328,7 +310,7 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     robot.linearSlide.setPower(1);
                 })
-
+                
                 // Square up with cone stack
                 .splineToLinearHeading(new Pose2d(10, 30, Math.toRadians(270)), Math.toRadians(270))
                 // Turn to face cone stack and lift linear slide to appropriate height
@@ -341,7 +323,7 @@ public class TrajectoryGenerator {
                 // Approach cone stack and wait a second
                 .splineToConstantHeading(new Vector2d(56, 8), Math.toRadians(0))
                 .waitSeconds(0.25)
-
+                
                 // Grab cone
                 .addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);
@@ -367,7 +349,7 @@ public class TrajectoryGenerator {
                 })
                 // Get to medium junction
                 .splineToLinearHeading(new Pose2d(27.5, 9, Math.toRadians(120)), Math.toRadians(210))
-
+                
                 // Drop cone
                 .splineToLinearHeading(new Pose2d(24.5, 13.5, Math.toRadians(120)), Math.toRadians(120))
                 .addDisplacementMarker(() -> {
@@ -386,6 +368,24 @@ public class TrajectoryGenerator {
                 // Go to position to prepare for parking
                 .splineToLinearHeading(new Pose2d(35, 6, Math.toRadians(90)), Math.toRadians(90));
         return gen;
+    }
+    
+    // TODO work on this
+    /**
+     * Get front position trajectories for sweat autonomous type
+     * @return A builder for the sweat front trajectories
+     */
+    private TrajectorySequenceBuilder getSweatFrontTrajectories() {
+        throw new NotImplementedError("Moron we're not done with this");
+    }
+    
+    // TODO work on this
+    /**
+     * Get back position trajectories for sweat autonomous type
+     * @return A builder for the sweat back trajectories
+     */
+    private TrajectorySequenceBuilder getSweatBackTrajectories() {
+        throw new NotImplementedError("Moron we're not done with this");
     }
 
     /**
