@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -13,11 +12,11 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 @Autonomous
 //@Disabled
-public class ShortTrajectoryTest extends LinearOpMode {
+public class ShortBlueBackTrajTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Hardware23 robot = new Hardware23(hardwareMap);
-        Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
+        Pose2d startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
         robot.drive.setPoseEstimate(startPose);
         TrajectorySequence test = robot.drive.trajectorySequenceBuilder(startPose)
                 .addDisplacementMarker(() -> {
@@ -32,7 +31,7 @@ public class ShortTrajectoryTest extends LinearOpMode {
                     robot.linearSlide.setPower(1);
                 })
                 //.strafeTo(new Vector2d(-20,54.375 ))
-                .lineToConstantHeading(new Vector2d(-20,54.375))
+                .lineToConstantHeading(new Vector2d(20,54.375))
                 .waitSeconds(0.5)
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
@@ -40,7 +39,7 @@ public class ShortTrajectoryTest extends LinearOpMode {
                 })
                 .forward(0.01)
                 .waitSeconds(0.25)
-                .strafeTo(new Vector2d(-35,60 ))
+                .strafeTo(new Vector2d(35,60 ))
                 .addDisplacementMarker(() -> {
                     robot.linearSlide.setTargetPosition(Constants.linearSlideZeroOffset);
 
@@ -62,6 +61,8 @@ public class ShortTrajectoryTest extends LinearOpMode {
                 .strafeTo(new Vector2d(-62, 60))
                 .splineToLinearHeading(new Pose2d(-62, 33, Math.toRadians(90)), Math.toRadians(270))
                  */
+
+
 
                 .strafeTo(new Vector2d(-8, 60))
                 .splineToLinearHeading(new Pose2d(-8, 33, Math.toRadians(90)), Math.toRadians(270))
