@@ -38,11 +38,35 @@ public class ShortTrajectoryTest extends LinearOpMode {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
                 })
+                .forward(0.01)
                 .waitSeconds(0.25)
-                .strafeTo(new Vector2d(-35,58 ))
+                .strafeTo(new Vector2d(-35,60 ))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.linearSlideZeroOffset);
 
-                // Left parking
-                .strafeTo(new Vector2d(-6, 58))
+                })
+
+                /* BLUE FRONT PARKING 1
+                .strafeTo(new Vector2d(-8, 60))
+                .splineToLinearHeading(new Pose2d(-8, 33, Math.toRadians(90)), Math.toRadians(270))
+                */
+
+                /* BLUE FRONT PARKING 2
+                .strafeTo(new Vector2d(-8, 60))
+                .splineToLinearHeading(new Pose2d(-8, 33, Math.toRadians(90)), Math.toRadians(270))
+                .strafeTo(new Vector2d(-40, 33))
+                .strafeTo(new Vector2d(-35, 33))
+                 */
+
+                /* BLUE FRONT PARKING 3
+                .strafeTo(new Vector2d(-62, 60))
+                .splineToLinearHeading(new Pose2d(-62, 33, Math.toRadians(90)), Math.toRadians(270))
+                 */
+
+                .strafeTo(new Vector2d(-8, 60))
+                .splineToLinearHeading(new Pose2d(-8, 33, Math.toRadians(90)), Math.toRadians(270))
+                .strafeTo(new Vector2d(-40, 33))
+                .strafeTo(new Vector2d(-35, 33))
 
                 //.splineToConstantHeading(new Vector2d(-10, 57.1), Math.toRadians(270))
 
