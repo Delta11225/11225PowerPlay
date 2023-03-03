@@ -70,7 +70,7 @@ public class Hardware23 {
     public Servo leftClaw;
 
     public ColorSensor colorSensor;
-    // RoadRunner driver
+    // RoadRunner drive class
     public SampleMecanumDrive drive;
 
     /**
@@ -82,12 +82,12 @@ public class Hardware23 {
         drive = new SampleMecanumDrive(hardwareMap);
 
         // We wrap these in try catch blocks to prevent the robot from failing when something is unplugged
-        // or not connected to the robot. Don't have this enabled for competition
+        // or not connected to the robot. Is not enabled for competition
         try {
             rearLeft = hardwareMap.dcMotor.get("rear_left");
 //            rearLeft.setDirection(DcMotor.Direction.REVERSE);
         } catch (Exception e) {
-            // If we are not in competition mode we throw the error, otherwise we replace the device
+            // If we are in competition mode we throw the error, otherwise we replace the device
             // with a "null" device, which basically just acts as a dummy device and eats all method calls
             // with no effect
             if (!Constants.COMPETITION_MODE) {

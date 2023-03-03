@@ -7,6 +7,11 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.types.AutoState;
+import org.firstinspires.ftc.teamcode.util.types.AutoType;
+import org.firstinspires.ftc.teamcode.util.types.Color;
+import org.firstinspires.ftc.teamcode.util.types.ParkingPosition;
+import org.firstinspires.ftc.teamcode.util.types.StartPosition;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -175,7 +180,7 @@ public class TrajectoryGenerator {
 
     /**
      * Get the start trajectories for the long auto and the front starting position
-     * @return
+     * @return The appropriate trajectories
      */
     private TrajectorySequenceBuilder getLongFrontTrajectories() {
         // Where the robot starts
@@ -281,7 +286,7 @@ public class TrajectoryGenerator {
 
     /**
      * Get the start trajectories for the long auto and the back starting position
-     * @return
+     * @return The appropriate trajectories
      */
     private TrajectorySequenceBuilder getLongBackTrajectories() {
         // Where the robot starts

@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.testing;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.autonomous.AutoState;
-import org.firstinspires.ftc.teamcode.autonomous.ParkingPosition;
+import org.firstinspires.ftc.teamcode.util.types.AutoState;
+import org.firstinspires.ftc.teamcode.util.types.ParkingPosition;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.util.Hardware23;

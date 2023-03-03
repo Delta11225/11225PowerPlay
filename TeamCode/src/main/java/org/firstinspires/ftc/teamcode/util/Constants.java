@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
-import org.firstinspires.ftc.teamcode.autonomous.AutoState;
-import org.firstinspires.ftc.teamcode.autonomous.AutoType;
-import org.firstinspires.ftc.teamcode.autonomous.Color;
-import org.firstinspires.ftc.teamcode.autonomous.StartPosition;
+import org.firstinspires.ftc.teamcode.util.types.AutoState;
+import org.firstinspires.ftc.teamcode.util.types.AutoType;
+import org.firstinspires.ftc.teamcode.util.types.Color;
+import org.firstinspires.ftc.teamcode.util.types.StartPosition;
 
 /**
  * This is a class that holds all necessary constants for the robot. Put "magic numbers" here.

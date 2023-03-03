@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
-import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
+import org.firstinspires.ftc.teamcode.util.types.LinearSlideMode;
 
 @TeleOp
 @Disabled

@@ -8,6 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.util.types.AutoState;
+import org.firstinspires.ftc.teamcode.util.types.AutoType;
+import org.firstinspires.ftc.teamcode.util.types.Color;
+import org.firstinspires.ftc.teamcode.util.types.ParkingPosition;
+import org.firstinspires.ftc.teamcode.util.types.StartPosition;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;

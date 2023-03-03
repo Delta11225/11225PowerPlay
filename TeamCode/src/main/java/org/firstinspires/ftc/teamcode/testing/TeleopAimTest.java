@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.testing;
 
-import android.graphics.Canvas;
 import android.util.Log;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -12,29 +11,19 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.apache.commons.math3.exception.MathArithmeticException;
-import org.apache.commons.math3.geometry.Point;
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.ControlConfig;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
-import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
+import org.firstinspires.ftc.teamcode.util.types.LinearSlideMode;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 
 @Disabled
 @TeleOp
@@ -411,12 +400,8 @@ public class TeleopAimTest extends OpMode {
         if (quadrant == 3 && jx <= rx && jy >= ry) {
             return true;
         }
-        
-        if (jx >= rx && jy >= ry) {
-            return true;
-        }
-
-        return false;
+    
+        return jx >= rx && jy >= ry;
     }
 
     private List<Vector2d> filterJunctionsByQuadrant(int quadrant, List<Vector2d> junctions, Pose2d robotPos) {

@@ -21,11 +21,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.teamcode.autonomous.Color;
+import org.firstinspires.ftc.teamcode.util.types.Color;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.ControlConfig;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
-import org.firstinspires.ftc.teamcode.util.LinearSlideMode;
+import org.firstinspires.ftc.teamcode.util.types.LinearSlideMode;
 
 import java.util.Locale;
 
@@ -459,7 +459,7 @@ public class TeleopFinal extends OpMode {
         long linearSlidePos = robot.linearSlide.getCurrentPosition();
         long ellaSafetyThreshold = Constants.getLiftEncoderJunctions()[0] - 20;
         if (ControlConfig.goToGround && !(isClawClosed && linearSlidePos > ellaSafetyThreshold)) {
-            linearSlideMode = LinearSlideMode.GROUD;
+            linearSlideMode = LinearSlideMode.GROUND;
             linearSlideTarget = Constants.linearSlideZeroOffset;
         }
 
