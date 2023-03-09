@@ -37,6 +37,7 @@ public class ShortBlueBackTrajTest extends LinearOpMode {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
                 })
+
                 .forward(0.01)
                 .waitSeconds(0.25)
                 .strafeTo(new Vector2d(35,60 ))
@@ -44,20 +45,20 @@ public class ShortBlueBackTrajTest extends LinearOpMode {
                     robot.linearSlide.setTargetPosition(Constants.linearSlideZeroOffset);
 
                 })
-                // 10/1 Parking 3
-                //.strafeTo(new Vector2d(6, 60))
-                //.splineToLinearHeading(new Pose2d(6, 33, Math.toRadians(90)), Math.toRadians(270))
+                //10/1 Parking 3
+                // .strafeTo(new Vector2d(6, 60))
+                // .splineToLinearHeading(new Pose2d(6, 30, Math.toRadians(90)), Math.toRadians(270))
 
 
                 // 10/1 Parking 2
-                //.strafeTo(new Vector2d(6, 60))
-               // .splineToLinearHeading(new Pose2d(6, 33, Math.toRadians(90)), Math.toRadians(270))
-               // .strafeTo(new Vector2d(40, 33))
-               // .strafeTo(new Vector2d(32, 33))
+                // .strafeTo(new Vector2d(6, 60))
+                // .splineToLinearHeading(new Pose2d(6, 30, Math.toRadians(90)), Math.toRadians(270))
+                // .strafeTo(new Vector2d(40, 30))
+                // .strafeTo(new Vector2d(32, 30))
 
                 // 10/1 Parking 1
                 .strafeTo(new Vector2d(61, 60))
-                .splineToLinearHeading(new Pose2d(61, 33, Math.toRadians(90)), Math.toRadians(270))
+                .splineToLinearHeading(new Pose2d(61, 30, Math.toRadians(90)), Math.toRadians(270))
 
                 //.splineToConstantHeading(new Vector2d(-10, 57.1), Math.toRadians(270))
 

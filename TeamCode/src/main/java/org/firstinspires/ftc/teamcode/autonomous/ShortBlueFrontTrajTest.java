@@ -64,19 +64,19 @@ public class ShortBlueFrontTrajTest extends LinearOpMode {
                  */
 
                 // 10/1 Parking 1
-                //.strafeTo(new Vector2d(6, 60))
-                //.splineToLinearHeading(new Pose2d(6, 33, Math.toRadians(90)), Math.toRadians(270))
+                .strafeTo(new Vector2d(-6, 60))
+                .splineToLinearHeading(new Pose2d(-8, 30, Math.toRadians(90)), Math.toRadians(270))
 
 
                 // 10/1 Parking 2
-                //.strafeTo(new Vector2d(-6, 60))
-                // .splineToLinearHeading(new Pose2d(-6, 33, Math.toRadians(90)), Math.toRadians(270))
-                // .strafeTo(new Vector2d(-40, 33))
-                // .strafeTo(new Vector2d(-32, 33))
+               // .strafeTo(new Vector2d(-6, 60))
+                //.splineToLinearHeading(new Pose2d(-6, 30, Math.toRadians(90)), Math.toRadians(270))
+                //.strafeTo(new Vector2d(-40, 33))
+                //.strafeTo(new Vector2d(-32, 33))
 
                 // 10/1 Parking 3
-                .strafeTo(new Vector2d(-63, 60))
-                .splineToLinearHeading(new Pose2d(-63, 33, Math.toRadians(90)), Math.toRadians(270))
+                //.strafeTo(new Vector2d(-63, 60))
+                //.splineToLinearHeading(new Pose2d(-63, 30, Math.toRadians(90)), Math.toRadians(270))
 
 
                 //.splineToConstantHeading(new Vector2d(-10, 57.1), Math.toRadians(270))
