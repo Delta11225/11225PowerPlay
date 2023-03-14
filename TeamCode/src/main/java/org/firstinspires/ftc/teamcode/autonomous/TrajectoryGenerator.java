@@ -370,13 +370,43 @@ public class TrajectoryGenerator {
         return gen;
     }
     
-    // TODO work on this
+    // TODO work on this with better comments
     /**
      * Get front position trajectories for sweat autonomous type
      * @return A builder for the sweat front trajectories
      */
     private TrajectorySequenceBuilder getSweatFrontTrajectories() {
-        throw new NotImplementedError("Moron we're not done with this");
+        Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
+    
+        startPose.plus(new Pose2d(offset.getX(), offset.getY()));
+        
+        TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
+                .addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                })
+                .forward(.01)
+                .waitSeconds(1.0)
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                //.strafeTo(new Vector2d(-20,54.375 ))
+                .lineToConstantHeading(new Vector2d(-20,54.375))
+                .waitSeconds(0.5)
+                .addDisplacementMarker(() -> {
+                    robot.leftClaw.setPosition(Constants.leftClawOpen);
+                    robot.rightClaw.setPosition(Constants.rightClawOpen);
+                })
+                .forward(0.01)
+                .waitSeconds(0.25)
+                .strafeTo(new Vector2d(-35,60 ))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.linearSlideZeroOffset);
+                
+                });
+        return gen;
     }
     
     // TODO work on this
@@ -385,7 +415,38 @@ public class TrajectoryGenerator {
      * @return A builder for the sweat back trajectories
      */
     private TrajectorySequenceBuilder getSweatBackTrajectories() {
-        throw new NotImplementedError("Moron we're not done with this");
+        Pose2d startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
+    
+        startPose.plus(new Pose2d(offset.getX(), offset.getY()));
+    
+        TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
+                .addDisplacementMarker(() -> {
+                    robot.rightClaw.setPosition(Constants.rightClawClosed);
+                    robot.leftClaw.setPosition(Constants.leftClawClosed);
+                })
+                .forward(.01)
+                .waitSeconds(1.0)
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[0]);
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                //.strafeTo(new Vector2d(-20,54.375 ))
+                .lineToConstantHeading(new Vector2d(20,54.375))
+                .waitSeconds(0.5)
+                .addDisplacementMarker(() -> {
+                    robot.leftClaw.setPosition(Constants.leftClawOpen);
+                    robot.rightClaw.setPosition(Constants.rightClawOpen);
+                })
+            
+                .forward(0.01)
+                .waitSeconds(0.25)
+                .strafeTo(new Vector2d(35,60 ))
+                .addDisplacementMarker(() -> {
+                    robot.linearSlide.setTargetPosition(Constants.linearSlideZeroOffset);
+                
+                });
+        return gen;
     }
 
     /**
@@ -448,6 +509,7 @@ public class TrajectoryGenerator {
     }
 
     // TODO work on this for parking
+    // FIXME IMPORTANT THIS NEEDS TESTING
     /**
      * Generate parking trajectories for sweat autonomous. Expects an initialized trajectory generator
      * @param gen The initialized trajectory generator
@@ -459,20 +521,36 @@ public class TrajectoryGenerator {
             case FRONT:
                 switch (trajState.parkPos) {
                     case ONE:
+                        gen.strafeTo(new Vector2d(-6, 60))
+                                .splineToLinearHeading(new Pose2d(-8, 30, Math.toRadians(90)), Math.toRadians(270));
                         break;
                     case TWO:
+                        gen.strafeTo(new Vector2d(-6, 60))
+                                .splineToLinearHeading(new Pose2d(-6, 30, Math.toRadians(90)), Math.toRadians(270))
+                                .strafeTo(new Vector2d(-40, 33))
+                                .strafeTo(new Vector2d(-32, 33));
                         break;
                     case THREE:
+                        gen.strafeTo(new Vector2d(-63, 60))
+                                .splineToLinearHeading(new Pose2d(-63, 30, Math.toRadians(90)), Math.toRadians(270));
                         break;
                 }
                 break;
             case BACK:
                 switch (trajState.parkPos) {
                     case ONE:
+                        gen.strafeTo(new Vector2d(61, 60))
+                                .splineToLinearHeading(new Pose2d(61, 30, Math.toRadians(90)), Math.toRadians(270));
                         break;
                     case TWO:
+                        gen.strafeTo(new Vector2d(6, 60))
+                                .splineToLinearHeading(new Pose2d(6, 30, Math.toRadians(90)), Math.toRadians(270))
+                                .strafeTo(new Vector2d(40, 30))
+                                .strafeTo(new Vector2d(32, 30));
                         break;
                     case THREE:
+                        gen.strafeTo(new Vector2d(6, 60))
+                                .splineToLinearHeading(new Pose2d(6, 30, Math.toRadians(90)), Math.toRadians(270));
                         break;
                 }
                 break;
