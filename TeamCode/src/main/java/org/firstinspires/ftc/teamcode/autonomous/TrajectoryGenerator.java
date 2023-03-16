@@ -377,9 +377,9 @@ public class TrajectoryGenerator {
      */
     private TrajectorySequenceBuilder getSweatFrontTrajectories() {
         Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
-    
+
         startPose.plus(new Pose2d(offset.getX(), offset.getY()));
-        
+
         TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
                 .addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawClosed);
@@ -404,8 +404,11 @@ public class TrajectoryGenerator {
                 .strafeTo(new Vector2d(-35,60 ))
                 .addDisplacementMarker(() -> {
                     robot.linearSlide.setTargetPosition(Constants.linearSlideZeroOffset);
-                
-                });
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                .forward(.001)
+                .waitSeconds(1);
         return gen;
     }
     
@@ -444,8 +447,11 @@ public class TrajectoryGenerator {
                 .strafeTo(new Vector2d(35,60 ))
                 .addDisplacementMarker(() -> {
                     robot.linearSlide.setTargetPosition(Constants.linearSlideZeroOffset);
-                
-                });
+                    robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.linearSlide.setPower(1);
+                })
+                .forward(.001)
+                .waitSeconds(1);
         return gen;
     }
 
