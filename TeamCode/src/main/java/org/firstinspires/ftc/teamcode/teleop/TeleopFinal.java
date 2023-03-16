@@ -465,7 +465,7 @@ public class TeleopFinal extends OpMode {
         long ellaSafetyThreshold = Constants.getLiftEncoderJunctions()[0] - 20;
         if (ControlConfig.goToGround &&
                 !(isClawClosed && (linearSlidePos > ellaSafetyThreshold || isConeClose()))) {
-            linearSlideMode = LinearSlideMode.GROUD;
+            linearSlideMode = LinearSlideMode.GROUND;
             linearSlideTarget = Constants.linearSlideZeroOffset;
         }
 
@@ -525,6 +525,22 @@ public class TeleopFinal extends OpMode {
 //        Log.d("LinearSlide", String.valueOf(linearSlideTarget));
         telemetry.update();
     }
+    
+    private boolean isConeClose() {
+        // Get color (red and blue) of and distance to cone.
+        ColorSensor colorSensor = robot.colorSensor;
+        int red = colorSensor.red();
+        int blue = colorSensor.blue();
+        double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
+    
+        // If we are too far from the cone, the cone is not close
+        if (distance > Constants.minAutoGrabDistance) {
+            return false;
+        }
+    
+        // Cone is only close if it is the same color as our team
+        return currentColor == Color.BLUE ? blue > red : red > blue;
+    }
 
     /**
      * Handles claw control and movement
@@ -576,19 +592,7 @@ public class TeleopFinal extends OpMode {
             return;
         }
 
-        // Get color (red and blue) of and distance to cone.
-        ColorSensor colorSensor = robot.colorSensor;
-        int red = colorSensor.red();
-        int blue = colorSensor.blue();
-        double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
-
-        // If we are too far from the cone, don't auto grab
-        if (distance > Constants.minAutoGrabDistance) {
-            return;
-        }
-
-        // Only grab the cone if the cone is the same color as our team
-        if (currentColor == Color.BLUE ? blue > red : red > blue) {
+        if (isConeClose()) {
             robot.rightClaw.setPosition(Constants.rightClawClosed);
             robot.leftClaw.setPosition(Constants.leftClawClosed);
             // Rumble peripheral controller to let user know auto grab has happened
