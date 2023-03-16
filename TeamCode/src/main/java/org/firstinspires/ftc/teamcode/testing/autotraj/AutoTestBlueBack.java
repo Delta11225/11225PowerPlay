@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 @Autonomous(preselectTeleOp = "TeleopFinal")
-@Disabled
+//@Disabled
 // TODO update and undisable
 public class AutoTestBlueBack extends LinearOpMode {
     @Override
