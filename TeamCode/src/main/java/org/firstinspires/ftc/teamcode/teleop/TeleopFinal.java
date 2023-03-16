@@ -253,9 +253,6 @@ public class TeleopFinal extends OpMode {
         ControlConfig.update(gamepad1, gamepad2);
 
         linearSlideMoveWithOverride();
-//        linearSlideMove();
-
-////////////////////GRABBER////////////////////////////////////////////////////////
 
         // A button = open claw, b button = closed claw
         // Prevents weirdness with gamepad2 locking up
@@ -272,15 +269,6 @@ public class TeleopFinal extends OpMode {
         }
 
         handleClawAutoGrab();
-
-        // TODO work on this please
-//        if (ControlConfig.resetIMU && !areInittingIMU) {
-//            telemetry.addLine("Reinitting IMU");
-//            telemetry.update();
-//            initIMU();
-//            areInittingIMU = false;
-//            gamepad2.rumble(500);
-//        }
     }
 
     private void handleClawAutoGrab() {
@@ -289,32 +277,27 @@ public class TeleopFinal extends OpMode {
             return;
         }
 
+        // Prevent autograb if we recently autograbbed
         if (lastAutoGrab.seconds() < Constants.autoGrabCooldownSeconds) {
             return;
         }
 
+        // If the claw is being held open, ignore autograb
         if (ControlConfig.openClaw) {
             return;
         }
 
+        // If the claw is closed, ignore autograb
         if (isClawClosed) {
             return;
         }
 
+        // If the linear slide is too high, don't autograb (prevents grabbing cone as we are dropping
         if (robot.linearSlide.getCurrentPosition() > Constants.getLiftEncoderJunctions()[0] - 40) {
             return;
         }
-
-        ColorSensor colorSensor = robot.colorSensor;
-        int red = colorSensor.red();
-        int blue = colorSensor.blue();
-        double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
-
-        if (distance > Constants.minAutoGrabDistance) {
-            return;
-        }
-
-        if (currentColor == Color.BLUE ? blue > red : red > blue) {
+    
+        if (isConeClose()) {
             robot.rightClaw.setPosition(Constants.rightClawClosed);
             robot.leftClaw.setPosition(Constants.leftClawClosed);
             gamepad2.rumble(250);
@@ -322,7 +305,27 @@ public class TeleopFinal extends OpMode {
             lastAutoGrab.reset();
         }
     }
-
+    
+    /**
+     * Determines whether a cone of the same color is close enough to the color sensor to grab
+     * @return Whether a cone of the right color is close enough to grab
+     */
+    private boolean isConeClose() {
+        ColorSensor colorSensor = robot.colorSensor;
+        int red = colorSensor.red();
+        int blue = colorSensor.blue();
+        // Need to do this cast to get distance
+        double distance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
+        
+        if (distance > Constants.minAutoGrabDistance) {
+            return false;
+        }
+        
+        // Determines whether blue is larger than red if we are red
+        // or if red is bigger than blue otherwise
+        return currentColor == Color.BLUE ? blue > red : red > blue;
+    }
+    
     private void initIMU() {
         areInittingIMU = true;
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -385,11 +388,17 @@ public class TeleopFinal extends OpMode {
         // target there and change the mode
 
         // Ella safety.
-        // For the ground, we don't want to go to ground if the claw is closed and we are above
-        // the low junction
+        // For the ground, we don't want to go to ground if we are holding a cone under any
+        // circumstance, and as a redundancy, we also don't want to go to ground if claw is closed and
+        // we are above the low junction
+        // I apologize for this absolutely painful logic, but here it is explained:
+        // IF we want to go to ground AND it is NOT true that (the claw is closed AND
+        // (linear slide is too high OR the cone is too close)) THEN go to ground
+        // GND*!(CLOSED(HIGH+CONE))
         long linearSlidePos = robot.linearSlide.getCurrentPosition();
         long ellaSafetyThreshold = Constants.getLiftEncoderJunctions()[0] - 20;
-        if (ControlConfig.goToGround && !(isClawClosed && linearSlidePos > ellaSafetyThreshold)) {
+        if (ControlConfig.goToGround &&
+                !(isClawClosed && (linearSlidePos > ellaSafetyThreshold || isConeClose()))) {
             linearSlideMode = LinearSlideMode.GROUD;
             linearSlideTarget = Constants.linearSlideZeroOffset;
         }
