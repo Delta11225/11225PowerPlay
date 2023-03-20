@@ -528,6 +528,7 @@ public class TrajectoryGenerator {
                 switch (trajState.parkPos) {
                     case ONE:
                         gen.strafeTo(new Vector2d(-6, 60))
+                                .splineToLinearHeading(new Pose2d(-8, 27, Math.toRadians(90)), Math.toRadians(270))
                                 .splineToLinearHeading(new Pose2d(-8, 30, Math.toRadians(90)), Math.toRadians(270));
                         break;
                     case TWO:
