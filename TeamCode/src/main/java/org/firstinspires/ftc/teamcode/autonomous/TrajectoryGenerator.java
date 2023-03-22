@@ -529,17 +529,20 @@ public class TrajectoryGenerator {
                     case ONE:
                         gen.strafeTo(new Vector2d(-6, 60))
                                 .splineToLinearHeading(new Pose2d(-8, 27, Math.toRadians(90)), Math.toRadians(270))
-                                .splineToLinearHeading(new Pose2d(-8, 30, Math.toRadians(90)), Math.toRadians(270));
+                                .splineToLinearHeading(new Pose2d(-8, 30, Math.toRadians(90)), Math.toRadians(90));
                         break;
                     case TWO:
                         gen.strafeTo(new Vector2d(-6, 60))
-                                .splineToLinearHeading(new Pose2d(-6, 30, Math.toRadians(90)), Math.toRadians(270))
-                                .strafeTo(new Vector2d(-40, 33))
-                                .strafeTo(new Vector2d(-32, 33));
+                                .splineToLinearHeading(new Pose2d(-6, 27, Math.toRadians(90)), Math.toRadians(270))
+                                .strafeTo(new Vector2d(-40, 27))
+                                .strafeTo(new Vector2d(-32, 27))
+                                .splineToLinearHeading(new Pose2d(-32, 30, Math.toRadians(90)), Math.toRadians(90));
+
                         break;
                     case THREE:
                         gen.strafeTo(new Vector2d(-63, 60))
-                                .splineToLinearHeading(new Pose2d(-63, 30, Math.toRadians(90)), Math.toRadians(270));
+                                .splineToLinearHeading(new Pose2d(-63, 27, Math.toRadians(90)), Math.toRadians(270))
+                                .splineToLinearHeading(new Pose2d(-63, 30, Math.toRadians(90)), Math.toRadians(90));
                         break;
                 }
                 break;
@@ -547,17 +550,20 @@ public class TrajectoryGenerator {
                 switch (trajState.parkPos) {
                     case ONE:
                         gen.strafeTo(new Vector2d(61, 60))
-                                .splineToLinearHeading(new Pose2d(61, 30, Math.toRadians(90)), Math.toRadians(270));
+                                .splineToLinearHeading(new Pose2d(61, 27, Math.toRadians(90)), Math.toRadians(270))
+                                .splineToLinearHeading(new Pose2d(61, 30, Math.toRadians(90)), Math.toRadians(90));
                         break;
                     case TWO:
                         gen.strafeTo(new Vector2d(6, 60))
-                                .splineToLinearHeading(new Pose2d(6, 30, Math.toRadians(90)), Math.toRadians(270))
-                                .strafeTo(new Vector2d(40, 30))
-                                .strafeTo(new Vector2d(32, 30));
+                                .splineToLinearHeading(new Pose2d(6, 27, Math.toRadians(90)), Math.toRadians(270))
+                                .strafeTo(new Vector2d(40, 27))
+                                .strafeTo(new Vector2d(32, 27))
+                                .splineToLinearHeading(new Pose2d(32, 30, Math.toRadians(90)), Math.toRadians(90));
                         break;
                     case THREE:
                         gen.strafeTo(new Vector2d(6, 60))
-                                .splineToLinearHeading(new Pose2d(6, 30, Math.toRadians(90)), Math.toRadians(270));
+                                .splineToLinearHeading(new Pose2d(6, 27, Math.toRadians(90)), Math.toRadians(270))
+                                .splineToLinearHeading(new Pose2d(6, 30, Math.toRadians(90)), Math.toRadians(90));
                         break;
                 }
                 break;
