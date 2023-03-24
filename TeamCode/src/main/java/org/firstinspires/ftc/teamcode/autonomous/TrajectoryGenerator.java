@@ -4,9 +4,13 @@ import android.util.Log;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TranslationalVelocityConstraint;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.util.types.AutoState;
 import org.firstinspires.ftc.teamcode.util.types.AutoType;
 import org.firstinspires.ftc.teamcode.util.types.Color;
@@ -533,10 +537,14 @@ public class TrajectoryGenerator {
                         break;
                     case TWO:
                         gen.strafeTo(new Vector2d(-6, 60))
-                                .splineToLinearHeading(new Pose2d(-6, 27, Math.toRadians(90)), Math.toRadians(270))
-                                .strafeTo(new Vector2d(-40, 27))
-                                .strafeTo(new Vector2d(-32, 27))
-                                .splineToLinearHeading(new Pose2d(-32, 30, Math.toRadians(90)), Math.toRadians(90));
+                                .splineToLinearHeading(new Pose2d(-6, 33, Math.toRadians(90)), Math.toRadians(270))
+                                .strafeTo(new Vector2d(-40, 33),
+                                        SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                                )
+                                .waitSeconds(0.25)
+                                .strafeTo(new Vector2d(-32, 33));
+                                // .splineToLinearHeading(new Pose2d(-32, , Math.toRadians(90)), Math.toRadians(90));
 
                         break;
                     case THREE:
