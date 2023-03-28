@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.util.types.StartPosition;
  */
 public abstract class Constants {
     // Set this to true before competition. When true, stops ignoring not found hardware in the hardware file.
-    public final static boolean COMPETITION_MODE = false;
+    public final static boolean COMPETITION_MODE = true;
 
     // Speed multipliers for teleop
     public final static double fastMultiplier = 0.8;
@@ -41,9 +41,9 @@ public abstract class Constants {
     // Stores zero offset, if there is one
     public static int linearSlideZeroOffset = 0;
 
-    private final static int liftEncoderMax = 4530;
+    private final static int liftEncoderMax = 4320;
 
-    // Set at end of auto for teleop to sue
+    // Set at end of auto for teleop to use
     public static Pose2d currentPose = new Pose2d();
     public static AutoState matchState = new AutoState(Color.BLUE, StartPosition.FRONT, AutoType.LONG, 0);
 
@@ -57,15 +57,15 @@ public abstract class Constants {
     //    private final static int[] liftEncoderJunctions = new int[] {1780, -1, -1, -1};
     public static int[] getLiftEncoderJunctions() {
         return new int[] {
-                1750 + linearSlideZeroOffset, // 0 = low junction
-                2910 + linearSlideZeroOffset, // 1 = med junction
-                4005 + linearSlideZeroOffset, // 2 = high junction
+                1630 + linearSlideZeroOffset, // 0 = low junction
+                2780 + linearSlideZeroOffset, // 1 = med junction
+                3930 + linearSlideZeroOffset, // 2 = high junction
                 liftEncoderMax + linearSlideZeroOffset
         };
     }
 
     // Gets the cone stack heights and takes zeroOffset into account
-    private final static int[] liftEncoderConeStack = new int[]{650, 534, 369, 181, 0};
+    private final static int[] liftEncoderConeStack = new int[]{603, 465, 330, 161, 0};
     public static int[] getLiftEncoderConeStack() {
         return new int[] {
                 liftEncoderConeStack[0] + linearSlideZeroOffset,

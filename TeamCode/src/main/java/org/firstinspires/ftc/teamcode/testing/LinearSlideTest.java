@@ -10,11 +10,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.ControlConfig;
+import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 @TeleOp
-@Disabled
+//@Disabled
 public class LinearSlideTest extends LinearOpMode {
 
     DcMotor linearSlide;
@@ -24,9 +26,11 @@ public class LinearSlideTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
+        Hardware23 robot = new Hardware23(hardwareMap);
+        linearSlide = robot.linearSlide;
+//        linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
 
         rightClaw = hardwareMap.get(Servo.class, "right_claw");
         leftClaw = hardwareMap.get(Servo.class, "left_claw");
@@ -64,12 +68,12 @@ public class LinearSlideTest extends LinearOpMode {
 
             // A button = open claw, b button = closed claw
             if (gamepad1.a) {
-                rightClaw.setPosition(0.95); // Right claw open
-                leftClaw.setPosition(0.0); // Left claw open
+                rightClaw.setPosition(Constants.rightClawOpen); // Right claw open
+                leftClaw.setPosition(Constants.leftClawOpen); // Left claw open
             }
             if (gamepad1.b) {
-                rightClaw.setPosition(0.70); // Right claw closed
-                leftClaw.setPosition(0.25); // Left claw closed
+                rightClaw.setPosition(Constants.rightClawClosed); // Right claw closed
+                leftClaw.setPosition(Constants.leftClawClosed); // Left claw closed
             }
 
 
