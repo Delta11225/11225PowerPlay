@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.util.ControlConfig;
 import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class LinearSlideTest extends LinearOpMode {
 
     DcMotor linearSlide;
