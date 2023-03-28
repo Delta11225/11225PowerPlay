@@ -300,8 +300,8 @@ public class Auto extends LinearOpMode {
         // Same logic as getColor
         telemetry.clear();
         telemetry.addData("Auto Type?","");
-        telemetry.addData("Blue", "X or Square");
-        telemetry.addData("Red", "B or Circle");
+        telemetry.addData("Long", "X or Square");
+        telemetry.addData("Sweat", "B or Circle");
         telemetry.update();
 
         AutoType autoType = null;

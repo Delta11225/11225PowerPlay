@@ -157,6 +157,9 @@ public class TeleopFinal extends OpMode {
         // Every time we loop, we need to update the controls as this class handles our control mapping
         ControlConfig.update(gamepad1, gamepad2);
 
+        // Update imu orientation angles
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
         telemetry.update();
         // Robot movement (driver oriented control)
         move();
