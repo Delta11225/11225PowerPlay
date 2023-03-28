@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -143,6 +144,7 @@ public class Hardware23 {
         try {
             linearSlide = hardwareMap.get(DcMotor.class, "linear_slide");
             linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            linearSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         } catch (Exception e) {
             if (!Constants.COMPETITION_MODE) {
                 linearSlide = new NullDcMotor();
