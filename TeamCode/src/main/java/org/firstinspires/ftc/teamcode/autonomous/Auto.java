@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -29,6 +30,7 @@ public class Auto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
         // Initialize all our robots hardware. We do this first as it is most important
         Hardware23 robot = new Hardware23(hardwareMap);
 
@@ -37,14 +39,16 @@ public class Auto extends LinearOpMode {
         OpenCvCamera webcam = initCamera(pipeline);
 
         // This method asks the user for the auto state and packages it into a nice class
-        AutoState autoState = getUserInput();
+//        AutoState autoState = getUserInput();
+        AutoState autoState = new AutoState(Color.BLUE, StartPosition.BACK, AutoType.SWEAT, 0);
         // Save current auto state in constats for teleop
         Constants.matchState = autoState;
         // We only need to get the delay here, everything else is handled by TrajectoryGenerator
         long delay = autoState.delay;
 
         // Get the robot's start offset, as provided by the user
-        Vector2d startOffset = getUserOffset(autoState);
+//        Vector2d startOffset = getUserOffset(autoState);
+        Vector2d startOffset = new Vector2d(0, 0);
 
         telemetry.addLine("Building trajectories...");
         telemetry.update();
@@ -54,7 +58,7 @@ public class Auto extends LinearOpMode {
         telemetry.update();
 
         // Ask the driver if they missed anything
-        confirmAutoGood();
+//        confirmAutoGood();
 
         // Loop to tell user current auto, constantly updates camera detection result
         while (!isStopRequested() && !isStarted()) {

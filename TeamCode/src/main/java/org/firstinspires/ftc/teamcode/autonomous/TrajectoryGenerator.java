@@ -558,15 +558,18 @@ public class TrajectoryGenerator {
                 switch (trajState.parkPos) {
                     case ONE:
                         gen.strafeTo(new Vector2d(61, 60))
-                                .splineToLinearHeading(new Pose2d(61, 27, Math.toRadians(90)), Math.toRadians(270))
+                                .splineToLinearHeading(new Pose2d(
+                                        61, 27, Math.toRadians(90)), Math.toRadians(270))
                                 .splineToLinearHeading(new Pose2d(61, 30, Math.toRadians(90)), Math.toRadians(90));
                         break;
                     case TWO:
                         gen.strafeTo(new Vector2d(6, 60))
-                                .splineToLinearHeading(new Pose2d(6, 27, Math.toRadians(90)), Math.toRadians(270))
-                                .strafeTo(new Vector2d(40, 27))
-                                .strafeTo(new Vector2d(32, 27))
-                                .splineToLinearHeading(new Pose2d(32, 30, Math.toRadians(90)), Math.toRadians(90));
+                                .splineToLinearHeading(new Pose2d(6, 33, Math.toRadians(90)), Math.toRadians(270))
+                                .strafeTo(new Vector2d(40, 33),
+                                        SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+//                                .strafeTo(new Vector2d(32, 33))
+                                .splineToLinearHeading(new Pose2d(32, 33, Math.toRadians(90)), Math.toRadians(90));
                         break;
                     case THREE:
                         gen.strafeTo(new Vector2d(6, 60))
