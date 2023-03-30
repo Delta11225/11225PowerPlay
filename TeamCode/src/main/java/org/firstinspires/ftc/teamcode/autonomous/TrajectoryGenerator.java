@@ -299,7 +299,7 @@ public class TrajectoryGenerator {
                 // Go to middle high junction
                 .splineToLinearHeading(new Pose2d(1, 32, Math.toRadians(240)), Math.toRadians(240))
                 // Approach it a bit closer
-                .splineToLinearHeading(new Pose2d(0, 30.5, Math.toRadians(240)), Math.toRadians(240))
+                .splineToLinearHeading(new Pose2d(-1, 29.5, Math.toRadians(240)), Math.toRadians(240))
                 // Drop cone
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
