@@ -374,7 +374,6 @@ public class TrajectoryGenerator {
         return gen;
     }
     
-    // TODO work on this with better comments
     /**
      * Get front position trajectories for sweat autonomous type
      * @return A builder for the sweat front trajectories
@@ -416,7 +415,6 @@ public class TrajectoryGenerator {
         return gen;
     }
     
-    // TODO work on this
     /**
      * Get back position trajectories for sweat autonomous type
      * @return A builder for the sweat back trajectories
@@ -518,8 +516,6 @@ public class TrajectoryGenerator {
         return gen;
     }
 
-    // TODO work on this for parking
-    // FIXME IMPORTANT THIS NEEDS TESTING
     /**
      * Generate parking trajectories for sweat autonomous. Expects an initialized trajectory generator
      * @param gen The initialized trajectory generator

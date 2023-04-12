@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.util.Hardware23;
 
 @Autonomous(preselectTeleOp = "TeleopFinal")
 @Disabled
-// TODO update and undisable
 public class AutoTestBlueBack extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
