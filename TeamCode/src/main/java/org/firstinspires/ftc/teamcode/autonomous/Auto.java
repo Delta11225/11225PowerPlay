@@ -30,7 +30,7 @@ public class Auto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
+//        telemetry = new MultipleTelemetry(telemetry, ftcDashboard.getTelemetry());
         // Initialize all our robots hardware. We do this first as it is most important
         Hardware23 robot = new Hardware23(hardwareMap);
 
@@ -40,7 +40,7 @@ public class Auto extends LinearOpMode {
 
         // This method asks the user for the auto state and packages it into a nice class
         AutoState autoState = getUserInput();
-//        AutoState autoState = new AutoState(Color.BLUE, StartPosition.FRONT, AutoType.LONG, 0);
+        telemetry.clear();
         // Save current auto state in constats for teleop
         Constants.matchState = autoState;
         // We only need to get the delay here, everything else is handled by TrajectoryGenerator
@@ -48,7 +48,7 @@ public class Auto extends LinearOpMode {
 
         // Get the robot's start offset, as provided by the user
         Vector2d startOffset = getUserOffset(autoState);
-//        Vector2d startOffset = new Vector2d(0, 0);
+        telemetry.clear();
 
         telemetry.addLine("Building trajectories...");
         telemetry.update();
@@ -206,7 +206,6 @@ public class Auto extends LinearOpMode {
      * @return The specified autonomous state
      */
     public AutoState getUserInput() {
-        // Get all the user input to save into auto state
         // To solve bugs
         gamepad2.reset();
 
@@ -214,18 +213,23 @@ public class Auto extends LinearOpMode {
         Color color = getColor();
         // Sleep to allow time for telemetry to show up
         sleep(100);
+        telemetry.clear();
 
         // Front or back?
         StartPosition startPosition = getPosition();
         sleep(100);
+        telemetry.clear();
 
         // Long or Sweat?
         AutoType autoType = getAutoType();
-
+        sleep(100);
+        telemetry.clear();
+        
         // Delay for how long?
         long delay = getDelay();
         sleep(100);
-
+        telemetry.clear();
+        
         return new AutoState(color, startPosition, autoType, delay);
     }
 
