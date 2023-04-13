@@ -219,7 +219,7 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setPower(1);
                 })
                 // Approach cone stack and wait a second
-                .splineToConstantHeading(new Vector2d(-56.5, 8), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-56, 8), Math.toRadians(180))
                 .waitSeconds(0.25)
                 
                 // Grab cone
@@ -247,7 +247,7 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setPower(1);
                 })
                 // Get to medium junction
-                .splineToLinearHeading(new Pose2d(-32, 11, Math.toRadians(50)), Math.toRadians(50))
+//                .splineToLinearHeading(new Pose2d(-32, 11, Math.toRadians(50)), Math.toRadians(50))
                 .splineToLinearHeading(new Pose2d(-26.5, 13.25, Math.toRadians(50)), Math.toRadians(50))
                 .forward(4)
                 // Drop cone
@@ -297,7 +297,7 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setPower(1);
                 })
                 // Go to middle high junction
-                .splineToLinearHeading(new Pose2d(1, 32, Math.toRadians(240)), Math.toRadians(240))
+                .splineToLinearHeading(new Pose2d(1.5, 31.5, Math.toRadians(240)), Math.toRadians(240))
                 // Approach it a bit closer
                 .splineToLinearHeading(new Pose2d(-1, 29.5, Math.toRadians(240)), Math.toRadians(240))
                 // Drop cone
