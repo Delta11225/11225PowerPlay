@@ -22,6 +22,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.util.ArrayList;
+
 // For here, after auto ends, automatically selects our teleop
 @Autonomous(preselectTeleOp = "TeleopFinal")
 public class Auto extends LinearOpMode {
@@ -63,6 +65,9 @@ public class Auto extends LinearOpMode {
         // Loop to tell user current auto, constantly updates camera detection result
         while (!isStopRequested() && !isStarted()) {
             // Confirm auto settings
+            if (isUntestedAuto(autoState)) {
+                telemetry.addLine("WARN! UNCERTAIN RELIABILITY FOR THIS AUTO. ARE YOU SURE?");
+            }
             telemetry.addLine("Init complete, ready to run");
             telemetry.addData("Color", autoState.color);
             telemetry.addData("Start pos", autoState.position);
@@ -114,7 +119,25 @@ public class Auto extends LinearOpMode {
         // Save the last pose for teleop
         Constants.currentPose = robot.drive.getPoseEstimate();
     }
-
+    
+    /**
+     * For competitions only. Checks if an auto has been marked as untested, and returns true if so.
+     * @param autoState The auto to check
+     * @return Whether this auto is competition ready
+     */
+    private boolean isUntestedAuto(AutoState autoState) {
+        ArrayList<AutoState> untestedAutos = new ArrayList<>();
+        untestedAutos.add(new AutoState(Color.BLUE, StartPosition.FRONT, AutoType.LONG));
+        untestedAutos.add(new AutoState(Color.RED, StartPosition.BACK, AutoType.LONG));
+        
+        for (AutoState untestedAuto : untestedAutos) {
+            if (untestedAuto.isEqualType(autoState)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Prompt the user for the start offset of the robot
      * @param autoState The auto state, used for auto color

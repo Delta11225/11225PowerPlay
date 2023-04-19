@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.types;
 
+import org.firstinspires.ftc.teamcode.autonomous.Auto;
+
 /**
  * A complete representation of an autonomous state
  */
@@ -21,5 +23,21 @@ public class AutoState {
         this.position = position;
         this.delay = delay;
         this.autoType = autoType;
+    }
+    
+    /**
+     * Constructor with no delay.
+     */
+    public AutoState(Color color, StartPosition position, AutoType autoType) {
+        this(color, position, autoType, 0);
+    }
+    
+    /**
+     * Checks if this autostate is equal to another. Ignores delay.
+     * @param autoState The autostate to compare to
+     * @return Whether the two autostates are the same, ignoring delay
+     */
+    public boolean isEqualType(AutoState autoState) {
+        return autoState.color == color && autoState.position == position && autoState.autoType == autoType;
     }
 }
