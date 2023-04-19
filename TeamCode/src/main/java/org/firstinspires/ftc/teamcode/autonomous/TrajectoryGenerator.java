@@ -152,7 +152,7 @@ public class TrajectoryGenerator {
                         return getLongFrontTrajectories();
                     case BACK:
                         return getLongBackTrajectories();
-                };
+                }
             case SWEAT:
                 switch (autoState.position) {
                     case FRONT:
@@ -168,11 +168,11 @@ public class TrajectoryGenerator {
      * Get the start trajectories for the long auto and the front starting position
      * @return The appropriate trajectories
      */
-    private TrajectorySequenceBuilder getLongFrontTrajectories() {
-        // Where the robot starts
-        Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
-        // Add offset to start pose
-        startPose = startPose.plus(new Pose2d(offset.getX(), offset.getY()));
+        private TrajectorySequenceBuilder getLongFrontTrajectories() {
+            // Where the robot starts
+            Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
+            // Add offset to start pose
+            startPose = startPose.plus(new Pose2d(offset.getX(), offset.getY()));
         
         // We return a generator instead of the trajectory in case we want to add to it
         TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
@@ -248,8 +248,8 @@ public class TrajectoryGenerator {
                 })
                 // Get to medium junction
                 .splineToLinearHeading(new Pose2d(-32, 11, Math.toRadians(50)), Math.toRadians(50))
-                .splineToLinearHeading(new Pose2d(-26.5, 12, Math.toRadians(50)), Math.toRadians(50))
-                .forward(4)
+                .splineToLinearHeading(new Pose2d(-27.5, 14, Math.toRadians(50)), Math.toRadians(50))
+                .forward(1)
                 // Drop cone
                 .addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
@@ -299,7 +299,7 @@ public class TrajectoryGenerator {
                 // Go to middle high junction
                 .splineToLinearHeading(new Pose2d(1, 32, Math.toRadians(240)), Math.toRadians(240))
                 // Approach it a bit closer
-                .splineToLinearHeading(new Pose2d(0, 30, Math.toRadians(240)), Math.toRadians(240))
+                .splineToLinearHeading(new Pose2d(0, 31, Math.toRadians(240)), Math.toRadians(240))
                 // Drop cone
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
@@ -325,7 +325,7 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setPower(1);
                 })
                 // Approach cone stack and wait a second
-                .splineToConstantHeading(new Vector2d(56, 8), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(57, 8), Math.toRadians(0))
                 .waitSeconds(0.25)
                 
                 // Grab cone
