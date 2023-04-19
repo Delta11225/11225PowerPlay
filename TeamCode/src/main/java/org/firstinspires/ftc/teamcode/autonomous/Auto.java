@@ -64,10 +64,12 @@ public class Auto extends LinearOpMode {
 
         // Loop to tell user current auto, constantly updates camera detection result
         while (!isStopRequested() && !isStarted()) {
-            // Confirm auto settings
-            if (isUntestedAuto(autoState)) {
+            // If we are at competition and the auto is untested, warn user
+            if (Constants.COMPETITION_MODE && isUntestedAuto(autoState)) {
                 telemetry.addLine("WARN! UNCERTAIN RELIABILITY FOR THIS AUTO. ARE YOU SURE?");
             }
+            
+            // Confirm auto settings
             telemetry.addLine("Init complete, ready to run");
             telemetry.addData("Color", autoState.color);
             telemetry.addData("Start pos", autoState.position);
