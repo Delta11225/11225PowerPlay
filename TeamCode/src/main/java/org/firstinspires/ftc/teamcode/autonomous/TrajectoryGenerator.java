@@ -172,7 +172,7 @@ public class TrajectoryGenerator {
         // Where the robot starts
         Pose2d startPose = new Pose2d(-40, 70 - (12.25 / 2.0), Math.toRadians(270));
         // Add offset to start pose
-        startPose.plus(new Pose2d(offset.getX(), offset.getY()));
+        startPose = startPose.plus(new Pose2d(offset.getX(), offset.getY()));
         
         // We return a generator instead of the trajectory in case we want to add to it
         TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
@@ -194,7 +194,7 @@ public class TrajectoryGenerator {
                 // Go to middle high junction
                 .splineToLinearHeading(new Pose2d(-2, 32, Math.toRadians(300)), Math.toRadians(300))
                 // Approach it a bit closer
-                .splineToLinearHeading(new Pose2d(-.5, 30, Math.toRadians(300)), Math.toRadians(300))
+                .splineToLinearHeading(new Pose2d(-1.5, 31, Math.toRadians(300)), Math.toRadians(300))
                 // Drop cone
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
@@ -248,7 +248,7 @@ public class TrajectoryGenerator {
                 })
                 // Get to medium junction
                 .splineToLinearHeading(new Pose2d(-32, 11, Math.toRadians(50)), Math.toRadians(50))
-                .splineToLinearHeading(new Pose2d(-26.5, 13.25, Math.toRadians(50)), Math.toRadians(50))
+                .splineToLinearHeading(new Pose2d(-26.5, 12, Math.toRadians(50)), Math.toRadians(50))
                 .forward(4)
                 // Drop cone
                 .addDisplacementMarker(() -> {
@@ -278,7 +278,7 @@ public class TrajectoryGenerator {
         // Where the robot starts
         Pose2d startPose = new Pose2d(29.5, 70 - (12.25 / 2.0), Math.toRadians(270));
         // Add offset to start pose
-        startPose.plus(new Pose2d(offset.getX(), offset.getY()));
+        startPose = startPose.plus(new Pose2d(offset.getX(), offset.getY()));
         
         // We return a generator instead of the trajectory in case we want to add to it
         TrajectorySequenceBuilder gen = robot.drive.trajectorySequenceBuilder(startPose)
@@ -299,7 +299,7 @@ public class TrajectoryGenerator {
                 // Go to middle high junction
                 .splineToLinearHeading(new Pose2d(1, 32, Math.toRadians(240)), Math.toRadians(240))
                 // Approach it a bit closer
-                .splineToLinearHeading(new Pose2d(-1, 29.5, Math.toRadians(240)), Math.toRadians(240))
+                .splineToLinearHeading(new Pose2d(0, 30, Math.toRadians(240)), Math.toRadians(240))
                 // Drop cone
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
@@ -352,7 +352,7 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setPower(1);
                 })
                 // Get to medium junction
-                .splineToLinearHeading(new Pose2d(27.5, 9, Math.toRadians(120)), Math.toRadians(210))
+                .splineToLinearHeading(new Pose2d(27.5, 10, Math.toRadians(120)), Math.toRadians(210))
                 
                 // Drop cone
                 .splineToLinearHeading(new Pose2d(24.5, 13.5, Math.toRadians(120)), Math.toRadians(120))
