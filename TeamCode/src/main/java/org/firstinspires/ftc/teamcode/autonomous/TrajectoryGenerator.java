@@ -300,6 +300,8 @@ public class TrajectoryGenerator {
                 .splineToLinearHeading(new Pose2d(1, 32, Math.toRadians(240)), Math.toRadians(240))
                 // Approach it a bit closer
                 .splineToLinearHeading(new Pose2d(0, 31, Math.toRadians(240)), Math.toRadians(240))
+                // Competition change. Should line it up better
+                .forward(1.5)
                 // Drop cone
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
@@ -324,7 +326,9 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     robot.linearSlide.setPower(1);
                 })
-                // Approach cone stack and wait a second
+                // Approach cone stack (avoiding opponent signal sleeve) and wait a second
+                .splineToConstantHeading(new Vector2d(48, 9), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(52, 8), Math.toRadians(0))
                 .splineToConstantHeading(new Vector2d(57, 8), Math.toRadians(0))
                 .waitSeconds(0.25)
                 
@@ -342,9 +346,9 @@ public class TrajectoryGenerator {
                     robot.linearSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     robot.linearSlide.setPower(1);
                 })
-                // Back up from cone stack
+                // Back up from cone stack (avoiding opponent signal sleeve again)
                 .back(5)
-                .splineToLinearHeading(new Pose2d(27.5, 5.5, Math.toRadians(0)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(27.5, 9, Math.toRadians(0)), Math.toRadians(180))
                 // Go to medium junction height
                 .addDisplacementMarker(() -> {
                     robot.linearSlide.setTargetPosition(Constants.getLiftEncoderJunctions()[1]);
@@ -355,7 +359,7 @@ public class TrajectoryGenerator {
                 .splineToLinearHeading(new Pose2d(27.5, 10, Math.toRadians(120)), Math.toRadians(210))
                 
                 // Drop cone
-                .splineToLinearHeading(new Pose2d(24.5, 13.5, Math.toRadians(120)), Math.toRadians(120))
+                .splineToLinearHeading(new Pose2d(24.5, 12, Math.toRadians(120)), Math.toRadians(120))
                 .addDisplacementMarker(() -> {
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
