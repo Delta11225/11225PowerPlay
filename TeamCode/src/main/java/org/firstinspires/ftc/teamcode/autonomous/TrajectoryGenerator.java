@@ -301,12 +301,15 @@ public class TrajectoryGenerator {
                 // Approach it a bit closer
                 .splineToLinearHeading(new Pose2d(.5, 31, Math.toRadians(240)), Math.toRadians(240))
                 // Competition change. Should line it up better
-                .forward(.5)
+                .forward(.75)
+                .waitSeconds(1)
+                .forward(0.001)
                 // Drop cone
                 .addDisplacementMarker(() -> {
                     robot.leftClaw.setPosition(Constants.leftClawOpen);
                     robot.rightClaw.setPosition(Constants.rightClawOpen);
                 })
+                .forward(0.001)
                 // Wait for cone to fall
                 .waitSeconds(0.25)
                 // Back up and lower slide
