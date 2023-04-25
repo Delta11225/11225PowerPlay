@@ -53,10 +53,15 @@ public abstract class ControlConfig {
      */
     public static void update(Gamepad pad1, Gamepad pad2) {
         // Update movement values. Currently set so that field 270 (facing drivers) is forward
-        forward = pad1.left_stick_y;
-        backward = -pad1.left_stick_y;
-        right = -pad1.left_stick_x;
-        left = pad1.left_stick_x;
+        if (pad2.touchpad_finger_1) {
+            forward = pad2.touchpad_finger_1_y;
+            right = pad2.touchpad_finger_1_x;
+        } else {
+            forward = 0;
+            right = 0;
+        }
+        backward = -forward;
+        left = -right;
         clockwise = pad1.right_stick_x;
 
         // Speed modifier values
